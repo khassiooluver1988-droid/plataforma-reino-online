@@ -1,0 +1,53 @@
+PLATAFORMA REINO — REGISTRO DE ATUALIZAÇÃO DO QUIZ
+Data: 27/09/2026
+
+Base aplicada: PROMPT MESTRE — QUIZ DO REINO
+
+QR-UPD-001 — DESIGN PRESERVADO
+Nenhum redesenho estrutural foi aplicado. Layout, cores, tipografia, cards, cabeçalho e rodapé foram mantidos.
+
+QR-UPD-002 — CRONÔMETRO REMOVIDO
+O limite de 30/15 segundos foi retirado do Quiz. O usuário responde sem pressão de tempo.
+
+QR-UPD-003 — HISTÓRIA CRISTÃ REMOVIDA
+A arena "História Cristã" foi retirada e a geração de perguntas dessa categoria foi desativada.
+
+QR-UPD-004 — VIDA CRISTÃ MANTIDA E PRIORIZADA
+A categoria "Vida Cristã" permanece ativa, com perguntas práticas do cotidiano cristão.
+
+QR-UPD-005 — NÍVEL EDITORIAL
+Cada pergunta passa a possuir nível editorial. Quando não houver classificação explícita, o padrão é "DESCOBERTA".
+Níveis suportados:
+- DESCOBERTA
+- CONHECIMENTO
+- APROFUNDAMENTO
+- MESTRE DO REINO
+
+QR-UPD-006 — CAMPOS EDITORIAIS
+A lógica passa a normalizar: dificuldade, tipo, status, classificação, fonte e tags, sem exigir alteração visual.
+
+QR-UPD-007 — ERRO COMO APRENDIZADO
+A resposta incorreta continua usando "QUASE!" e mostra resposta correta, explicação e referência bíblica.
+
+QR-UPD-008 — VER NA BÍBLIA
+O CTA foi padronizado para "VER NA BÍBLIA →".
+
+QR-UPD-009 — MÉTRICAS LOCAIS
+Foram adicionadas métricas locais de:
+- partidas iniciadas
+- perguntas respondidas
+- acertos
+- erros
+- aberturas da Bíblia
+- partidas concluídas
+- categorias respondidas
+
+QR-UPD-010 — TAXA DE DESCOBERTA BÍBLICA
+A lógica já possui cálculo para: aberturas da Bíblia / perguntas respondidas.
+
+QR-UPD-011 — BANCO EVOLUTIVO
+O Quiz deixa de bloquear a partida por não ter exatamente 1.000 perguntas. O banco pode crescer por lotes.
+
+QR-UPD-012 — TEXTO DE ENTRADA AJUSTADO
+Foram removidas promessas fixas de "1.000 perguntas" e "30s por desafio" da apresentação inicial.
+O foco passa a ser descoberta bíblica, aprendizado e vida cristã.

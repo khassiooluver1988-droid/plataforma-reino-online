@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071a34">
+  <meta name="description" content="Histórias que Inspiram — Plataforma Reino">
+  <title>História que Inspira | Plataforma Reino</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <script>try{const access=JSON.parse(localStorage.getItem('reino_access_granted_v2')||'{}');if(!access.connected){const back=encodeURIComponent('historia.html'+location.search+location.hash);location.replace('index.html?return='+back)}}catch{location.replace('index.html')}</script>
+  <link rel="stylesheet" href="assets/story.css">
+</head>
+<body class="story-page-body">
+  <header class="story-topbar"><a class="brand" href="index.html#historias"><span class="brand-mark">✦</span><span><strong>PLATAFORMA</strong><b>REINO</b></span></a><a class="button dark-outline" href="index.html#historias">← Voltar às histórias</a></header>
+  <main class="story-reader">
+    <section class="story-detail-hero" id="story-detail-hero">
+      <div class="story-detail-art" id="story-detail-art" aria-hidden="true"></div>
+      <div class="story-detail-copy"><span class="hero-label" id="story-category">HISTÓRIA ILUSTRATIVA</span><h1 id="story-title">Carregando história...</h1><p id="story-deck"></p><div class="story-audio-controls"><button class="button gold" type="button" id="story-play">▶ Ouvir história</button><button class="button outline" type="button" id="story-stop" disabled>Parar áudio</button></div><small>A narração utiliza uma voz em português disponível no seu navegador.</small></div>
+    </section>
+    <article class="story-article panel">
+      <div class="story-notice"><strong>Relato ilustrativo</strong><span>Personagens e situações foram criados para transmitir aprendizado e esperança. Não é um depoimento real.</span></div>
+      <div id="story-content"></div>
+      <blockquote id="story-verse"></blockquote>
+      <div class="story-reflection"><span class="eyebrow">PARA REFLETIR</span><h2 id="story-reflection-title"></h2><p id="story-reflection-text"></p></div>
+      <div class="story-end-actions"><a class="button navy" href="index.html#testemunhos">Compartilhar meu testemunho ↗</a><button class="button soft" type="button" id="story-share">Compartilhar esta história</button></div>
+    </article>
+  </main>
+  <footer class="story-footer"><strong>PLATAFORMA REINO</strong><span>Cristo é o encontro. A tecnologia é a ferramenta. As pessoas são a missão.</span></footer>
+  <script src="assets/story.js"></script>
+</body>
+</html>

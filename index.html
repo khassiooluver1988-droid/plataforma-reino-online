@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Plataforma Reino: conteúdo, Palavra, comunidade e propósito em um só lugar.">
+  <meta name="theme-color" content="#071a34">
+  <title>Plataforma Reino</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23071a34'/%3E%3Cpath d='M29 10h6v14h12v6H35v24h-6V30H17v-6h12z' fill='%23d8b05d'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <section class="auth-gate" id="auth-gate" aria-labelledby="access-title">
+    <div class="auth-brand-panel">
+      <img class="auth-cover-image" src="assets/capa-comunidade-rede.webp" alt="Comunidade cristã conectada pela Plataforma Reino">
+      <a class="brand" href="index.html" aria-label="Plataforma Reino"><span class="brand-mark">✦</span><span><strong>PLATAFORMA</strong><b>REINO</b></span></a>
+      <div class="auth-welcome-copy"><span class="hero-label">SEU PRIMEIRO ACESSO</span><h1>Entre uma vez.<br>Viva toda a jornada.</h1><p>Informe seus dados somente agora. Nos próximos acessos, este aparelho levará você diretamente para a Plataforma Reino.</p></div>
+      <small>Cristo é o encontro. A tecnologia é a ferramenta. As pessoas são a missão.</small>
+    </div>
+    <div class="auth-form-panel">
+      <form class="auth-card" id="first-access-form">
+        <span class="eyebrow">BEM-VINDO À PLATAFORMA REINO</span>
+        <h2 id="access-title">Faça seu primeiro acesso</h2>
+        <p>É rápido: depois desta entrada, você não precisará preencher novamente neste aparelho.</p>
+        <label>Como podemos chamar você?<input id="access-name" name="nome" required maxlength="80" autocomplete="name" placeholder="Seu nome ou apelido"></label>
+        <label>E-mail ou telefone<input id="access-login" name="login" required maxlength="120" autocomplete="username" placeholder="voce@email.com ou (86) 99999-9999"></label>
+        <label>Crie sua senha<input id="access-password" name="senha" type="password" required minlength="6" maxlength="80" autocomplete="new-password" placeholder="Mínimo de 6 caracteres"></label>
+        <label class="show-password"><input id="show-access-password" type="checkbox"><span>Mostrar senha</span></label>
+        <label class="consent-check"><input id="access-consent" type="checkbox" required><span>Concordo em salvar meu acesso somente neste aparelho.</span></label>
+        <button class="button gold full auth-enter-button" type="submit">ENTRAR NA PLATAFORMA →</button>
+        <div class="access-trust"><span>✓ Acesso único</span><span>✓ Senha protegida</span><span>✓ Dados neste aparelho</span></div>
+        <p class="auth-note">Este acesso demonstra a experiência da plataforma e não envia senha ou dados bancários.</p>
+      </form>
+    </div>
+  </section>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Navegação principal">
+      <a class="brand" href="index.html#inicio" aria-label="Plataforma Reino - início">
+        <span class="brand-mark" aria-hidden="true">✦</span>
+        <span><strong>PLATAFORMA</strong><b>REINO</b></span>
+      </a>
+
+      <nav class="nav-list">
+        <span class="nav-group-title">Explore a Plataforma</span>
+        <a href="index.html#inicio" data-route="inicio"><span>⌂</span><b>Início</b></a>
+        <a class="nav-highlight quiz-link" href="quiz.html"><span>?</span><b>Quiz do Reino</b><small>JOGAR</small></a>
+        <a href="index.html#biblioteca" data-route="biblioteca"><span>▥</span><b>Biblioteca</b></a>
+        <a href="index.html#herois" data-route="herois"><span>★</span><b>Heróis da Fé</b></a>
+        <a href="index.html#historias" data-route="historias"><span>✦</span><b>Histórias</b></a>
+        <a href="index.html#testemunhos" data-route="testemunhos"><span>“</span><b>Meu Testemunho</b></a>
+        <a href="index.html#conexao" data-route="conexao"><span>∞</span><b>Conexão Reino</b></a>
+        <a href="index.html#acolhimento" data-route="acolhimento"><span>♡</span><b>Acolhimento</b></a>
+        <a href="index.html#comunidade" data-route="comunidade"><span>♙</span><b>Comunidade</b></a>
+        <a class="nav-help" href="index.html#posso-ajudar" data-route="posso-ajudar"><span>＋</span><b>Posso Ajudar</b></a>
+        <a href="index.html#nossa-historia" data-route="nossa-historia"><span>R</span><b>Nossa História</b></a>
+      </nav>
+
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="mobile-menu" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button>
+        <div>
+          <span class="top-kicker">PLATAFORMA REINO</span>
+          <h1 id="page-title">Início</h1>
+        </div>
+
+        <div class="top-actions">
+          <button class="icon-button" id="theme-toggle" type="button" aria-label="Alternar contraste">◐</button>
+          <button class="profile-button" type="button" data-dialog="profile-dialog">
+            <span class="avatar" id="header-avatar">V</span>
+            <span><small>Bem-vindo</small><strong id="header-name">Visitante</strong></span>
+          </button>
+        </div>
+      </header>
+
+      <section class="page active" id="inicio" data-title="Início">
+        <section class="home-promos" aria-labelledby="home-promos-title">
+          <div class="promo-heading">
+            <div><span class="eyebrow">ESCOLHA SEU PRÓXIMO PASSO</span><h2 id="home-promos-title">Conteúdo que chama. Experiências que transformam.</h2></div>
+            <div class="promo-controls" aria-label="Controles dos banners">
+              <button type="button" id="promo-previous" aria-label="Banner anterior">←</button>
+              <button type="button" id="promo-next" aria-label="Próximo banner">→</button>
+            </div>
+          </div>
+
+          <div class="promo-carousel" id="promo-carousel" aria-live="polite" tabindex="0" aria-label="Banners interativos da Plataforma Reino. Use as setas do teclado para navegar.">
+            <article class="promo-slide promo-courses active" data-promo-slide="0">
+              <img class="promo-bg" src="assets/capa-cursos-igreja.webp" alt="Jovens aprendendo vídeo, som, design e comunicação para servir na igreja">
+              <div class="promo-copy"><span class="promo-tag">CURSOS GRATUITOS • TALENTO EM AÇÃO</span><h2>Seu talento pode servir ao Reino. Comece hoje.</h2><p>Aprenda Vídeo Maker, Social Media, Design, Som, Projeção e Fotografia para atuar com excelência na igreja e no mercado.</p><div class="promo-highlights"><span>Formação gratuita</span><span>Aplicação prática</span><span>Para jovens</span></div><a class="button gold" href="index.html#cursos">Quero desenvolver meu talento →</a></div>
+            </article>
+
+            <article class="promo-slide promo-care" data-promo-slide="1">
+              <img class="promo-bg" src="assets/banner-acolhimento.webp" alt="Uma pessoa oferecendo escuta e acolhimento a outra">
+              <div class="promo-copy"><span class="promo-tag">ACOLHIMENTO • ESCUTA • ESPERANÇA</span><h2>Se está pesado demais, você não precisa carregar sozinho.</h2><p>Encontre escuta sem julgamento, orientação responsável e um caminho seguro para pedir ajuda.</p><div class="promo-highlights"><span>Espaço seguro</span><span>Conversa guiada</span><span>Apoio responsável</span></div><a class="button gold" href="index.html#acolhimento">Encontrar acolhimento agora →</a></div>
+            </article>
+
+            <article class="promo-slide promo-testimony" data-promo-slide="2">
+              <img class="promo-bg" src="assets/banner-testemunho.webp" alt="Pessoa compartilhando um testemunho de fé com uma comunidade">
+              <div class="promo-copy"><span class="promo-tag">TESTEMUNHO • RECOMEÇO • ESPERANÇA</span><h2>O que Deus fez em você pode reacender a esperança de alguém.</h2><p>Compartilhe sua caminhada, transforme superação em encorajamento e mostre que recomeçar é possível.</p><div class="promo-highlights"><span>Sua história importa</span><span>Inspire pessoas</span><span>Compartilhe com cuidado</span></div><a class="button gold" href="index.html#testemunhos">Contar meu testemunho →</a></div>
+            </article>
+
+            <article class="promo-slide promo-quiz" data-promo-slide="3">
+              <img class="promo-bg" src="assets/banner-quiz.webp" alt="Jovem estudando a Bíblia durante o Quiz do Reino">
+              <div class="promo-copy"><span class="promo-tag">QUIZ BÍBLICO • 400 PERGUNTAS • RANKING</span><h2>Você conhece a Bíblia o suficiente para entrar no Top 5?</h2><p>Responda, aprenda com cada explicação bíblica, some pontos e dispute uma posição entre os melhores.</p><div class="promo-highlights"><span>Ranking Top 5</span><span>Sem repetição</span><span>Aprenda ao responder</span></div><a class="button gold" href="quiz.html">Aceitar o desafio →</a></div>
+            </article>
+
+            <article class="promo-slide promo-heroes" data-promo-slide="4">
+              <img class="promo-bg" src="assets/banner-herois.webp" alt="Homens e mulheres representando diferentes heróis da fé cristã">
+              <div class="promo-copy"><span class="promo-tag">HERÓIS DA FÉ • CORAGEM • LEGADO</span><h2>Eles enfrentaram o impossível e deixaram um legado de fé.</h2><p>Conheça vidas marcadas por coragem, missão, oração e serviço — e descubra o que você pode aprender com cada história.</p><div class="promo-highlights"><span>12 biografias</span><span>Histórias reais</span><span>Prova interativa</span></div><a class="button gold" href="index.html#herois">Conhecer esses legados →</a></div>
+            </article>
+
+            <article class="promo-slide promo-community" data-promo-slide="5">
+              <img class="promo-bg" src="assets/capa-comunidade-rede.webp" alt="Jovens cristãos reunidos com música, dança, teatro e produção audiovisual">
+              <div class="promo-copy"><span class="promo-tag">COMUNIDADE • TALENTOS • CONEXÕES</span><h2>Seu talento tem lugar. Sua voz também.</h2><p>Conecte-se com jovens de Teatro, Dança, Música, Louvor, Design, Audiovisual, Esportes e Ação Social.</p><div class="promo-highlights"><span>Novas amizades</span><span>Grupos por interesse</span><span>Projetos colaborativos</span></div><a class="button gold" href="index.html#comunidade">Entrar na Comunidade Reino →</a></div>
+            </article>
+          </div>
+
+          <div class="promo-dots" role="tablist" aria-label="Escolher banner">
+            <button class="active" type="button" data-promo-dot="0" aria-label="Mostrar Cursos Gratuitos" aria-selected="true"></button>
+            <button type="button" data-promo-dot="1" aria-label="Mostrar Acolhimento" aria-selected="false"></button>
+            <button type="button" data-promo-dot="2" aria-label="Mostrar Testemunhos" aria-selected="false"></button>
+            <button type="button" data-promo-dot="3" aria-label="Mostrar Quiz Bíblico e Ranking" aria-selected="false"></button>
+            <button type="button" data-promo-dot="4" aria-label="Mostrar Heróis da Fé" aria-selected="false"></button>
+            <button type="button" data-promo-dot="5" aria-label="Mostrar Comunidade Reino" aria-selected="false"></button>
+          </div>
+        </section>
+
+        <section class="home-categories" aria-labelledby="category-title">
+          <div class="section-heading"><div><span class="eyebrow">CONTEÚDO PARA O SEU DIA</span><h2 id="category-title">Escolha uma categoria</h2></div><p>Informação, conhecimento e acontecimentos vistos por uma perspectiva cristã.</p></div>
+          <div class="category-grid">
+            <a class="category-card informative" href="index.html#informativo"><img class="category-bg" src="assets/categoria-informativo.webp" alt="Pessoa pesquisando informações cristãs com Bíblia e computador"><span>01</span><small>INFORMATIVO</small><h3>Conteúdo que orienta e fortalece</h3><p>Reflexões, estudos e informações para viver a fé com sabedoria no cotidiano.</p><b>Abrir informativos →</b></a>
+            <a class="category-card curiosity" href="index.html#curiosidades"><img class="category-bg" src="assets/categoria-curiosidades.webp" alt="Bíblia, mapa antigo e objetos históricos representando descobertas bíblicas"><span>02</span><small>CURIOSIDADES</small><h3>Descobertas que aproximam da Palavra</h3><p>Contextos, personagens e detalhes bíblicos apresentados de forma clara e envolvente.</p><b>Descobrir curiosidades →</b></a>
+            <a class="category-card world" href="index.html#noticias"><img class="category-bg" src="assets/categoria-mundo.webp" alt="Voluntários cristãos servindo uma comunidade em uma missão internacional"><span>03</span><small>NOTÍCIAS CRISTÃS</small><h3>A fé em movimento no Brasil e no mundo</h3><p>Notícias, missões e acontecimentos relevantes para a comunidade cristã.</p><b>Ver notícias cristãs →</b></a>
+          </div>
+        </section>
+
+        <section class="daily-word-home" aria-label="Palavra do dia">
+          <img src="assets/categoria-curiosidades.webp" alt="Bíblia aberta iluminada pela luz da manhã">
+          <div class="daily-word-copy"><span class="hero-label">PALAVRA DO DIA</span><p>“Eu sou a videira; vocês são os ramos. Se alguém permanecer em mim e eu nele, esse dará muito fruto.”</p><strong>João 15:5</strong><div class="actions"><a class="button gold" href="index.html?book=john&chapter=15#palavra">Ler o capítulo completo →</a><button class="button outline" type="button" id="copy-daily">Compartilhar</button></div></div>
+        </section>
+
+        <section class="bible-home-cta" aria-labelledby="bible-invite-title">
+          <img src="assets/categoria-curiosidades.webp" alt="Bíblia aberta representando a Palavra de Deus">
+          <div><span class="hero-label">BÍBLIA COMPLETA • 66 LIVROS</span><h2 id="bible-invite-title">A Palavra que pode transformar o seu hoje está a um clique.</h2><p>Abra a Bíblia, escolha o livro e o capítulo e encontre direção para cada momento da sua caminhada.</p><a class="animated-bible-button bible-shaped-button" href="index.html#palavra"><span class="bible-book-icon" aria-hidden="true"><em>✝</em></span><b><small>ABRIR A</small>BÍBLIA SAGRADA</b><i>→</i></a><small>Leitura completa em português dentro da Plataforma Reino</small></div>
+        </section>
+
+        <section class="home-radio-dock" aria-label="Rádio Viver é Cristo">
+          <audio id="radio-stream" preload="none" crossorigin="anonymous"><source src="https://stream3.svrdedicado.org/8070/stream" type="audio/mpeg"></audio>
+          <div class="radio-brand"><span>♫</span><div><small>RÁDIO ONLINE • AO VIVO</small><strong>Viver é Cristo</strong></div></div>
+          <div class="home-radio-player"><button type="button" id="radio-toggle" class="round-button" aria-label="Ouvir rádio ao vivo">▶</button><div><strong id="radio-status">Clique para ouvir ao vivo</strong><span id="radio-detail">Louvores e mensagens 24 horas</span></div></div>
+          <label class="volume-control">Volume <input id="radio-volume" type="range" min="0" max="1" step="0.05" value="0.8"></label>
+        </section>
+      </section>
+
+      <section class="page editorial-page" id="noticias" data-title="Notícias Cristãs">
+        <div class="editorial-cover">
+          <img src="assets/capa-noticias-cristas.webp" alt="Bíblia, computador e ambiente editorial de notícias cristãs">
+          <div class="editorial-cover-copy"><span class="hero-label">NOTÍCIAS CRISTÃS • BRASIL E MUNDO</span><h2>Informação que amplia a visão e fortalece a oração.</h2><p>Acompanhe acontecimentos, missões, projetos bíblicos e histórias da Igreja com fontes identificadas.</p><button class="button gold" type="button" data-scroll-target="noticias-grid">Ver últimas matérias ↓</button></div>
+        </div>
+        <div class="editorial-toolbar"><div><span class="eyebrow">ACONTECEU NO MUNDO</span><h2>Notícias em destaque</h2></div><span class="editorial-badge">Atualizado em 24/09/2026</span></div>
+        <div class="news-grid" id="noticias-grid" data-editorial-grid="noticias"></div>
+        <p class="integrity-note">A Plataforma Reino resume conteúdos de fontes identificadas. Use o botão da matéria para conferir a publicação original.</p>
+      </section>
+
+      <section class="page editorial-page" id="informativo" data-title="Informativo">
+        <div class="editorial-cover editorial-cover-informativo">
+          <img src="assets/categoria-informativo.webp" alt="Capa do Informativo Reino com Bíblia e ambiente de pesquisa">
+          <div class="editorial-cover-copy"><span class="hero-label">INFORMATIVO REINO</span><h2>Entenda antes de compartilhar.</h2><p>Informações claras, orientação prática e conteúdo bíblico para decisões mais conscientes.</p><button class="button gold" type="button" data-scroll-target="informativo-grid">Explorar informativos ↓</button></div>
+        </div>
+        <div class="editorial-toolbar"><div><span class="eyebrow">CONTEÚDO QUE ORIENTA</span><h2>Informativos para a vida cristã</h2></div><span class="editorial-badge">Leitura responsável</span></div>
+        <div class="news-grid" id="informativo-grid" data-editorial-grid="informativo"></div>
+      </section>
+
+      <section class="page editorial-page" id="curiosidades" data-title="Curiosidades Bíblicas">
+        <div class="editorial-cover editorial-cover-curiosidades">
+          <img src="assets/categoria-curiosidades.webp" alt="Capa de curiosidades bíblicas com Bíblia, mapa e objetos históricos">
+          <div class="editorial-cover-copy"><span class="hero-label">CURIOSIDADES BÍBLICAS</span><h2>Detalhes que tornam a leitura ainda mais fascinante.</h2><p>Conheça contextos, traduções, personagens e fatos históricos que ajudam a compreender as Escrituras.</p><button class="button gold" type="button" data-scroll-target="curiosidades-grid">Descobrir agora ↓</button></div>
+        </div>
+        <div class="editorial-toolbar"><div><span class="eyebrow">BÍBLIA • HISTÓRIA • CONTEXTO</span><h2>Aprenda algo novo hoje</h2></div><span class="editorial-badge">Conhecimento com referência</span></div>
+        <div class="news-grid" id="curiosidades-grid" data-editorial-grid="curiosidades"></div>
+      </section>
+
+      <section class="page" id="viver" data-title="Viver é Cristo">
+        <div class="page-intro"><span class="eyebrow">WEB RÁDIO E CONTEÚDO</span><h2>Viver é Cristo</h2><p>Louvor e conteúdo cristão ao vivo para acompanhar sua jornada.</p></div>
+        <div>
+          <article class="panel">
+            <span class="eyebrow">RÁDIO FIXA NA PÁGINA INICIAL</span><h3>Ouça enquanto navega</h3><p>A Rádio Viver é Cristo agora está disponível na parte inferior da página inicial, com controle de reprodução e volume.</p>
+          </article>
+          <article class="panel top-gap">
+            <span class="eyebrow">CONTEÚDOS RECENTES</span>
+            <div class="content-list">
+              <a href="index.html?book=philippians&chapter=4#palavra" target="_blank" rel="noopener"><span><small>DEVOCIONAL</small><strong>A paz em dias difíceis</strong></span><b>Ler ↗</b></a>
+              <a href="index.html?book=matthew&chapter=6#palavra" target="_blank" rel="noopener"><span><small>ORAÇÃO</small><strong>Um coração sincero</strong></span><b>Ler ↗</b></a>
+              <a href="index.html?book=james&chapter=2#palavra" target="_blank" rel="noopener"><span><small>PROPÓSITO</small><strong>Fé que se torna ação</strong></span><b>Ler ↗</b></a>
+            </div>
+            <p class="source-note">Transmissão fornecida pela Rádio Gospel. O áudio depende da conexão com a internet.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="page" id="palavra" data-title="Palavra">
+        <div class="page-intro"><span class="eyebrow">BÍBLIA COMPLETA • 66 LIVROS</span><h2>Palavra de Deus</h2><p>Leia os 1.189 capítulos e 31.098 versículos da edição histórica de João Ferreira de Almeida.</p></div>
+        <div class="bible-layout">
+          <article class="panel books-panel">
+            <label class="search-box"><span>⌕</span><input id="bible-search" type="search" placeholder="Buscar livro..." autocomplete="off"></label>
+            <div class="book-grid" id="book-grid" aria-live="polite"></div>
+          </article>
+          <article class="panel reading-panel" id="reading-panel">
+            <span class="eyebrow">LEITURA SELECIONADA</span>
+            <div class="bible-controls"><label>Livro<select id="bible-book-select"></select></label><label>Capítulo<select id="bible-chapter-select"></select></label></div>
+            <div class="chapter-navigation"><button class="button soft" type="button" id="previous-chapter">← Anterior</button><h3 id="reading-title">João 3</h3><button class="button soft" type="button" id="next-chapter">Próximo →</button></div>
+            <div id="verse-list" class="verse-list" aria-live="polite"></div>
+            <div class="actions">
+              <button class="button navy" type="button" id="favorite-verse">♡ Favoritar capítulo</button>
+              <button class="button soft" type="button" id="share-verse">Compartilhar referência</button>
+            </div>
+            <small class="source-note">Tradução histórica de João Ferreira de Almeida • domínio público.</small>
+          </article>
+        </div>
+      </section>
+
+      <section class="page" id="podcasts" data-title="Podcasts">
+        <div class="page-intro"><span class="eyebrow">OUÇA • APRENDA • COMPARTILHE</span><h2>Podcasts do Reino</h2><p>Uma central para descobrir conversas bíblicas, estudos e mensagens cristãs em áudio.</p></div>
+        <div class="podcast-featured">
+          <article class="podcast-cover"><span>EM DESTAQUE</span><strong>REINO<br>CAST</strong><small>Conversas que apontam para Cristo</small></article>
+          <article class="panel podcast-copy"><span class="eyebrow">EPISÓDIO DE APRESENTAÇÃO</span><h3>Fé para a vida real</h3><p>Este espaço está pronto para receber episódios próprios da Plataforma Reino, séries de igrejas e criadores cristãos parceiros.</p><div class="topic-tags"><span>Bíblia</span><span>Vida cristã</span><span>Brasil</span></div><button class="button navy" type="button" id="follow-podcast">＋ Seguir o ReinoCast</button></article>
+        </div>
+        <div class="section-heading compact-heading"><div><span class="eyebrow">PARA COMEÇAR</span><h2>Conteúdo cristão confiável</h2></div><p>Os links abaixo levam aos canais oficiais na mesma janela.</p></div>
+        <div class="media-grid">
+          <article class="media-card"><span class="media-number">01</span><small>TEOLOGIA • PORTUGUÊS</small><h3>BTCast</h3><p>Conversas sobre Bíblia e teologia a serviço do crescimento da igreja brasileira.</p><a class="button soft" href="https://bibotalk.com/categoria/podcast/" target="_blank" rel="noopener noreferrer">Ouvir no canal oficial ↗</a></article>
+          <article class="media-card"><span class="media-number">02</span><small>BÍBLIA • ESTUDO</small><h3>BibleProject Podcast</h3><p>Temas, personagens e histórias bíblicas explorados em conversas aprofundadas.</p><a class="button soft" href="https://bibleproject.com/podcasts/" target="_blank" rel="noopener noreferrer">Abrir podcast oficial ↗</a></article>
+          <article class="media-card"><span class="media-number">03</span><small>ÁUDIO • 24 HORAS</small><h3>Viver é Cristo</h3><p>Continue ouvindo louvor e mensagens na rádio online integrada à plataforma.</p><a class="button soft" href="index.html#viver" target="_blank" rel="noopener">Ouvir rádio ↗</a></article>
+        </div>
+        <p class="integrity-note">Curadoria não significa concordância com todo conteúdo. Cada publicação própria deverá informar autor, igreja ou ministério e base bíblica.</p>
+      </section>
+
+      <section class="page" id="biblioteca" data-title="Biblioteca">
+        <div class="section-cover cover-library"><img src="assets/noticia-estudo-biblico.webp" alt="Jovens estudando livros cristãos e a Bíblia"><div><span class="hero-label">BIBLIOTECA DO REINO</span><h2>Conhecimento que fortalece. Palavra que transforma.</h2><p>Descubra livros cristãos em português, planos de leitura e conteúdos que ajudam você a crescer com discernimento.</p></div></div>
+        <div class="page-intro"><span class="eyebrow">BIBLIOTECA DO REINO • EM PORTUGUÊS</span><h2>20 livros evangélicos para conhecer</h2><p>Uma seleção em português com clássicos, fundamentos da fé, discipulado, oração, biografias e cuidado emocional.</p></div>
+        <article class="library-banner"><div><span class="hero-label">COLEÇÃO EVANGÉLICA</span><h3>Leia com discernimento.<br>Volte sempre à Palavra.</h3><p>Conheça cada obra, seu autor e por que ela pode contribuir para sua caminhada.</p></div><strong>20<small>livros evangélicos<br>em português</small></strong></article>
+        <div class="library-toolbar panel"><label class="search-box"><span>⌕</span><input id="library-search" type="search" placeholder="Buscar título, autor ou tema..."></label><div class="filter-pills"><button class="active" type="button" data-library-filter="Todos">Todos</button><button type="button" data-library-filter="Livros">20 livros</button><button type="button" data-library-filter="Clássicos">Clássicos</button><button type="button" data-library-filter="Discipulado">Discipulado</button><button type="button" data-library-filter="Oração">Oração</button><button type="button" data-library-filter="Biografias">Biografias</button><button type="button" data-library-filter="Planos">Planos bíblicos</button></div></div>
+        <div class="library-grid" id="library-grid" aria-live="polite"></div>
+        <article class="panel library-principle"><span class="feature-icon">▤</span><div><span class="eyebrow">NOSSO COMPROMISSO</span><h3>A Biblioteca aponta para a Bíblia</h3><p>O catálogo apresenta as obras, mas não reproduz livros protegidos. A disponibilidade depende das editoras e livrarias. Livros ajudam; a Palavra fundamenta.</p></div><a class="button navy" href="index.html#palavra" target="_blank" rel="noopener">Ler a Bíblia ↗</a></article>
+      </section>
+
+      <section class="page" id="herois" data-title="Heróis da Fé">
+        <div class="heroes-hero section-cover"><img src="assets/banner-herois.webp" alt="Representação de homens e mulheres que deixaram um legado cristão"><div><span class="hero-label">HERÓIS DA FÉ</span><h2>Vidas comuns.<br>Fé extraordinária.</h2><p>Homens e mulheres que serviram a Cristo por meio da Reforma, missões, oração, justiça, evangelização e serviço ao próximo.</p></div><div class="heroes-emblem"><strong>12</strong><span>histórias<br>de legado</span></div></div>
+        <div class="section-heading"><div><span class="eyebrow">CONHEÇA O LEGADO</span><h2>Pessoas de épocas e lugares diferentes</h2></div><p>Nenhuma delas foi perfeita. O objetivo é aprender com sua coragem, seus limites e sua dedicação.</p></div>
+        <div class="heroes-filter" role="group" aria-label="Filtrar heróis"><button class="active" type="button" data-hero-filter="Todos">Todos</button><button type="button" data-hero-filter="Reforma">Reforma</button><button type="button" data-hero-filter="Missões">Missões</button><button type="button" data-hero-filter="Serviço">Serviço</button><button type="button" data-hero-filter="Brasil">Brasil</button></div>
+        <div class="heroes-grid" id="heroes-grid" aria-live="polite"></div>
+
+        <article class="faith-challenge panel">
+          <div class="challenge-intro"><span class="eyebrow">PROVA • HERÓIS DA FÉ</span><h2>O que você aprendeu?</h2><p>Responda cinco perguntas. A explicação aparece depois de cada resposta.</p><div class="challenge-score"><span>ACERTOS</span><strong id="heroes-score">0/5</strong></div></div>
+          <div class="challenge-game" id="heroes-quiz"><span class="question-category" id="heroes-question-number">PERGUNTA 1 DE 5</span><h3 id="heroes-question"></h3><div class="heroes-options" id="heroes-options"></div><div class="heroes-feedback hidden" id="heroes-feedback"></div><button class="button navy hidden" type="button" id="heroes-next">Próxima pergunta</button></div>
+        </article>
+      </section>
+
+      <section class="page" id="missoes" data-title="Missões">
+        <div class="missions-hero visual-hero"><img src="assets/capa-missoes-v2.webp" alt="Missionários servindo famílias no Brasil e no mundo"><div><span class="hero-label">MISSÕES • BRASIL E MUNDO</span><h2>Onde existe uma necessidade, existe uma oportunidade de servir.</h2><p>Conheça notícias missionárias, projetos responsáveis e caminhos para transformar oração em presença, cuidado e esperança.</p><button class="button gold" type="button" data-scroll-target="mission-news">Ver notícias de missões ↓</button></div></div>
+        <div class="section-heading" id="mission-news"><div><span class="eyebrow">NOTÍCIAS MISSIONÁRIAS</span><h2>A fé atravessando fronteiras</h2></div><p>Histórias e iniciativas apresentadas a partir de fontes missionárias identificadas.</p></div>
+        <div class="mission-news-grid">
+          <article class="mission-news-card"><img src="assets/capa-comunidade-rede.webp" alt="Jovens brasileiros mobilizados para servir"><div><small>BRASIL • CAMPANHA 2026</small><h3>“Para que todo o Brasil ouça” mobiliza igrejas e voluntários</h3><p>A campanha reúne materiais, oração e ações para levar a missão das igrejas para as ruas e comunidades brasileiras.</p><a href="https://missoesnacionais.org.br/blog/campanha-2026-conteudo-do-blog-do-promotor/" rel="noopener noreferrer">Ler na fonte oficial →</a></div></article>
+          <article class="mission-news-card"><img src="assets/capa-missoes-v2.webp" alt="Voluntários em ação missionária humanitária"><div><small>AMÉRICA LATINA • 2026</small><h3>Resposta humanitária leva esperança a famílias na Venezuela</h3><p>Equipes missionárias ampliaram ações de cuidado após terremotos, unindo ajuda prática e acompanhamento.</p><a href="https://missoesmundiais.com.br/46-campanha" rel="noopener noreferrer">Ler na fonte oficial →</a></div></article>
+          <article class="mission-news-card"><img src="assets/noticia-igreja-mundo.webp" alt="Cristãos de várias nações unidos em oração"><div><small>IGREJA PERSEGUIDA • MUNDO</small><h3>Jovens se unem em oração por cristãos perseguidos</h3><p>Mobilizações ajudam novas gerações a conhecer, interceder e agir com responsabilidade.</p><a href="https://portasabertas.org.br/" rel="noopener noreferrer">Ler na fonte oficial →</a></div></article>
+          <article class="mission-news-card"><img src="assets/capa-comunidade-rede.webp" alt="Jovens usando música e criatividade na missão"><div><small>URUGUAI • 2026</small><h3>Quando a música abre portas para o Evangelho</h3><p>Uma ação missionária mostrou como arte, relacionamento e serviço podem aproximar pessoas.</p><a href="https://missoesmundiais.com.br/noticias/35-europa" rel="noopener noreferrer">Ler na fonte oficial →</a></div></article>
+        </div>
+        <div class="section-heading"><div><span class="eyebrow">QUATRO FRENTES</span><h2>Onde podemos servir</h2></div><p>Cada frente abre caminhos para oração, voluntariado, formação e parceria com igrejas locais.</p></div>
+        <div class="mission-grid">
+          <article class="mission-card"><span class="mission-code">01</span><small>MISSÃO LOCAL</small><h3>Cuidar da cidade</h3><p>Ações de escuta, apoio a famílias, visitas, arrecadações e serviço junto a igrejas e organizações responsáveis.</p><button type="button" data-mission="Missão local">Tenho interesse</button></article>
+          <article class="mission-card"><span class="mission-code">02</span><small>MISSÃO DIGITAL</small><h3>Comunicar esperança</h3><p>Produção de vídeos, podcasts, estudos, design e tecnologia para levar conteúdo bíblico a quem está conectado.</p><button type="button" data-mission="Missão digital">Quero colaborar</button></article>
+          <article class="mission-card"><span class="mission-code">03</span><small>MISSÃO SOCIAL</small><h3>Fé que se torna cuidado</h3><p>Projetos de capacitação, alimentação, acolhimento e encaminhamento, respeitando proteção, transparência e dignidade.</p><button type="button" data-mission="Missão social">Quero ajudar</button></article>
+          <article class="mission-card"><span class="mission-code">04</span><small>MISSÃO GLOBAL</small><h3>Servir entre culturas</h3><p>Oração, preparo intercultural e parceria com organizações missionárias que atuam de forma ética e supervisionada.</p><button type="button" data-mission="Missão global">Conhecer melhor</button></article>
+        </div>
+        <article class="panel mission-interest"><div><span class="eyebrow">MEU INTERESSE MISSIONÁRIO</span><h3 id="mission-interest-count">Nenhuma frente selecionada</h3><p>Nesta demonstração, a escolha fica salva somente neste aparelho.</p></div><button class="text-button" id="clear-missions" type="button">Limpar escolhas</button></article>
+        <p class="integrity-note">Projetos missionários reais deverão apresentar liderança responsável, igreja ou organização parceira, política de proteção, prestação de contas e canais de denúncia.</p>
+      </section>
+
+      <section class="page" id="historias" data-title="Histórias que Inspiram">
+        <div class="section-cover cover-stories"><img src="assets/banner-testemunho.webp" alt="Pessoa compartilhando uma história de fé e recomeço"><div><span class="hero-label">HISTÓRIAS QUE INSPIRAM</span><h2>Uma história pode mudar o rumo de outra vida.</h2><p>Leia e ouça relatos ilustrados sobre fé, serviço, coragem, recomeço e solidariedade.</p></div></div>
+        <div class="page-intro"><span class="eyebrow">TEXTO • ILUSTRAÇÃO • ÁUDIO</span><h2>Escolha uma história</h2><p>Clique para abrir a narrativa completa, acompanhar a ilustração e ouvir o conteúdo na mesma janela.</p></div>
+        <div class="story-hub-grid">
+          <a class="inspiring-story ocean" href="historia.html?id=ponte" target="_blank" rel="noopener"><div class="story-illustration" aria-hidden="true"><svg viewBox="0 0 320 180"><circle cx="250" cy="45" r="24"/><path d="M0 145 Q70 110 135 145 T320 145 V180 H0Z"/><path d="M55 132 Q160 45 265 132" fill="none"/><path d="M95 105v44M225 105v44"/></svg></div><div><small>MISSÃO • COMUNIDADE</small><h3>A ponte que começou com uma conversa</h3><p>Uma jovem decidiu escutar antes de tentar mudar o bairro.</p><b>Ler e ouvir história ↗</b></div></a>
+          <a class="inspiring-story sunrise" href="historia.html?id=caderno" target="_blank" rel="noopener"><div class="story-illustration" aria-hidden="true"><svg viewBox="0 0 320 180"><circle cx="75" cy="55" r="30"/><path d="M0 150 L85 90 L145 135 L220 70 L320 150 V180 H0Z"/><path d="M130 125h60v42h-60z"/></svg></div><div><small>EDUCAÇÃO • PROPÓSITO</small><h3>O caderno que abriu uma porta</h3><p>Um curso gratuito transformou insegurança em primeiro trabalho.</p><b>Ler e ouvir história ↗</b></div></a>
+          <a class="inspiring-story green" href="historia.html?id=mesa" target="_blank" rel="noopener"><div class="story-illustration" aria-hidden="true"><svg viewBox="0 0 320 180"><circle cx="160" cy="75" r="48"/><path d="M80 132h160v18H80zM105 150v30M215 150v30"/><circle cx="125" cy="70" r="16"/><circle cx="195" cy="70" r="16"/></svg></div><div><small>SERVIÇO • DIGNIDADE</small><h3>Quando a mesa ficou maior</h3><p>Uma pequena igreja descobriu que repartir também é aprender nomes.</p><b>Ler e ouvir história ↗</b></div></a>
+          <a class="inspiring-story violet" href="historia.html?id=recomeco" target="_blank" rel="noopener"><div class="story-illustration" aria-hidden="true"><svg viewBox="0 0 320 180"><path d="M35 155 Q90 35 160 145 Q230 35 285 155" fill="none"/><circle cx="160" cy="65" r="25"/><path d="M160 90v65M125 120h70"/></svg></div><div><small>TESTEMUNHO • RECOMEÇO</small><h3>O dia em que pedir ajuda virou coragem</h3><p>Depois de uma perda, ele descobriu que fé e cuidado caminham juntos.</p><b>Ler e ouvir história ↗</b></div></a>
+        </div>
+        <p class="integrity-note">As quatro histórias são ilustrativas e usam personagens fictícios. Elas não devem ser apresentadas como depoimentos reais.</p>
+      </section>
+
+      <section class="page" id="testemunhos" data-title="Meu Testemunho">
+        <div class="testimony-hero section-cover"><img src="assets/banner-testemunho.webp" alt="Pessoa compartilhando um testemunho cristão"><div><span class="hero-label">MEU TESTEMUNHO</span><h2>Sua história pode acender esperança.</h2><p>Conte o que Deus fez, o que você aprendeu ou como encontrou forças para continuar.</p></div><strong>“Eles o venceram pelo sangue do Cordeiro e pela palavra do testemunho.”<small>Apocalipse 12:11</small></strong></div>
+        <div class="two-columns top-gap">
+          <form class="panel public-testimony-form" name="testemunho-reino" method="POST" data-netlify="true" netlify-honeypot="empresa-site" action="index.html#testemunhos">
+            <input type="hidden" name="form-name" value="testemunho-reino"><p class="hidden"><label>Não preencher: <input name="empresa-site"></label></p>
+            <span class="eyebrow">ENVIAR TESTEMUNHO</span><h3>Compartilhe com responsabilidade</h3>
+            <div class="form-grid"><label>Nome ou apelido<input name="nome" required maxlength="80" placeholder="Como deseja ser identificado"></label><label>Cidade<input name="cidade" maxlength="80" placeholder="Sua cidade"></label></div>
+            <label>Título do testemunho<input name="titulo" required maxlength="120" placeholder="Ex.: Quando encontrei forças para recomeçar"></label>
+            <label>Seu relato<textarea name="testemunho" required maxlength="1500" placeholder="Conte sua história sem informar dados sensíveis de outras pessoas."></textarea></label>
+            <label class="consent-check"><input type="checkbox" name="autorizacao" required><span>Autorizo a equipe a analisar este relato. A publicação dependerá de revisão e novo consentimento.</span></label>
+            <button class="button gold" type="submit">Enviar para análise</button>
+          </form>
+          <aside class="panel testimony-guidelines"><span class="eyebrow">ANTES DE ENVIAR</span><h3>Proteja você e outras pessoas</h3><ul><li>Não informe endereço, documentos ou telefone.</li><li>Não exponha crianças ou terceiros sem autorização.</li><li>Evite promessas de cura ou aconselhamento médico.</li><li>A equipe deverá revisar todo relato antes da publicação.</li></ul><a class="button navy" href="index.html#historias" target="_blank" rel="noopener">Ver histórias ilustrativas ↗</a></aside>
+        </div>
+      </section>
+
+      <section class="page" id="cursos" data-title="Cursos Gratuitos">
+        <div class="courses-hero visual-hero"><img src="assets/capa-cursos-igreja.webp" alt="Jovens aprendendo vídeo, som, projeção e design para servir na igreja"><div><span class="hero-label">MÍDIA • CRIATIVIDADE • MINISTÉRIO</span><h2>Aprenda uma habilidade. Coloque seu talento a serviço.</h2><p>Cursos e trilhas gratuitas para jovens atuarem com vídeo, redes sociais, som, projeção, fotografia e design na igreja.</p></div></div>
+        <div class="ministry-skills"><span>🎥 Vídeo Maker</span><span>📱 Social Media</span><span>🎚 Som</span><span>🖥 Projeção</span><span>✦ Design</span><span>📷 Fotografia</span></div>
+        <div class="section-heading"><div><span class="eyebrow">FORMAÇÃO PARA SERVIR</span><h2>Escolha a habilidade que deseja desenvolver</h2></div><p>Os conteúdos levam a plataformas oficiais e podem ser aplicados à comunicação da igreja.</p></div>
+        <div class="course-filter"><button class="active" type="button" data-course-filter="Todos">Todos</button><button type="button" data-course-filter="Mídia para Igreja">Mídia para igreja</button><button type="button" data-course-filter="Marketing">Marketing</button><button type="button" data-course-filter="Vendas">Vendas</button><button type="button" data-course-filter="Telemarketing e Atendimento">Atendimento</button><button type="button" data-course-filter="Administração e Negócios">Administração</button><button type="button" data-course-filter="Tecnologia e Informática">Tecnologia</button><button type="button" data-course-filter="Comunicação e RH">Comunicação</button></div>
+        <div class="courses-grid" id="courses-grid" aria-live="polite"></div>
+        <p class="integrity-note">“Gratuito” refere-se ao acesso informado pelos provedores na data da pesquisa. Algumas plataformas exigem cadastro; provas ou certificados específicos podem ter regras próprias. Menores devem verificar a idade exigida e contar com orientação do responsável.</p>
+      </section>
+
+      <section class="page" id="nossa-historia" data-title="Nossa História">
+        <div class="institutional-hero section-cover"><img src="assets/capa-noticias-cristas.webp" alt="Bíblia, comunicação e tecnologia representando a história da Plataforma Reino"><div><span class="hero-label">NOSSA HISTÓRIA</span><h2>Uma plataforma criada para conectar fé, cuidado e propósito.</h2><p>A Plataforma Reino nasceu do desejo de usar a tecnologia para aproximar pessoas da Palavra e umas das outras.</p></div></div>
+        <div class="values-grid">
+          <article class="panel"><span class="eyebrow">QUEM SOMOS</span><h3>Uma ponte para a caminhada cristã</h3><p>A Plataforma Reino nasce para aproximar pessoas da Palavra, fortalecer vínculos saudáveis e criar caminhos de aprendizado, cuidado e participação.</p></article>
+          <article class="panel"><span class="eyebrow">MISSÃO</span><h3>Conectar pessoas a Cristo e ao propósito</h3><p>Oferecer experiências digitais bíblicas, acessíveis e responsáveis que apoiem a fé, a formação e a vida em comunidade.</p></article>
+          <article class="panel"><span class="eyebrow">VISÃO</span><h3>Ser uma referência cristã no Brasil</h3><p>Construir um ecossistema reconhecido por conteúdo confiável, inovação, acolhimento e parceria com igrejas e organizações sérias.</p></article>
+          <article class="panel"><span class="eyebrow">VALORES</span><h3>Verdade, serviço e responsabilidade</h3><p>Cristo no centro, Bíblia como fundamento, respeito às pessoas, transparência, proteção dos vulneráveis e fortalecimento da igreja local.</p></article>
+        </div>
+        <article class="panel manifesto"><span>REINO</span><div><h3>Nossa frase orientadora</h3><blockquote>“Cristo é o encontro. A tecnologia é a ferramenta. As pessoas são a missão.”</blockquote></div></article>
+      </section>
+
+      <section class="page" id="posso-ajudar" data-title="Posso Ajudar">
+        <div class="section-cover cover-help"><img src="assets/capa-missoes-v2.webp" alt="Voluntários cristãos servindo pessoas e comunidades"><div><span class="hero-label">POSSO AJUDAR</span><h2>Seu talento pode se transformar em cuidado.</h2><p>Encontre maneiras de servir com oração, comunicação, música, ensino, ação social, acolhimento e missões.</p></div></div>
+        <div class="help-opportunities"><article><span>♡</span><h3>Acolher pessoas</h3><p>Ajude em ações de escuta, visitas e apoio responsável.</p></article><article><span>♫</span><h3>Servir com talentos</h3><p>Música, teatro, dança, vídeo, design e comunicação.</p></article><article><span>◎</span><h3>Apoiar missões</h3><p>Ore, participe e colabore com projetos transparentes.</p></article><article><span>▣</span><h3>Ensinar e capacitar</h3><p>Compartilhe conhecimento profissional e bíblico.</p></article></div>
+        <div class="page-intro"><span class="eyebrow">QUERO PARTICIPAR</span><h2>Conte como você deseja ajudar</h2><p>Envie uma proposta de voluntariado, parceria, conteúdo ou participação.</p></div>
+        <div class="contact-layout">
+          <form class="panel contact-form" name="contato-reino" method="POST" data-netlify="true" netlify-honeypot="site-confirmacao" action="index.html#posso-ajudar">
+            <input type="hidden" name="form-name" value="contato-reino"><p class="hidden"><label>Não preencher: <input name="site-confirmacao"></label></p>
+            <div class="form-grid"><label>Nome<input name="nome" required maxlength="100" placeholder="Seu nome"></label><label>E-mail<input name="email" type="email" required placeholder="voce@email.com"></label></div>
+            <label>Assunto<select name="assunto" required><option value="">Selecione</option><option>Parceria missionária</option><option>Enviar conteúdo</option><option>Curso ou formação</option><option>Comunidade e grupos</option><option>Suporte técnico</option><option>Outro assunto</option></select></label>
+            <label>Mensagem<textarea name="mensagem" required maxlength="1200" placeholder="Como podemos ajudar?"></textarea></label>
+            <label class="consent-check"><input type="checkbox" required name="consentimento"><span>Autorizo o uso destes dados somente para responder ao contato.</span></label>
+            <button class="button gold" type="submit">Enviar mensagem</button>
+          </form>
+          <aside class="panel contact-aside"><span class="eyebrow">CANAIS DA PLATAFORMA</span><h3>Escolha o motivo do contato</h3><div><b>Conteúdo</b><p>Podcasts, livros, estudos e histórias.</p></div><div><b>Missões</b><p>Projetos, voluntariado e parcerias.</p></div><div><b>Comunidade</b><p>Grupos, atividades e conexões.</p></div><small>Após publicar no Netlify, os formulários aparecem no painel de Forms do projeto.</small></aside>
+        </div>
+      </section>
+
+      <section class="page" id="conexao" data-title="Conexão Reino">
+        <div class="section-cover cover-connection"><img src="assets/capa-comunidade-rede.webp" alt="Jovens cristãos conectados por interesses e propósito"><div><span class="hero-label">CONEXÃO REINO</span><h2>Ninguém precisa caminhar sozinho.</h2><p>Encontre oração, pequenos grupos, mentoria e pessoas que compartilham a mesma fé e os mesmos interesses.</p></div></div>
+        <div class="connection-grid">
+          <article class="connection-card prayer"><span class="connection-icon">✦</span><small>ORAÇÃO</small><h3>Sala de oração</h3><p>Compartilhe um pedido com respeito e receba apoio da comunidade.</p><button class="button gold" type="button" data-connection="oração">Entrar na sala</button></article>
+          <article class="connection-card"><span class="connection-icon">◎</span><small>PEQUENOS GRUPOS</small><h3>Estudo em grupo</h3><p>Caminhe por um plano bíblico com outras pessoas e compartilhe aprendizados.</p><button class="button soft" type="button" data-connection="grupo de estudo">Tenho interesse</button></article>
+          <article class="connection-card"><span class="connection-icon">◇</span><small>ACOMPANHAMENTO</small><h3>Mentoria cristã</h3><p>Registre seu interesse em conversar com uma liderança cristã validada.</p><button class="button soft" type="button" data-connection="mentoria">Solicitar contato</button></article>
+          <article class="connection-card local"><span class="connection-icon">♙</span><small>COMUNIDADE</small><h3>Encontre pessoas com os mesmos interesses</h3><p>Participe de grupos de música, teatro, dança, mídia, estudos e ação social.</p><a class="button navy" href="index.html#comunidade">Explorar comunidade →</a></article>
+        </div>
+        <article class="panel connection-status"><div><span class="eyebrow">MEUS INTERESSES</span><h3 id="connection-count">Nenhuma conexão solicitada</h3><p>Seus interesses ficam salvos somente neste aparelho nesta versão.</p></div><button class="text-button" type="button" id="clear-connections">Limpar</button></article>
+      </section>
+
+      <section class="page" id="acolhimento" data-title="Acolhimento">
+        <div class="care-hero section-cover">
+          <img src="assets/banner-acolhimento.webp" alt="Pessoa recebendo acolhimento e apoio em um momento difícil">
+          <div><span class="hero-label">ACOLHIMENTO REINO</span><h2>Você importa. Sua dor merece cuidado.</h2><p>Se hoje está difícil, pare um instante. Aqui você encontra escuta guiada, palavras de esperança e caminhos seguros para pedir ajuda.</p><div class="care-hero-actions"><button class="button gold" type="button" id="start-care-chat">Quero conversar</button><a class="button outline" href="tel:188">Ligar gratuitamente 188</a></div></div>
+          <blockquote>“Perto está o Senhor dos que têm o coração quebrantado.”<strong>Salmos 34:18</strong></blockquote>
+        </div>
+
+        <aside class="urgent-help" role="note" aria-label="Ajuda imediata">
+          <span class="urgent-icon">!</span><div><strong>Está em perigo ou pensando em se machucar?</strong><p>Não fique sozinho. Ligue para o CVV no 188, procure alguém de confiança que possa ficar com você ou, em uma emergência, ligue 192.</p></div><div class="urgent-actions"><a href="tel:188">CVV 188</a><a href="https://cvv.org.br/chat/" target="_blank" rel="noopener noreferrer">Chat do CVV ↗</a><a href="tel:192">SAMU 192</a></div>
+        </aside>
+
+        <div class="section-heading compact-heading"><div><span class="eyebrow">COMO VOCÊ ESTÁ?</span><h2>Escolha o que mais se aproxima</h2></div><p>Não é diagnóstico. É apenas um primeiro passo para organizar o que você sente.</p></div>
+        <div class="feeling-grid">
+          <button type="button" data-feeling="ansiedade"><span>≈</span><strong>Ansiedade</strong><small>Minha mente não desacelera</small></button>
+          <button type="button" data-feeling="tristeza"><span>○</span><strong>Tristeza profunda</strong><small>Está difícil encontrar forças</small></button>
+          <button type="button" data-feeling="luto"><span>◇</span><strong>Luto ou perda</strong><small>Estou enfrentando uma ausência</small></button>
+          <button type="button" data-feeling="autoestima"><span>♡</span><strong>Baixa autoestima</strong><small>Não consigo reconhecer meu valor</small></button>
+        </div>
+        <article class="panel care-suggestion hidden" id="care-suggestion" aria-live="polite"></article>
+
+        <div class="care-layout top-gap" id="guided-chat">
+          <article class="panel guided-chat">
+            <div class="chat-head"><div class="chat-symbol">♡</div><div><span class="eyebrow">CONVERSA GUIADA</span><h3>Acolhimento automático</h3></div><span class="chat-status">Disponível agora</span></div>
+            <div class="chat-disclaimer">Este recurso oferece orientação inicial e não substitui psicólogo, médico, pastor capacitado ou serviço de emergência.</div>
+            <div class="chat-messages" id="care-chat-messages" aria-live="polite"><div class="chat-message bot">Olá. Eu estou aqui para ajudar você a organizar este momento. O que está pesando mais hoje?</div></div>
+            <div class="chat-quick" id="care-chat-quick"><button type="button" data-chat-topic="ansiedade">Estou ansioso</button><button type="button" data-chat-topic="luto">Sofri uma perda</button><button type="button" data-chat-topic="autoestima">Não me sinto suficiente</button><button type="button" data-chat-topic="apoio">Preciso de apoio</button></div>
+            <form class="chat-compose" id="care-chat-form"><label class="sr-only" for="care-chat-input">Escreva como você está se sentindo</label><input id="care-chat-input" maxlength="500" placeholder="Escreva como você está se sentindo..." autocomplete="off"><button class="button navy" type="submit">Enviar</button></form>
+            <button class="text-button clear-chat" id="clear-care-chat" type="button">Limpar conversa</button>
+          </article>
+          <aside class="panel next-steps">
+            <span class="eyebrow">PRÓXIMOS PASSOS SEGUROS</span><h3>Você não precisa escolher só um</h3>
+            <a href="https://cvv.org.br/quero-conversar/" target="_blank" rel="noopener noreferrer"><b>Conversar com o CVV</b><small>Apoio emocional, sigiloso e gratuito ↗</small></a>
+            <a href="https://www.gov.br/saude/pt-br/composicao/saes/desmad/raps" target="_blank" rel="noopener noreferrer"><b>Conhecer a rede do SUS</b><small>Serviços públicos de cuidado psicossocial ↗</small></a>
+            <a href="index.html#comunidade"><b>Conversar com a comunidade</b><small>Encontre apoio e interesses em comum →</small></a>
+            <button type="button" data-connection="mentoria"><b>Registrar interesse em mentoria</b><small>Para futura conexão com liderança validada</small></button>
+          </aside>
+        </div>
+
+        <div class="section-heading"><div><span class="eyebrow">HISTÓRIAS QUE INSPIRAM</span><h2>Esperança também tem testemunho</h2></div><p>Relatos ilustrativos mostram que pedir ajuda, aceitar cuidado e recomeçar são atitudes de coragem.</p></div>
+        <div class="story-grid">
+          <article class="story-card"><span>LUTO</span><h3>“Aprendi a viver um dia de cada vez.”</h3><p>Depois de uma perda, Ana buscou apoio da família, acompanhamento profissional e sua comunidade de fé. A dor não desapareceu de uma vez, mas deixou de ser carregada sozinha.</p><small>História ilustrativa • identidade fictícia</small></article>
+          <article class="story-card"><span>ANSIEDADE</span><h3>“Pedir ajuda não diminuiu minha fé.”</h3><p>Rafael percebeu que oração e cuidado profissional não eram rivais. Com acompanhamento, rotina e pessoas seguras, começou a compreender seus limites.</p><small>História ilustrativa • identidade fictícia</small></article>
+          <article class="story-card"><span>AUTOESTIMA</span><h3>“Meu valor não depende do meu pior dia.”</h3><p>Luísa aprendeu a questionar pensamentos duros sobre si e a reconhecer pequenas conquistas, cercada por apoio responsável e esperança.</p><small>História ilustrativa • identidade fictícia</small></article>
+        </div>
+
+        <div class="two-columns top-gap testimony-area">
+          <article class="panel"><span class="eyebrow">SEU DEPOIMENTO</span><h3>Sua história pode encorajar alguém</h3><p>Escreva uma mensagem de esperança. Nesta demonstração ela fica somente neste aparelho e não é publicada na internet.</p><textarea id="testimony-text" maxlength="600" placeholder="Conte o que ajudou você a continuar..."></textarea><div class="composer-footer"><small><span id="testimony-count">0</span>/600 caracteres</small><button class="button gold" type="button" id="save-testimony">Salvar depoimento</button></div></article>
+          <article class="panel saved-testimony"><span class="eyebrow">MEU RELATO SALVO</span><div id="saved-testimony"><p>Nenhum depoimento salvo neste aparelho.</p></div></article>
+        </div>
+        <p class="care-principle">A Plataforma Reino oferece acolhimento espiritual e informação. Depressão e transtornos de ansiedade são condições de saúde e podem precisar de avaliação e tratamento profissional.</p>
+      </section>
+
+      <section class="page" id="comunidade" data-title="Comunidade">
+        <div class="community-hero visual-hero"><img src="assets/capa-comunidade-rede.webp" alt="Jovens cristãos interagindo com música, dança, teatro e fotografia"><div><span class="hero-label">COMUNIDADE REINO</span><h2>Conecte sua fé, seus talentos e novas amizades.</h2><p>Uma rede para conversar, criar, servir e encontrar jovens que compartilham os mesmos interesses.</p></div></div>
+        <div class="community-nav-tabs" role="tablist" aria-label="Áreas da comunidade"><button class="active" type="button" data-community-view="feed">Feed</button><button type="button" data-community-view="groups">Grupos e temas</button><button type="button" data-community-view="chat">Bate-papo</button></div>
+        <div class="community-stories" aria-label="Grupos em destaque"><button type="button" data-community-topic="Músicos"><span>♫</span><b>Músicos</b></button><button type="button" data-community-topic="Teatro"><span>🎭</span><b>Teatro</b></button><button type="button" data-community-topic="Ministério de Dança"><span>◒</span><b>Dança</b></button><button type="button" data-community-topic="Pregações"><span>✦</span><b>Pregações</b></button><button type="button" data-community-topic="Guitarristas"><span>♬</span><b>Guitarristas</b></button><button type="button" data-community-topic="Jovens da Bíblia"><span>▤</span><b>Jovens da Bíblia</b></button><button type="button" data-community-topic="Batistas"><span>◎</span><b>Batistas</b></button><button type="button" data-community-topic="Jovens da CCB"><span>◇</span><b>Jovens da CCB</b></button></div>
+        <div class="social-network-layout" data-community-container="feed">
+          <aside class="social-profile-card panel"><div class="large-avatar" id="community-avatar">R</div><h3>Minha Comunidade</h3><p>Compartilhe sua caminhada, descubra grupos e crie conexões saudáveis.</p><div><span><strong>12</strong> grupos</span><span><strong>24</strong> conexões</span></div><small class="online-status"><i></i> Comunidade ativa agora</small></aside>
+          <div class="social-feed-column" data-community-panel="feed">
+            <article class="panel composer social-composer">
+              <div class="composer-user"><span class="avatar" id="composer-avatar">V</span><label for="new-post">Compartilhe algo com a comunidade</label></div>
+              <textarea id="new-post" maxlength="500" placeholder="Conte uma experiência, aprendizado, pedido de oração ou novidade..."></textarea>
+              <div class="media-preview hidden" id="community-media-preview"></div>
+              <div class="composer-tools"><label for="post-photo">▧ Foto</label><input class="sr-only" id="post-photo" type="file" accept="image/*"><label for="post-video">▶ Vídeo</label><input class="sr-only" id="post-video" type="file" accept="video/*"><button type="button" data-post-kind="Pedido de oração">✦ Pedido de oração</button><button type="button" data-post-kind="Testemunho">♡ Testemunho</button></div>
+              <div class="composer-footer"><small><span id="char-count">0</span>/500</small><button class="button gold" type="button" id="publish-post">Publicar</button></div>
+            </article>
+            <div class="feed" id="community-feed" aria-live="polite"></div>
+          </div>
+          <aside class="social-groups panel"><span class="eyebrow">EM ALTA AGORA</span><h3>Entre na conversa</h3><button type="button" data-open-group="musicos"><span>♫</span><b>Músicos do Reino<small>346 participantes</small></b><strong>Entrar</strong></button><button type="button" data-open-group="teatro"><span>🎭</span><b>Teatro Cristão<small>128 participantes</small></b><strong>Entrar</strong></button><button type="button" data-open-group="piaui"><span>●</span><b>Jovens Cristãos do Piauí<small>492 participantes</small></b><strong>Entrar</strong></button><button type="button" data-open-group="maranhao"><span>●</span><b>Jovens do Maranhão<small>318 participantes</small></b><strong>Entrar</strong></button><p class="community-rule">Respeito, segurança, moderação e fé em todas as interações.</p></aside>
+        </div>
+
+        <section class="community-groups-area hidden" data-community-container="groups">
+          <div class="section-heading"><div><span class="eyebrow">COMUNIDADES POR INTERESSE</span><h2>Encontre pessoas que falam a sua língua</h2></div><p>Escolha um grupo para trocar experiências, ideias, repertórios e conhecimento.</p></div>
+          <div class="community-groups-grid" id="community-groups-grid"></div>
+        </section>
+
+        <section class="community-chat-area hidden" data-community-container="chat">
+          <div class="group-chat-shell panel">
+            <aside class="chat-room-list"><span class="eyebrow">SALAS DISPONÍVEIS</span><h3>Bate-papo Reino</h3><div id="chat-room-list"></div></aside>
+            <div class="group-chat-main"><header><div><small>SALA ATUAL</small><h3 id="chat-room-title">Músicos do Reino</h3></div><span class="chat-online"><i></i> online</span></header><div class="group-chat-messages" id="group-chat-messages" aria-live="polite"></div><form class="group-chat-compose" id="group-chat-form"><input id="group-chat-input" maxlength="350" placeholder="Digite sua mensagem com respeito..." autocomplete="off"><button class="button gold" type="submit">Enviar</button></form><small class="chat-safety">Não compartilhe telefone, endereço, documentos ou informações de menores.</small></div>
+          </div>
+        </section>
+      </section>
+
+      <section class="page" id="perfil" data-title="Meu perfil">
+        <div class="page-intro"><span class="eyebrow">MINHA JORNADA</span><h2>Meu perfil</h2><p>Personalize seus dados e acompanhe sua atividade.</p></div>
+        <div class="profile-layout">
+          <article class="panel profile-card">
+            <button class="profile-photo-button" type="button" data-dialog="profile-dialog" aria-label="Adicionar ou trocar foto do perfil">
+              <span class="large-avatar" id="profile-avatar">V</span>
+              <span class="photo-edit-badge" aria-hidden="true">＋</span>
+            </button>
+            <small class="profile-photo-hint">Toque na foto para adicionar ou trocar</small>
+            <h3 id="profile-display-name">Visitante</h3><p id="profile-display-email">Cadastre seu nome para personalizar a experiência.</p>
+            <div class="actions"><button class="button navy" type="button" data-dialog="profile-dialog">Editar perfil</button></div>
+          </article>
+          <div class="stats-grid">
+            <article class="panel stat-card"><small>MELHOR QUIZ</small><strong id="profile-score">0/10</strong><span>Respostas corretas</span></article>
+            <article class="panel stat-card"><small>FAVORITOS</small><strong id="profile-favorites">0</strong><span>Versículos salvos</span></article>
+            <article class="panel stat-card"><small>PUBLICAÇÕES</small><strong id="profile-posts">0</strong><span>Mensagens enviadas</span></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="admin" data-title="Administração">
+        <div class="page-intro"><span class="eyebrow">PAINEL DEMONSTRATIVO</span><h2>Administração</h2><p>Gerencie usuários e conteúdos desta demonstração local.</p></div>
+        <div class="stats-grid four">
+          <article class="panel stat-card"><small>USUÁRIOS</small><strong>1.250</strong><span>+8% neste mês</span></article>
+          <article class="panel stat-card"><small>CONTEÚDOS</small><strong id="content-count">184</strong><span>Publicados e agendados</span></article>
+          <article class="panel stat-card"><small>GRUPOS</small><strong>38</strong><span>Comunidades ativas</span></article>
+          <article class="panel stat-card"><small>QUIZZES</small><strong>27</strong><span>Ativos na plataforma</span></article>
+        </div>
+        <article class="panel top-gap">
+          <div class="panel-top admin-top"><div><span class="eyebrow">USUÁRIOS</span><h3>Cadastros recentes</h3></div><label class="search-box compact"><span>⌕</span><input id="user-search" type="search" placeholder="Pesquisar..."></label></div>
+          <div class="table-wrap"><table><thead><tr><th>Nome</th><th>Papel</th><th>Status</th><th>Ação</th></tr></thead><tbody id="user-table"></tbody></table></div>
+        </article>
+        <div class="two-columns top-gap">
+          <article class="panel"><div class="panel-top"><div><span class="eyebrow">CONTEÚDO</span><h3>Publicações</h3></div><button class="button gold" type="button" data-dialog="content-dialog">+ Novo conteúdo</button></div><div id="admin-content-list" class="admin-content-list"></div></article>
+          <article class="panel"><span class="eyebrow">MODERAÇÃO</span><h3>Central de análises</h3><p>3 denúncias aguardam avaliação da equipe responsável.</p><button class="button navy" type="button" id="review-reports">Analisar denúncias</button></article>
+        </div>
+      </section>
+
+      <footer><span>PLATAFORMA REINO • 2026</span><p>Cristo é o encontro. A tecnologia é a ferramenta. As pessoas são a missão.</p></footer>
+    </main>
+  </div>
+
+  <dialog id="profile-dialog"><form method="dialog" class="dialog-card"><button class="dialog-close" value="cancel" aria-label="Fechar">×</button><span class="eyebrow">MEU PERFIL</span><h2>Editar informações</h2><div class="profile-photo-editor"><span class="large-avatar" id="profile-photo-preview">V</span><div><label class="button soft photo-picker" for="profile-photo">📷 Escolher uma foto</label><input id="profile-photo" class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp"><button class="text-button remove-profile-photo" id="remove-profile-photo" type="button">Remover foto</button><small>JPG, PNG ou WebP. A foto fica salva neste aparelho.</small></div></div><label>Nome<input id="profile-name" required></label><label>E-mail ou telefone<input id="profile-contact" required></label><button class="button gold full" id="save-profile" value="default">Salvar alterações</button><button class="text-button reset-access" id="reset-access" type="button">Trocar usuário neste aparelho</button></form></dialog>
+  <dialog id="content-dialog"><form method="dialog" class="dialog-card"><button class="dialog-close" value="cancel" aria-label="Fechar">×</button><span class="eyebrow">ADMINISTRAÇÃO</span><h2>Novo conteúdo</h2><label>Título<input id="content-title" required placeholder="Título do conteúdo"></label><label>Categoria<select id="content-category"><option>Devocional</option><option>Estudo</option><option>Oração</option><option>Notícia</option></select></label><button class="button gold full" id="save-content" value="default">Publicar conteúdo</button></form></dialog>
+  <dialog id="book-dialog"><div class="dialog-card book-dialog-card"><button class="dialog-close" type="button" id="close-book-dialog" aria-label="Fechar">×</button><span class="eyebrow" id="book-dialog-category">LIVRO EVANGÉLICO</span><h2 id="book-dialog-title"></h2><p class="book-author" id="book-dialog-author"></p><p id="book-dialog-description"></p><div class="book-reason"><strong>Por que conhecer esta obra?</strong><p id="book-dialog-reason"></p></div><p class="source-note">Apresentação editorial. O texto integral não está incluído. Procure uma edição brasileira autorizada.</p><button class="button gold full" type="button" id="save-dialog-book">☆ Salvar na biblioteca</button></div></dialog>
+  <dialog id="article-dialog" class="article-dialog"><article class="article-reader"><button class="dialog-close" type="button" id="close-article-dialog" aria-label="Fechar matéria">×</button><img id="article-dialog-image" src="assets/capa-noticias-cristas.webp" alt=""><div class="article-reader-copy"><span class="eyebrow" id="article-dialog-category"></span><h2 id="article-dialog-title"></h2><p class="article-lead" id="article-dialog-lead"></p><div id="article-dialog-body"></div><blockquote id="article-dialog-verse"></blockquote><div class="article-source"><span id="article-dialog-source"></span><a class="button navy" id="article-dialog-link" href="#">Conferir fonte original →</a></div></div></article></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="assets/bible-data.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

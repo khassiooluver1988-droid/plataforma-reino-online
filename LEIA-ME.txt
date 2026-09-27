@@ -1,0 +1,76 @@
+PLATAFORMA REINO - SITE HTML
+
+ARQUIVOS PRINCIPAIS
+- index.html: plataforma completa
+- quiz.html: rodadas de 10 perguntas em um banco com 400 perguntas únicas
+- as perguntas não se repetem até o usuário completar todo o banco
+- ranking local dos cinco melhores resultados
+- explicação bíblica escrita sempre que uma resposta estiver errada
+- ciclo de aprendizado: resposta, explicação, referência bíblica e aplicação
+- botão "Ler o texto bíblico" conectado diretamente ao módulo Palavra
+- Bíblia completa incorporada: 66 livros, 1.189 capítulos e 31.098 versículos
+- web rádio cristã online com transmissão ao vivo
+- jornada diária com 3 passos, progresso e sequência de dias
+- central de podcasts com espaço para produção própria e canais oficiais
+- biblioteca com planos bíblicos, busca, filtros, favoritos e clássicos públicos
+- catálogo demonstrativo com 20 livros evangélicos em português
+- opção Heróis da Fé com 12 biografias e prova interativa de 5 perguntas
+- Missões do Reino com quatro frentes e registro local de interesse
+- Histórias que Inspiram com quatro relatos ilustrativos, texto e áudio em português
+- Meu Testemunho com formulário preparado para Netlify Forms
+- oito opções oficiais de cursos gratuitos de marketing, carreira e negócios
+- páginas Quem Somos, Missão, Visão, Valores e Fale Conosco
+- Conexão Reino com oração, pequenos grupos, mentoria e igreja local
+- Acolhimento Reino para ansiedade, tristeza, luto e baixa autoestima
+- chat automático guiado somente dentro da página Acolhimento
+- detecção de frases de risco com orientação para CVV 188 e SAMU 192
+- histórias inspiradoras ilustrativas e depoimento privado salvo no aparelho
+- acesso direto, sem cadastro ou tela de login
+- assets/styles.css: identidade visual e versão responsiva
+- assets/app.js: funcionalidades da plataforma
+- assets/quiz.js: perguntas, respostas, pontuação e resultado
+
+COMO ABRIR
+1. Extraia o arquivo ZIP.
+2. Abra index.html no navegador.
+
+COMO PUBLICAR NO NETLIFY
+1. Entre na sua conta do Netlify.
+2. Abra o projeto Plataforma Reino.
+3. Envie a pasta extraída ou o ZIP para uma nova implantação manual.
+4. O arquivo index.html já está na raiz, pronto para publicação.
+
+OBSERVAÇÃO
+Perfil opcional, ranking, favoritos, publicações e progresso do quiz são salvos
+somente no navegador do aparelho. Para sincronização entre celulares, ranking
+global e painel administrativo online, será necessário conectar banco de dados,
+autenticação segura e backend conforme o Plano Técnico.
+
+Os links externos de podcast e livros abrem os respectivos canais oficiais. A
+inclusão de episódios e livros próprios exige os arquivos e autorizações dos
+respectivos produtores e autores.
+
+O Acolhimento Reino oferece orientação inicial e espiritual, não faz diagnóstico
+e não substitui psicólogo, médico ou emergência. O chat é automático e aparece
+somente na página Acolhimento. Em crise, use o CVV 188 ou o SAMU 192.
+
+As histórias são ilustrativas e usam personagens fictícios. A narração usa a voz
+em português disponível no navegador. A navegação e os links funcionam na mesma
+janela. A área de formação reúne 20 cursos gratuitos em Marketing, Vendas,
+Telemarketing e Atendimento, Administração e Negócios, Tecnologia e Informática,
+Comunicação e RH. Requisitos, idade mínima, disponibilidade e certificados
+dependem do fornecedor.
+
+A página inicial abre diretamente em um carrossel fotográfico animado e
+responsivo com banners do Quiz Bíblico, Heróis da Fé, Acolhimento, Testemunhos
+e Cursos Gratuitos. Os banners mudam lateralmente, possuem controles manuais e
+direcionam para cada área.
+
+Abaixo dos banners, a página inicial foi simplificada para três categorias:
+Informativo, Curiosidades e Aconteceu no Mundo. Também possui uma chamada
+destacada para abrir a Bíblia completa e a Rádio Viver é Cristo fixa na parte
+inferior. Os antigos blocos de jornada, módulos, versículo e estatísticas foram
+retirados somente da página inicial; as áreas continuam acessíveis pelo menu.
+
+Os formulários Meu Testemunho e Fale Conosco usam Netlify Forms. Depois da nova
+publicação, confirme os formulários no painel Forms do projeto Netlify.

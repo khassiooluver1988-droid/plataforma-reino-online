@@ -1,0 +1,16 @@
+BÍBLIA INCORPORADA À PLATAFORMA REINO
+
+Tradução: João Ferreira de Almeida (edição histórica)
+Licença indicada pela fonte: Domínio público
+Fonte textual: seven1m/open-bibles (por-almeida.usfx.xml)
+Normalização de dados: pd-text-corpus
+
+Conteúdo incorporado:
+- 66 livros
+- 1.189 capítulos
+- 31.098 versículos
+
+Observação: esta edição histórica foi escolhida para o protótipo por sua indicação
+de domínio público. Antes do lançamento comercial definitivo, a tradução e o
+licenciamento devem passar pela revisão técnica e jurídica prevista no documento
+MVP da Plataforma Reino.

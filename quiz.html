@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#071a34">
+  <meta name="description" content="Quiz cristão interativo de descoberta bíblica, aprendizado e vida cristã.">
+  <title>Quiz Bíblico | Plataforma Reino</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23071a34'/%3E%3Cpath d='M29 10h6v14h12v6H35v24h-6V30H17v-6h12z' fill='%23d8b05d'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/styles.css">
+  <script>try{const access=JSON.parse(localStorage.getItem('reino_access_granted_v2')||'{}');if(!access.connected){const back=encodeURIComponent('quiz.html'+location.search+location.hash);location.replace('index.html?return='+back)}}catch{location.replace('index.html')}</script>
+</head>
+<body class="quiz-body">
+  <div class="game-grid-bg" aria-hidden="true"></div>
+  <div class="game-orb orb-one" aria-hidden="true"></div><div class="game-orb orb-two" aria-hidden="true"></div>
+  <main class="quiz-shell">
+    <header class="quiz-header">
+      <a class="button outline dark-outline" href="index.html" rel="noopener">← Voltar à plataforma</a>
+      <a class="brand" href="index.html" rel="noopener"><span class="brand-mark">✦</span><span><strong>PLATAFORMA</strong><b>REINO</b></span></a>
+      <button class="game-sound-toggle" type="button" id="quiz-sound-toggle" aria-label="Ativar ou desativar sons do jogo">♫ Som ligado</button>
+    </header>
+
+    <section class="quiz-start" id="quiz-start">
+      <div class="game-hero-copy">
+        <span class="game-kicker"><i></i> DESAFIO DO REINO ONLINE</span>
+        <h1>Entre no jogo.<br><em>Domine a Palavra.</em></h1>
+        <p>Descubra detalhes da Bíblia, aprenda com cada resposta e avance no Ranking do Reino.</p>
+        <div class="quiz-details"><span><b>DESCOBERTA</b> bíblica</span><span><b>SEM PRESSA</b> para responder</span><span><b>TOP 5</b> ranking gamer</span></div>
+        <div class="game-features"><span>✓ Curiosidade e descoberta bíblica</span><span>✓ Vida cristã na prática</span><span>✓ Explicação + referência bíblica</span></div>
+        <div class="game-hero-image"><img src="assets/banner-quiz.webp" alt="Jovem participando do Quiz do Reino"><span>Perguntas para descobrir, aprender e abrir a Bíblia</span></div>
+      </div>
+      <aside class="gamer-setup-card">
+        <div class="setup-level"><span>NÍVEL 01</span><b>PREPARE-SE PARA JOGAR</b></div>
+        <div class="gamer-avatar" id="gamer-avatar">G</div>
+        <label class="player-name-label">ESCOLHA SEU NOME GAMER<input id="player-name" maxlength="18" placeholder="Ex.: GuerreiroDaFé" autocomplete="nickname"></label>
+        <fieldset class="game-mode-picker"><legend>ESCOLHA A ARENA</legend><button class="active" type="button" data-quiz-mode="TODOS">Tudo</button><button type="button" data-quiz-mode="BÍBLIA">Bíblia</button><button type="button" data-quiz-mode="ANTIGO TESTAMENTO">Antigo Testamento</button><button type="button" data-quiz-mode="NOVO">Novo Testamento</button><button type="button" data-quiz-mode="VIDA CRISTÃ">Vida Cristã</button></fieldset>
+        <button class="game-start-button" type="button" id="start-quiz"><span>▶</span> INICIAR PARTIDA</button>
+        <small>Seu progresso e ranking ficam salvos neste aparelho.</small>
+      </aside>
+      <section class="leaderboard-card gamer-leaderboard"><div><span class="game-kicker"><i></i> RANKING AO VIVO</span><h2>TOP 5 JOGADORES</h2></div><ol id="leaderboard-start"></ol></section>
+    </section>
+
+    <section class="quiz-game hidden" id="quiz-game" aria-live="polite">
+      <div class="game-hud">
+        <div class="hud-player"><span class="avatar" id="hud-avatar">G</span><div><small>JOGADOR</small><strong id="hud-player-name">Gamer</strong></div></div>
+        <div class="hud-stat"><small>XP TOTAL</small><strong><span id="score-now">0</span> XP</strong></div>
+        <div class="hud-stat combo"><small>COMBO</small><strong>×<span id="streak-now">0</span></strong></div>
+      </div>
+      <div class="quiz-meta"><span id="question-count">MISSÃO 1 DE 10</span><strong id="arena-name">ARENA ALEATÓRIA</strong></div>
+      <div class="progress-track"><span id="progress-bar"></span></div>
+      <article class="quiz-question-card">
+        <div class="question-top"><span class="question-category" id="question-category">BÍBLIA</span><span class="difficulty-badge" id="difficulty-badge">DESCOBERTA</span></div>
+        <h1 id="question-text"></h1>
+        <div class="quiz-options" id="quiz-options"></div>
+        <div class="answer-feedback hidden" id="answer-feedback"></div>
+        <button class="game-next-button hidden" type="button" id="next-question">PRÓXIMA MISSÃO <span>→</span></button>
+      </article>
+    </section>
+
+    <section class="quiz-result hidden" id="quiz-result">
+      <div class="victory-rays" aria-hidden="true"></div>
+      <span class="result-seal" id="result-seal">10/10</span>
+      <span class="game-kicker"><i></i> PARTIDA CONCLUÍDA</span>
+      <h1 id="result-title">Excelente!</h1>
+      <p id="result-message"></p>
+      <div class="result-stats"><div><small>ACERTOS</small><strong id="correct-total">0</strong><span>de 10</span></div><div><small>XP GANHO</small><strong id="xp-total">0</strong><span>pontos</span></div><div><small>MAIOR COMBO</small><strong id="combo-total">0</strong><span>seguidos</span></div><div><small>RECORDE</small><strong id="best-total">0</strong><span>acertos</span></div></div>
+      <div class="hero-actions center"><button class="game-start-button compact" type="button" id="restart-quiz"><span>↻</span> JOGAR NOVAMENTE</button><button class="button outline dark-outline" type="button" id="share-result">Compartilhar resultado</button></div>
+      <section class="leaderboard-card result-board"><span class="hero-label">TOP 5</span><h2>Melhores resultados</h2><ol id="leaderboard-result"></ol></section>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="assets/quiz-bank.js"></script>
+  <script src="assets/quiz-extra-bank.js"></script>
+  <script src="assets/quiz.js"></script>
+</body>
+</html>

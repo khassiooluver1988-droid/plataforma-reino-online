@@ -1,0 +1,80 @@
+const BANK=Array.isArray(window.REINO_QUIZ_BANK)?window.REINO_QUIZ_BANK:[];
+const QUIZ_SIZE=10;
+const KEYS={seen:'reino_quiz_seen_v2',ranking:'reino_quiz_ranking_v2',score:'reino_best_score',gamer:'reino_gamer_name',sound:'reino_quiz_sound',metrics:'reino_quiz_metrics_v1'};
+let questions=[],current=0,correctCount=0,xp=0,streak=0,maxStreak=0,locked=false,usedTotal=0,selectedMode='TODOS',audioContext=null;
+let soundEnabled=read(KEYS.sound,true);
+const $=id=>document.getElementById(id);
+
+function read(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
+function write(key,value){localStorage.setItem(key,JSON.stringify(value))}
+function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2500)}
+function shuffle(items){const copy=[...items];for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]]}return copy}
+function escapeHtml(value){return String(value).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function initials(name='G'){return name.split(/\s+/).filter(Boolean).slice(0,2).map(part=>part[0]).join('').toUpperCase()||'G'}
+
+function editorialLevel(item){
+  const level=String(item.difficulty||item.level||'DESCOBERTA').toUpperCase();
+  return ['DESCOBERTA','CONHECIMENTO','APROFUNDAMENTO','MESTRE DO REINO'].includes(level)?level:'DESCOBERTA'
+}
+function questionType(item){
+  if(item.type)return String(item.type).toUpperCase();
+  if(item.category==='VIDA CRISTÃ')return 'VIDA CRISTÃ';
+  if(item.category==='EVANGELHOS')return 'JESUS E EVANGELHOS';
+  if(item.category==='ANTIGO TESTAMENTO')return 'ANTIGO TESTAMENTO';
+  if(item.category==='NOVO TESTAMENTO')return 'BÍBLIA';
+  return 'CURIOSIDADE'
+}
+function normalizedQuestion(item){
+  return {
+    ...item,
+    difficulty:editorialLevel(item),
+    type:questionType(item),
+    status:item.status||'published',
+    classification:item.classification||'TEXTO BÍBLICO',
+    source:item.source||'Bíblia',
+    tags:Array.isArray(item.tags)?item.tags:[item.category].filter(Boolean)
+  }
+}
+function metrics(){
+  return read(KEYS.metrics,{started:0,answered:0,correct:0,wrong:0,bibleOpens:0,completed:0,categories:{}})
+}
+function bumpMetric(key,amount=1){
+  const data=metrics();
+  data[key]=(data[key]||0)+amount;
+  write(KEYS.metrics,data);
+}
+function bumpCategory(category){
+  const data=metrics();
+  data.categories=data.categories||{};
+  data.categories[category]=(data.categories[category]||0)+1;
+  write(KEYS.metrics,data);
+}
+function discoveryRate(){
+  const data=metrics();
+  return data.answered?Math.round((data.bibleOpens/data.answered)*100):0
+}
+
+function ensureAudio(){if(!audioContext)audioContext=new(window.AudioContext||window.webkitAudioContext)();if(audioContext.state==='suspended')audioContext.resume()}
+function tone(frequency,duration=.12,type='sine',volume=.045,delay=0){if(!soundEnabled)return;ensureAudio();const oscillator=audioContext.createOscillator();const gain=audioContext.createGain();oscillator.type=type;oscillator.frequency.setValueAtTime(frequency,audioContext.currentTime+delay);gain.gain.setValueAtTime(volume,audioContext.currentTime+delay);gain.gain.exponentialRampToValueAtTime(.001,audioContext.currentTime+delay+duration);oscillator.connect(gain);gain.connect(audioContext.destination);oscillator.start(audioContext.currentTime+delay);oscillator.stop(audioContext.currentTime+delay+duration)}
+function playSound(kind){if(!soundEnabled)return;if(kind==='click')tone(310,.07,'square',.025);if(kind==='correct'){tone(520,.11,'sine',.055);tone(680,.13,'sine',.05,.1);tone(880,.18,'sine',.045,.2)}if(kind==='wrong'){tone(220,.16,'sawtooth',.035);tone(145,.22,'sawtooth',.03,.12)}if(kind==='tick')tone(440,.045,'square',.018);if(kind==='victory'){[440,554,659,880].forEach((note,index)=>tone(note,.22,'triangle',.05,index*.12))}}
+function updateSoundButton(){const button=$('quiz-sound-toggle');button.textContent=soundEnabled?'♫ Som ligado':'× Som desligado';button.classList.toggle('muted',!soundEnabled);button.setAttribute('aria-pressed',String(soundEnabled))}
+
+function poolForMode(){if(selectedMode==='ANTIGO TESTAMENTO')return BANK.filter(item=>item.category==='ANTIGO TESTAMENTO');if(selectedMode==='NOVO')return BANK.filter(item=>item.category==='NOVO TESTAMENTO'||item.category==='EVANGELHOS');if(selectedMode==='BÍBLIA')return BANK.filter(item=>['BÍBLIA','ANTIGO TESTAMENTO','NOVO TESTAMENTO','EVANGELHOS'].includes(item.category));if(selectedMode==='VIDA CRISTÃ')return BANK.filter(item=>item.category==='VIDA CRISTÃ');return [...BANK]}
+function randomizeAnswers(item){const mixed=shuffle(item.options.map((text,index)=>({text,index})));return{...item,options:mixed.map(option=>option.text),answer:mixed.findIndex(option=>option.index===item.answer)}}
+function buildRound(){const pool=poolForMode();const seenState=read(KEYS.seen,{});let seen=Array.isArray(seenState)?seenState:(seenState[selectedMode]||[]);seen=seen.filter(id=>pool.some(question=>question.id===id));let available=pool.filter(question=>!seen.includes(question.id));if(available.length<QUIZ_SIZE){seen=[];available=[...pool];toast('Arena concluída! Um novo ciclo de perguntas foi liberado.')}questions=shuffle(available).slice(0,QUIZ_SIZE).map(normalizedQuestion).map(randomizeAnswers);seen.push(...questions.map(question=>question.id));const nextState=Array.isArray(seenState)?{}:{...seenState};nextState[selectedMode]=seen;write(KEYS.seen,nextState);usedTotal=seen.length}
+
+function gamerName(){return $('player-name').value.trim()}
+function arenaLabel(){const labels={TODOS:'ARENA COMPLETA',BÍBLIA:'ARENA BÍBLICA','ANTIGO TESTAMENTO':'ARENA ANTIGO TESTAMENTO',NOVO:'ARENA NOVO TESTAMENTO','VIDA CRISTÃ':'ARENA VIDA CRISTÃ'};return labels[selectedMode]||'ARENA COMPLETA'}
+function start(){if(BANK.length<10){toast('O banco de perguntas ainda não tem conteúdo suficiente para iniciar.');return}const name=gamerName();if(!name){$('player-name').focus();toast('Escolha seu nome gamer para iniciar.');playSound('wrong');return}ensureAudio();playSound('click');write(KEYS.gamer,name);bumpMetric('started');buildRound();current=0;correctCount=0;xp=0;streak=0;maxStreak=0;locked=false;$('hud-player-name').textContent=name;$('hud-avatar').textContent=initials(name);$('quiz-start').classList.add('hidden');$('quiz-result').classList.add('hidden');$('quiz-game').classList.remove('hidden');render();scrollTo({top:0,behavior:'smooth'})}
+function render(){const item=questions[current];$('question-count').textContent=`MISSÃO ${current+1} DE ${questions.length} • ${usedTotal} USADAS`;$('score-now').textContent=xp;$('streak-now').textContent=streak;$('arena-name').textContent=arenaLabel();$('progress-bar').style.width=`${((current+1)/questions.length)*100}%`;$('question-category').textContent=item.category;$('difficulty-badge').textContent=editorialLevel(item);$('question-text').textContent=item.q;$('answer-feedback').classList.add('hidden');$('next-question').classList.add('hidden');$('next-question').innerHTML=current===questions.length-1?'VER RESULTADO <span>→</span>':'PRÓXIMA MISSÃO <span>→</span>';locked=false;$('quiz-options').innerHTML=item.options.map((option,index)=>`<button class="quiz-option" type="button" data-answer="${index}"><span>${String.fromCharCode(65+index)}</span><b>${escapeHtml(option)}</b></button>`).join('');$('quiz-options').querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>answer(Number(button.dataset.answer))))}
+function answer(choice){if(locked)return;locked=true;const item=questions[current];const correct=choice===item.answer;bumpMetric('answered');bumpMetric(correct?'correct':'wrong');bumpCategory(item.category);let gained=0;if(correct){correctCount++;streak++;maxStreak=Math.max(maxStreak,streak);gained=100+(streak-1)*25;xp+=gained;playSound('correct');$('quiz-question-card').classList.add('success-pulse')}else{streak=0;playSound('wrong');$('quiz-question-card').classList.add('error-shake')}setTimeout(()=>$('quiz-question-card').classList.remove('success-pulse','error-shake'),550);$('quiz-options').querySelectorAll('button').forEach((button,index)=>{button.disabled=true;if(index===item.answer)button.classList.add('correct');if(index===choice&&!correct)button.classList.add('wrong')});const title=correct?`ACERTOU! +${gained} XP`:`QUASE! A RESPOSTA CORRETA É ${item.options[item.answer]}.`;const learnMore=item.bookSlug&&item.chapter?`<div class="learn-more"><b>Quer aprender mais?</b><a class="bible-open-link" href="index.html?book=${encodeURIComponent(item.bookSlug)}&chapter=${item.chapter}#palavra" rel="noopener">VER NA BÍBLIA →</a></div>`:`<div class="learn-more"><b>Continue aprendendo</b><span>Explore outras missões desta arena.</span></div>`;$('answer-feedback').className=`answer-feedback ${correct?'game-correct':'game-wrong'}`;$('answer-feedback').innerHTML=`<strong>${escapeHtml(title)}</strong><span class="feedback-explanation">${escapeHtml(item.explanation)}</span><span class="bible-reference">▤ ${escapeHtml(item.reference)}</span><span class="learn-box"><b>APRENDA:</b> ${escapeHtml(item.learn)}</span>${learnMore}`;$('next-question').classList.remove('hidden');const bibleLink=$('answer-feedback').querySelector('.bible-open-link');if(bibleLink)bibleLink.addEventListener('click',()=>bumpMetric('bibleOpens'),{once:true});$('score-now').textContent=xp;$('streak-now').textContent=streak}
+function next(){playSound('click');if(current<questions.length-1){current++;render()}else finish()}
+function saveRanking(){const name=gamerName()||'Gamer';const entry={name,xp,correct:correctCount,combo:maxStreak,date:new Date().toLocaleDateString('pt-BR')};const ranking=read(KEYS.ranking,[]);const same=ranking.findIndex(item=>item.name.toLocaleLowerCase('pt-BR')===name.toLocaleLowerCase('pt-BR'));if(same<0)ranking.push(entry);else if((ranking[same].xp||0)<=entry.xp)ranking[same]=entry;ranking.sort((a,b)=>(b.xp||0)-(a.xp||0)||b.correct-a.correct||a.name.localeCompare(b.name,'pt-BR'));write(KEYS.ranking,ranking.slice(0,5));renderLeaderboard()}
+function finish(){bumpMetric('completed');const best=Math.max(correctCount,Number(read(KEYS.score,0)));write(KEYS.score,best);saveRanking();$('quiz-game').classList.add('hidden');$('quiz-result').classList.remove('hidden');$('result-seal').textContent=`${correctCount}/${questions.length}`;$('correct-total').textContent=correctCount;$('xp-total').textContent=xp;$('combo-total').textContent=maxStreak;$('best-total').textContent=best;let title='Continue treinando, guerreiro!';let message='Cada missão aumenta seu conhecimento. Leia as explicações e volte para conquistar mais XP.';if(correctCount>=9){title='Lendário da Palavra!';message='Você dominou esta arena e mostrou conhecimento bíblico de alto nível.'}else if(correctCount>=7){title='Guardião da Palavra!';message='Grande partida! Você está muito perto de alcançar o nível lendário.'}else if(correctCount>=5){title='Discípulo em evolução!';message='Boa jornada. Revise as referências bíblicas e volte ainda mais preparado.'}$('result-title').textContent=title;$('result-message').textContent=message;playSound('victory');scrollTo({top:0,behavior:'smooth'})}
+function renderLeaderboard(){const ranking=read(KEYS.ranking,[]);const medals=['◆','◇','○','4','5'];const html=ranking.length?ranking.map((item,index)=>`<li><span><b>${medals[index]}</b><span>${escapeHtml(item.name)}<small>${item.correct}/10 acertos • combo ${item.combo||0}</small></span></span><strong>${item.xp||0} XP</strong></li>`).join(''):'<li class="empty-ranking">A arena está vazia. Seja o primeiro jogador!</li>';[$('leaderboard-start'),$('leaderboard-result')].forEach(list=>list.innerHTML=html)}
+async function share(){const text=`Meu nome gamer é ${gamerName()||'Gamer'} e fiz ${correctCount}/10 com ${xp} XP no Quiz do Reino!`;if(navigator.share){try{await navigator.share({title:'Quiz do Reino',text});return}catch{}}if(navigator.clipboard){await navigator.clipboard.writeText(text);toast('Resultado gamer copiado para compartilhar.')}else toast(text)}
+
+const savedName=read(KEYS.gamer,'');$('player-name').value=savedName;$('gamer-avatar').textContent=initials(savedName);$('player-name').addEventListener('input',event=>{$('gamer-avatar').textContent=initials(event.target.value)});$('player-name').addEventListener('keydown',event=>{if(event.key==='Enter')start()});
+document.querySelectorAll('[data-quiz-mode]').forEach(button=>button.addEventListener('click',()=>{selectedMode=button.dataset.quizMode;document.querySelectorAll('[data-quiz-mode]').forEach(item=>item.classList.toggle('active',item===button));playSound('click')}));
+$('quiz-sound-toggle').addEventListener('click',()=>{soundEnabled=!soundEnabled;write(KEYS.sound,soundEnabled);updateSoundButton();if(soundEnabled)playSound('click')});
+updateSoundButton();renderLeaderboard();$('start-quiz').addEventListener('click',start);$('next-question').addEventListener('click',next);$('restart-quiz').addEventListener('click',start);$('share-result').addEventListener('click',share);
