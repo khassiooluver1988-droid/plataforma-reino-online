@@ -443,7 +443,6 @@ async function loadTestimonyHistory(){
 }
 document.querySelector('.contact-form').addEventListener('submit',event=>submitReinoForm(event,'contact_submissions',['nome','email','assunto','mensagem'],'site-confirmacao'));
 document.querySelector('.public-testimony-form').addEventListener('submit',async event=>{await submitReinoForm(event,'testimony_submissions',['nome','cidade','titulo','testemunho'],'empresa-site');await loadTestimonyHistory()});loadTestimonyHistory();
-document.getElementById('clear-care-chat').addEventListener('click',()=>{document.getElementById('care-chat-messages').innerHTML='<div class="chat-message bot">Olá. Eu estou aqui para ajudar você a organizar este momento. O que está pesando mais hoje?</div>';toast('Conversa local apagada.')});
 
 const radio=document.getElementById('radio-stream');const radioToggle=document.getElementById('radio-toggle');const radioStatus=document.getElementById('radio-status');radio.volume=.8;
 radioToggle.addEventListener('click',async()=>{if(radio.paused){radioStatus.textContent='Conectando à transmissão...';try{await radio.play()}catch{radioStatus.textContent='Não foi possível iniciar. Tente novamente.'}}else radio.pause()});
