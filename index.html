@@ -309,10 +309,10 @@
         <div class="section-cover cover-stories"><img src="assets/banner-testemunho.webp" alt="Pessoa compartilhando uma história de fé e recomeço"><div><span class="hero-label">HISTÓRIAS QUE INSPIRAM</span><h2>Uma história pode mudar o rumo de outra vida.</h2><p>Leia e ouça relatos ilustrados sobre fé, serviço, coragem, recomeço e solidariedade.</p></div></div>
         <div class="page-intro"><span class="eyebrow">TEXTO • ILUSTRAÇÃO • ÁUDIO</span><h2>Escolha uma história</h2><p>Clique para abrir a narrativa completa, acompanhar a ilustração e ouvir o conteúdo na mesma janela.</p></div>
         <div class="story-hub-grid">
-          <a class="inspiring-story ocean" href="historia.html?id=ponte" target="_blank" rel="noopener"><div class="story-illustration" aria-hidden="true"><svg viewBox="0 0 320 180"><circle cx="250" cy="45" r="24"/><path d="M0 145 Q70 110 135 145 T320 145 V180 H0Z"/><path d="M55 132 Q160 45 265 132" fill="none"/><path d="M95 105v44M225 105v44"/></svg></div><div><small>MISSÃO • COMUNIDADE</small><h3>A ponte que começou com uma conversa</h3><p>Uma jovem decidiu escutar antes de tentar mudar o bairro.</p><b>Ler e ouvir história ↗</b></div></a>
-          <a class="inspiring-story sunrise" href="historia.html?id=caderno" target="_blank" rel="noopener"><div class="story-illustration" aria-hidden="true"><svg viewBox="0 0 320 180"><circle cx="75" cy="55" r="30"/><path d="M0 150 L85 90 L145 135 L220 70 L320 150 V180 H0Z"/><path d="M130 125h60v42h-60z"/></svg></div><div><small>EDUCAÇÃO • PROPÓSITO</small><h3>O caderno que abriu uma porta</h3><p>Um curso gratuito transformou insegurança em primeiro trabalho.</p><b>Ler e ouvir história ↗</b></div></a>
-          <a class="inspiring-story green" href="historia.html?id=mesa" target="_blank" rel="noopener"><div class="story-illustration" aria-hidden="true"><svg viewBox="0 0 320 180"><circle cx="160" cy="75" r="48"/><path d="M80 132h160v18H80zM105 150v30M215 150v30"/><circle cx="125" cy="70" r="16"/><circle cx="195" cy="70" r="16"/></svg></div><div><small>SERVIÇO • DIGNIDADE</small><h3>Quando a mesa ficou maior</h3><p>Uma pequena igreja descobriu que repartir também é aprender nomes.</p><b>Ler e ouvir história ↗</b></div></a>
-          <a class="inspiring-story violet" href="historia.html?id=recomeco" target="_blank" rel="noopener"><div class="story-illustration" aria-hidden="true"><svg viewBox="0 0 320 180"><path d="M35 155 Q90 35 160 145 Q230 35 285 155" fill="none"/><circle cx="160" cy="65" r="25"/><path d="M160 90v65M125 120h70"/></svg></div><div><small>TESTEMUNHO • RECOMEÇO</small><h3>O dia em que pedir ajuda virou coragem</h3><p>Depois de uma perda, ele descobriu que fé e cuidado caminham juntos.</p><b>Ler e ouvir história ↗</b></div></a>
+          <a class="inspiring-story ocean" href="historia.html?id=ponte"><div class="story-illustration" aria-hidden="true"><svg viewBox="0 0 320 180"><circle cx="250" cy="45" r="24"/><path d="M0 145 Q70 110 135 145 T320 145 V180 H0Z"/><path d="M55 132 Q160 45 265 132" fill="none"/><path d="M95 105v44M225 105v44"/></svg></div><div><small>MISSÃO • COMUNIDADE</small><h3>A ponte que começou com uma conversa</h3><p>Uma jovem decidiu escutar antes de tentar mudar o bairro.</p><b>Ler e ouvir história ↗</b></div></a>
+          <a class="inspiring-story sunrise" href="historia.html?id=caderno"><div class="story-illustration" aria-hidden="true"><svg viewBox="0 0 320 180"><circle cx="75" cy="55" r="30"/><path d="M0 150 L85 90 L145 135 L220 70 L320 150 V180 H0Z"/><path d="M130 125h60v42h-60z"/></svg></div><div><small>EDUCAÇÃO • PROPÓSITO</small><h3>O caderno que abriu uma porta</h3><p>Um curso gratuito transformou insegurança em primeiro trabalho.</p><b>Ler e ouvir história ↗</b></div></a>
+          <a class="inspiring-story green" href="historia.html?id=mesa"><div class="story-illustration" aria-hidden="true"><svg viewBox="0 0 320 180"><circle cx="160" cy="75" r="48"/><path d="M80 132h160v18H80zM105 150v30M215 150v30"/><circle cx="125" cy="70" r="16"/><circle cx="195" cy="70" r="16"/></svg></div><div><small>SERVIÇO • DIGNIDADE</small><h3>Quando a mesa ficou maior</h3><p>Uma pequena igreja descobriu que repartir também é aprender nomes.</p><b>Ler e ouvir história ↗</b></div></a>
+          <a class="inspiring-story violet" href="historia.html?id=recomeco"><div class="story-illustration" aria-hidden="true"><svg viewBox="0 0 320 180"><path d="M35 155 Q90 35 160 145 Q230 35 285 155" fill="none"/><circle cx="160" cy="65" r="25"/><path d="M160 90v65M125 120h70"/></svg></div><div><small>TESTEMUNHO • RECOMEÇO</small><h3>O dia em que pedir ajuda virou coragem</h3><p>Depois de uma perda, ele descobriu que fé e cuidado caminham juntos.</p><b>Ler e ouvir história ↗</b></div></a>
         </div>
         <p class="integrity-note">As quatro histórias são ilustrativas e usam personagens fictícios. Elas não devem ser apresentadas como depoimentos reais.</p>
       </section>
@@ -506,6 +506,18 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
   <script src="assets/supabase-config.js"></script>
   <script src="assets/bible-data.js"></script>
+  <script>
+(function(){
+  const target=Date.parse('2026-10-29T00:00:00-03:00');
+  const ids=['launch-days','launch-hours','launch-minutes','launch-seconds'];
+  function tick(){
+    const diff=Math.max(0,target-Date.now());
+    const values=[Math.floor(diff/86400000),Math.floor((diff%86400000)/3600000),Math.floor((diff%3600000)/60000),Math.floor((diff%60000)/1000)];
+    ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.textContent=String(values[i]).padStart(2,'0')});
+  }
+  tick();window.setInterval(tick,1000);
+})();
+</script>
   <script src="assets/app.js"></script>
 </body>
 </html>
