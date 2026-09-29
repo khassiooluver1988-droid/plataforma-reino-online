@@ -424,8 +424,8 @@
 
       <section class="page" id="comunidade" data-title="Comunidade">
         <div class="community-hero visual-hero"><img src="assets/capa-comunidade-rede.webp" alt="Jovens cristãos interagindo com música, dança, teatro e fotografia"><div><span class="hero-label">COMUNIDADE REINO</span><h2>Conecte sua fé, seus talentos e novas amizades.</h2><p>Uma rede para conversar, criar, servir e encontrar jovens que compartilham os mesmos interesses.</p></div></div>
-        <div class="community-nav-tabs" role="tablist" aria-label="Áreas da comunidade"><button class="active" type="button" data-community-view="feed">Feed</button><button type="button" data-community-view="groups">Grupos e temas</button><button type="button" data-community-view="chat">Bate-papo</button></div>
-        <div class="community-stories" aria-label="Grupos em destaque"><button type="button" data-community-topic="Músicos"><span>♫</span><b>Músicos</b></button><button type="button" data-community-topic="Teatro"><span>🎭</span><b>Teatro</b></button><button type="button" data-community-topic="Ministério de Dança"><span>◒</span><b>Dança</b></button><button type="button" data-community-topic="Pregações"><span>✦</span><b>Pregações</b></button><button type="button" data-community-topic="Guitarristas"><span>♬</span><b>Guitarristas</b></button><button type="button" data-community-topic="Jovens da Bíblia"><span>▤</span><b>Jovens da Bíblia</b></button><button type="button" data-community-topic="Batistas"><span>◎</span><b>Batistas</b></button><button type="button" data-community-topic="Jovens da CCB"><span>◇</span><b>Jovens da CCB</b></button></div>
+        <div class="community-nav-tabs" role="tablist" aria-label="Áreas da comunidade"><button class="active" type="button" data-community-view="feed">Feed</button><button type="button" disabled aria-disabled="true" title="Em breve">Grupos e temas • em breve</button><button type="button" disabled aria-disabled="true" title="Em breve">Bate-papo • em breve</button></div>
+        <div class="community-lock-note">Publicações, fotos e comentários estão liberados. Grupos e bate-papo serão liberados em uma próxima etapa.</div>
         <div class="social-network-layout" data-community-container="feed">
           <aside class="social-profile-card panel"><div class="large-avatar" id="community-avatar">R</div><h3>Minha Comunidade</h3><p>Compartilhe sua caminhada, descubra grupos e crie conexões saudáveis.</p><div><span><strong>12</strong> grupos</span><span><strong>24</strong> conexões</span></div><small class="online-status"><i></i> Comunidade ativa agora</small></aside>
           <div class="social-feed-column" data-community-panel="feed">
@@ -433,25 +433,16 @@
               <div class="composer-user"><span class="avatar" id="composer-avatar">V</span><label for="new-post">Compartilhe algo com a comunidade</label></div>
               <textarea id="new-post" maxlength="500" placeholder="Conte uma experiência, aprendizado, pedido de oração ou novidade..."></textarea>
               <div class="media-preview hidden" id="community-media-preview"></div>
-              <div class="composer-tools"><label for="post-photo">▧ Foto</label><input class="sr-only" id="post-photo" type="file" accept="image/*"><label for="post-video">▶ Vídeo</label><input class="sr-only" id="post-video" type="file" accept="video/*"><button type="button" data-post-kind="Pedido de oração">✦ Pedido de oração</button><button type="button" data-post-kind="Testemunho">♡ Testemunho</button></div>
+              <div class="composer-tools"><label for="post-photo">▧ Foto</label><input class="sr-only" id="post-photo" type="file" accept="image/jpeg,image/png,image/webp"><button type="button" data-post-kind="Pedido de oração">✦ Pedido de oração</button><button type="button" data-post-kind="Testemunho">♡ Testemunho</button></div>
               <div class="composer-footer"><small><span id="char-count">0</span>/500</small><button class="button gold" type="button" id="publish-post">Publicar</button></div>
             </article>
             <div class="feed" id="community-feed" aria-live="polite"></div>
           </div>
-          <aside class="social-groups panel"><span class="eyebrow">EM ALTA AGORA</span><h3>Entre na conversa</h3><button type="button" data-open-group="musicos"><span>♫</span><b>Músicos do Reino<small>346 participantes</small></b><strong>Entrar</strong></button><button type="button" data-open-group="teatro"><span>🎭</span><b>Teatro Cristão<small>128 participantes</small></b><strong>Entrar</strong></button><button type="button" data-open-group="piaui"><span>●</span><b>Jovens Cristãos do Piauí<small>492 participantes</small></b><strong>Entrar</strong></button><button type="button" data-open-group="maranhao"><span>●</span><b>Jovens do Maranhão<small>318 participantes</small></b><strong>Entrar</strong></button><p class="community-rule">Respeito, segurança, moderação e fé em todas as interações.</p></aside>
+          <aside class="social-groups panel community-locked-panel"><span class="eyebrow">EM BREVE</span><h3>Grupos e bate-papo</h3><p>Esta área está temporariamente bloqueada enquanto finalizamos a experiência da comunidade.</p></aside>
         </div>
 
-        <section class="community-groups-area hidden" data-community-container="groups">
-          <div class="section-heading"><div><span class="eyebrow">COMUNIDADES POR INTERESSE</span><h2>Encontre pessoas que falam a sua língua</h2></div><p>Escolha um grupo para trocar experiências, ideias, repertórios e conhecimento.</p></div>
-          <div class="community-groups-grid" id="community-groups-grid"></div>
-        </section>
-
-        <section class="community-chat-area hidden" data-community-container="chat">
-          <div class="group-chat-shell panel">
-            <aside class="chat-room-list"><span class="eyebrow">SALAS DISPONÍVEIS</span><h3>Bate-papo Reino</h3><div id="chat-room-list"></div></aside>
-            <div class="group-chat-main"><header><div><small>SALA ATUAL</small><h3 id="chat-room-title">Músicos do Reino</h3></div><span class="chat-online"><i></i> online</span></header><div class="group-chat-messages" id="group-chat-messages" aria-live="polite"></div><form class="group-chat-compose" id="group-chat-form"><input id="group-chat-input" maxlength="350" placeholder="Digite sua mensagem com respeito..." autocomplete="off"><button class="button gold" type="submit">Enviar</button></form><small class="chat-safety">Não compartilhe telefone, endereço, documentos ou informações de menores.</small></div>
-          </div>
-        </section>
+        <section class="community-groups-area hidden" data-community-container="groups"></section>
+        <section class="community-chat-area hidden" data-community-container="chat"></section>
       </section>
 
       <section class="page" id="perfil" data-title="Meu perfil">
@@ -467,7 +458,7 @@
             <div class="actions"><button class="button navy" type="button" data-dialog="profile-dialog">Editar perfil</button></div>
           </article>
           <div class="stats-grid">
-            <article class="panel stat-card"><small>MELHOR QUIZ</small><strong id="profile-score">0/10</strong><span>Respostas corretas</span></article>
+            
             <article class="panel stat-card"><small>FAVORITOS</small><strong id="profile-favorites">0</strong><span>Versículos salvos</span></article>
             <article class="panel stat-card"><small>PUBLICAÇÕES</small><strong id="profile-posts">0</strong><span>Mensagens enviadas</span></article>
           </div>
@@ -480,7 +471,7 @@
           <article class="panel stat-card"><small>USUÁRIOS</small><strong>1.250</strong><span>+8% neste mês</span></article>
           <article class="panel stat-card"><small>CONTEÚDOS</small><strong id="content-count">184</strong><span>Publicados e agendados</span></article>
           <article class="panel stat-card"><small>GRUPOS</small><strong>38</strong><span>Comunidades ativas</span></article>
-          <article class="panel stat-card"><small>QUIZZES</small><strong>27</strong><span>Ativos na plataforma</span></article>
+          
         </div>
         <article class="panel top-gap">
           <div class="panel-top admin-top"><div><span class="eyebrow">USUÁRIOS</span><h3>Cadastros recentes</h3></div><label class="search-box compact"><span>⌕</span><input id="user-search" type="search" placeholder="Pesquisar..."></label></div>
@@ -496,11 +487,13 @@
   <div><span class="eyebrow">CONTAGEM REGRESSIVA</span><h2>Já, já estaremos no ar!</h2><p>Lançamento da Plataforma Reino em <strong>29 de outubro de 2026 • 00:00</strong>.</p></div>
   <div class="launch-units"><span><strong id="launch-days">00</strong><small>DIAS</small></span><span><strong id="launch-hours">00</strong><small>HORAS</small></span><span><strong id="launch-minutes">00</strong><small>MINUTOS</small></span><span><strong id="launch-seconds">00</strong><small>SEGUNDOS</small></span></div>
 </section>
-<footer class="reino-footer">
-  <div><strong>PLATAFORMA REINO • 2026</strong><p>Cristo é o encontro. A tecnologia é a ferramenta. As pessoas são a missão.</p></div>
-  <div class="footer-credits"><span><b>Idealização:</b> Pastor João Neto</span><span><b>Desenvolvimento e acompanhamento:</b> Khassio Silva • Engaja Marketing e Projetos Estratégicos</span></div>
-  <div class="footer-security"><span aria-hidden="true">🔒</span><div><b>PLATAFORMA SEGURA</b><small>Conexão protegida e autenticação segura</small></div></div>
-  <div class="footer-social"><b>Redes sociais</b><span>Instagram • Facebook • YouTube</span><small>Perfis oficiais serão vinculados sem inventar endereços.</small></div>
+<footer class="reino-footer reino-footer-compact">
+  <span>Plataforma Reino • 2026</span>
+  <span>Cristo é o encontro. A tecnologia é a ferramenta. As pessoas são a missão.</span>
+  <span>Idealização: Pastor João Neto</span>
+  <span>Desenvolvimento e acompanhamento: Khassio Silva • Engaja Marketing e Projetos Estratégicos</span>
+  <span>🔒 Plataforma segura • conexão protegida</span>
+  <span>Instagram • Facebook • YouTube</span>
 </footer>
     </main>
   </div>
