@@ -54,7 +54,8 @@ async function completeFirstAccess(name,contact,password){
   if(error){
     if(error.code==='email_not_confirmed')throw new Error('Confirme seu cadastro pelo link enviado ao seu e-mail e depois entre com a mesma senha. Confira também a pasta de spam.');
     if(error.code!=='invalid_credentials')throw error;
-    const signup=await client.auth.signUp({email,password,options:{data:{full_name:name.trim()}}});
+    const emailRedirectTo=new URL('index.html',location.href).href;
+    const signup=await client.auth.signUp({email,password,options:{emailRedirectTo,data:{full_name:name.trim()}}});
     if(signup.error)throw signup.error;
     data=signup.data;
     if(!data.session){toast('Confira o e-mail para confirmar o cadastro. Depois, entre com a mesma senha.');return false}
