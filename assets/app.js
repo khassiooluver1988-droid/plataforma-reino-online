@@ -82,7 +82,7 @@ async function setupFirstAccess(){
   document.getElementById('auth-login-tab').addEventListener('click',()=>setAuthMode('login'));
   document.getElementById('auth-signup-tab').addEventListener('click',()=>setAuthMode('signup'));
   document.getElementById('show-login-password').addEventListener('change',event=>document.getElementById('login-password').type=event.target.checked?'text':'password');
-  document.getElementById('show-signup-password').addEventListener('change',event=>['signup-password','signup-password-confirm'].forEach(id=>document.getElementById(id).type=event.target.checked?'text':'password'));
+  document.getElementById('show-signup-password').addEventListener('change',event=>document.getElementById('signup-password').type=event.target.checked?'text':'password');
   document.getElementById('login-form').addEventListener('submit',async event=>{
     event.preventDefault();const email=document.getElementById('login-email').value.trim().toLowerCase(),password=document.getElementById('login-password').value;
     if(!validContact(email)||password.length<6)return authMessage('login-status','Informe um e-mail válido e sua senha.',true);
@@ -90,7 +90,7 @@ async function setupFirstAccess(){
     try{
       const {data,error}=await client.auth.signInWithPassword({email,password});
       if(error){
-        if(error.code==='email_not_confirmed')throw new Error('Confirme seu e-mail antes de entrar.');
+        if(error.code==='email_not_confirmed')throw new Error('Sua conta ainda está aguardando confirmação do Supabase.');
         if(error.code==='invalid_credentials')throw new Error('E-mail ou senha incorretos.');
         throw error;
       }
@@ -100,10 +100,8 @@ async function setupFirstAccess(){
   });
   document.getElementById('signup-form').addEventListener('submit',async event=>{
     event.preventDefault();
-    const name=document.getElementById('signup-name').value.trim(),email=document.getElementById('signup-email').value.trim().toLowerCase(),password=document.getElementById('signup-password').value,confirm=document.getElementById('signup-password-confirm').value;
+    const name=document.getElementById('signup-name').value.trim(),email=document.getElementById('signup-email').value.trim().toLowerCase(),password=document.getElementById('signup-password').value;
     if(!name||!validContact(email)||password.length<6)return authMessage('signup-status','Preencha nome, e-mail válido e uma senha com pelo menos 6 caracteres.',true);
-    if(password!==confirm)return authMessage('signup-status','As senhas não são iguais.',true);
-    if(!document.getElementById('signup-consent').checked)return authMessage('signup-status','Confirme a criação da conta para continuar.',true);
     const button=event.currentTarget.querySelector('[type="submit"]');button.disabled=true;button.textContent='CRIANDO CONTA...';authMessage('signup-status','');
     try{
       const emailRedirectTo=new URL('index.html',location.href).href;
@@ -112,7 +110,7 @@ async function setupFirstAccess(){
         if(error.code==='user_already_exists')throw new Error('Este e-mail já possui conta. Use a opção Entrar.');
         throw error;
       }
-      if(!data.session){authMessage('signup-status','Conta criada. Confira seu e-mail para confirmar o cadastro e depois use Entrar.');setTimeout(()=>setAuthMode('login'),3500);return}
+      if(!data.session){authMessage('signup-status','Conta criada, mas o Supabase ainda exige confirmação por e-mail. Vou manter esta mensagem até a confirmação ser desativada no Auth.');setTimeout(()=>setAuthMode('login'),3500);return}
       await client.from('profiles').update({full_name:name,email}).eq('id',data.user.id);
       await finishAuthenticatedAccess(data.user,name);
     }catch(error){authMessage('signup-status',error.message||'Não foi possível criar a conta.',true)}
