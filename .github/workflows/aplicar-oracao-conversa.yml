@@ -1,0 +1,101 @@
+name: Aplicar Oração e Conversa
+
+on:
+  push:
+    paths:
+      - '.github/workflows/aplicar-oracao-conversa.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Atualizar interface e integração
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          index = Path('index.html')
+          html = index.read_text(encoding='utf-8')
+
+          html = html.replace('<a href="index.html#acolhimento" data-route="acolhimento"><span>♡</span><b>Acolhimento</b></a>', '<a href="index.html#acolhimento" data-route="acolhimento"><span>♡</span><b>Oração e Conversa</b></a>')
+          html = html.replace('data-title="Acolhimento"', 'data-title="Oração e Conversa"')
+          html = html.replace('aria-label="Mostrar Acolhimento"', 'aria-label="Mostrar Oração e Conversa"')
+          html = html.replace('<span class="promo-tag">ACOLHIMENTO • ESCUTA • ESPERANÇA</span><h2>Se está pesado demais, você não precisa carregar sozinho.</h2><p>Encontre escuta sem julgamento, orientação responsável e um caminho seguro para pedir ajuda.</p><div class="promo-highlights"><span>Espaço seguro</span><span>Conversa guiada</span><span>Apoio responsável</span></div><a class="button gold" href="index.html#acolhimento">Encontrar acolhimento agora →</a>', '<span class="promo-tag">ORAÇÃO • CONVERSA • CUIDADO</span><h2>Quer orar, conversar ou simplesmente escrever o que está vivendo?</h2><p>Use este espaço com liberdade. Você não precisa classificar o seu problema para compartilhar o que precisa.</p><div class="promo-highlights"><span>Pedido de oração</span><span>Conversa</span><span>Mensagem livre</span></div><a class="button gold" href="index.html#acolhimento">Abrir Oração e Conversa →</a>')
+
+          new_section = '''      <section class="page" id="acolhimento" data-title="Oração e Conversa">
+        <div class="care-hero section-cover">
+          <img src="assets/banner-acolhimento.webp" alt="Pessoas conversando e oferecendo apoio com respeito">
+          <div><span class="hero-label">ORAÇÃO E CONVERSA</span><h2>Este é um espaço para você falar com liberdade.</h2><p>Você não precisa escolher ou identificar um problema específico. Com suas próprias palavras, conte como podemos acolher você.</p></div>
+          <blockquote>“Perto está o Senhor dos que têm o coração quebrantado.”<strong>Salmos 34:18</strong></blockquote>
+        </div>
+
+        <div class="section-heading compact-heading"><div><span class="eyebrow">COMO PODEMOS AJUDAR?</span><h2>Escolha apenas como deseja começar</h2></div><p>Independentemente do que você esteja vivendo, você pode escrever livremente.</p></div>
+
+        <form class="panel support-request-form" id="support-request-form">
+          <div class="feeling-grid" id="support-type-options">
+            <button type="button" data-support-subject="Quero pedir uma oração"><span>✦</span><strong>Quero pedir uma oração</strong><small>Compartilhe seu pedido com suas próprias palavras</small></button>
+            <button type="button" data-support-subject="Quero conversar com alguém"><span>♡</span><strong>Quero conversar com alguém</strong><small>Conte o que você deseja compartilhar</small></button>
+            <button type="button" data-support-subject="Quero enviar uma mensagem"><span>✉</span><strong>Quero enviar uma mensagem</strong><small>Escreva livremente, sem precisar escolher um problema</small></button>
+          </div>
+          <input type="hidden" name="subject" required>
+          <label>Conte para nós o que você deseja compartilhar<textarea name="message" required maxlength="2000" rows="7" placeholder="Escreva aqui, com suas próprias palavras..."></textarea></label>
+          <button class="button gold" type="submit">Enviar mensagem</button>
+          <p class="form-note">Sua mensagem será recebida com respeito e privacidade. Nossa equipe poderá entrar em contato com você para continuar essa conversa.</p>
+          <p id="support-request-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>'''
+
+          pattern = re.compile(r'      <section class="page" id="acolhimento".*?      </section>\n\n      <section class="page" id="comunidade"', re.S)
+          if not pattern.search(html):
+              raise SystemExit('Seção acolhimento não encontrada')
+          html = pattern.sub(new_section + '\n\n      <section class="page" id="comunidade"', html, count=1)
+          index.write_text(html, encoding='utf-8')
+
+          app = Path('assets/app.js')
+          js = app.read_text(encoding='utf-8')
+          new_js = r'''const supportTypeButtons=[...document.querySelectorAll('[data-support-subject]')];
+supportTypeButtons.forEach(button=>button.addEventListener('click',()=>{
+  supportTypeButtons.forEach(item=>item.classList.toggle('active',item===button));
+  const form=document.getElementById('support-request-form');
+  form.elements.subject.value=button.dataset.supportSubject;
+  form.elements.message.focus();
+}));
+document.getElementById('support-request-form').addEventListener('submit',async event=>{
+  event.preventDefault();
+  const form=event.currentTarget,button=form.querySelector('[type="submit"]'),status=document.getElementById('support-request-status');
+  const subject=form.elements.subject.value.trim(),message=form.elements.message.value.trim();
+  if(!subject){status.textContent='Escolha se deseja pedir uma oração, conversar ou enviar uma mensagem.';return}
+  if(!message){status.textContent='Escreva a mensagem que deseja compartilhar.';return}
+  const client=window.REINO_SUPABASE;
+  if(!client){status.textContent='Conexão indisponível. Tente novamente mais tarde.';return}
+  button.disabled=true;status.textContent='Enviando...';
+  try{
+    const {data:{user},error:authError}=await client.auth.getUser();
+    if(authError||!user)throw new Error('Entre na sua conta para enviar a mensagem.');
+    const {error}=await client.from('support_requests').insert({user_id:user.id,subject,message});
+    if(error)throw error;
+    form.reset();supportTypeButtons.forEach(item=>item.classList.remove('active'));
+    status.textContent='Sua mensagem foi recebida com respeito e privacidade. Nossa equipe poderá entrar em contato com você para continuar essa conversa.';
+  }catch(error){console.warn('Oração e Conversa:',error);status.textContent=error.message||'Não foi possível enviar. Tente novamente.'}
+  finally{button.disabled=false}
+});
+'''
+          js_pattern = re.compile(r'const careGuidance=\{.*?(?=async function submitReinoForm)', re.S)
+          if not js_pattern.search(js):
+              raise SystemExit('Bloco antigo de acolhimento não encontrado no app.js')
+          js = js_pattern.sub(new_js + '\n', js, count=1)
+          app.write_text(js, encoding='utf-8')
+          PY
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html assets/app.js
+          git commit -m "Atualiza acolhimento para Oração e Conversa"
+          git push
