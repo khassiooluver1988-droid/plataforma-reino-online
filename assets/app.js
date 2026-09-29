@@ -45,57 +45,80 @@ async function cacheAuthenticatedUser(authUser,fallbackName=''){
   write(STORE.access,{connected:true,userId:authUser.id,createdAt:Date.now()});
   refreshUser();
 }
-async function completeFirstAccess(name,contact,password){
-  const client=window.REINO_SUPABASE;
-  if(!client)throw new Error('Conexão com Supabase indisponível.');
-  const email=contact.trim().toLowerCase();
-  if(!validContact(email))throw new Error('Informe um e-mail válido.');
-  let {data,error}=await client.auth.signInWithPassword({email,password});
-  if(error){
-    if(error.code==='email_not_confirmed')throw new Error('Confirme seu cadastro pelo link enviado ao seu e-mail e depois entre com a mesma senha. Confira também a pasta de spam.');
-    if(error.code!=='invalid_credentials')throw error;
-    const emailRedirectTo=new URL('index.html',location.href).href;
-    const signup=await client.auth.signUp({email,password,options:{emailRedirectTo,data:{full_name:name.trim()}}});
-    if(signup.error)throw signup.error;
-    data=signup.data;
-    if(!data.session){toast('Confira o e-mail para confirmar o cadastro. Depois, entre com a mesma senha.');return false}
-  }
-  const authUser=data.user||data.session?.user;
+function authMessage(id,message,isError=false){
+  const el=document.getElementById(id);if(!el)return;el.textContent=message||'';el.classList.toggle('error',Boolean(isError));
+}
+async function finishAuthenticatedAccess(authUser,fallbackName=''){
   if(!authUser)throw new Error('Não foi possível validar o usuário.');
-  await client.from('profiles').update({full_name:name.trim(),email}).eq('id',authUser.id);
-  await cacheAuthenticatedUser(authUser,name);
+  await cacheAuthenticatedUser(authUser,fallbackName);
   document.body.classList.remove('auth-locked');
   document.getElementById('auth-gate').classList.add('authenticated');
   const destination=safeReturnDestination();
-  if(destination)setTimeout(()=>location.href=destination,250);
-  return true
+  if(destination)setTimeout(()=>location.href=destination,200);
+}
+function setAuthMode(mode){
+  const login=mode==='login';
+  document.getElementById('login-form').classList.toggle('hidden',!login);
+  document.getElementById('signup-form').classList.toggle('hidden',login);
+  document.getElementById('auth-login-tab').classList.toggle('active',login);
+  document.getElementById('auth-signup-tab').classList.toggle('active',!login);
+  document.getElementById('auth-login-tab').setAttribute('aria-selected',String(login));
+  document.getElementById('auth-signup-tab').setAttribute('aria-selected',String(!login));
+  document.getElementById('access-title').textContent=login?'Acesse sua conta':'Crie sua conta';
+  authMessage('login-status','');authMessage('signup-status','');
+  setTimeout(()=>document.getElementById(login?'login-email':'signup-name')?.focus(),50);
 }
 async function setupFirstAccess(){
-  const gate=document.getElementById('auth-gate');
-  const client=window.REINO_SUPABASE;
+  const gate=document.getElementById('auth-gate'),client=window.REINO_SUPABASE;
   document.body.classList.add('auth-locked');
-  if(client){
-    const {data:{user},error}=await client.auth.getUser();
-    if(!error&&user){
-      await cacheAuthenticatedUser(user);
-      gate.classList.add('authenticated');
-      document.body.classList.remove('auth-locked');
-      const destination=safeReturnDestination();
-      if(destination)location.replace(destination);
-      return
-    }
+  if(!client){authMessage('login-status','Conexão com Supabase indisponível.',true);return}
+  const {data:{session}}=await client.auth.getSession();
+  if(session?.user){
+    await cacheAuthenticatedUser(session.user);
+    gate.classList.add('authenticated');document.body.classList.remove('auth-locked');
+    const destination=safeReturnDestination();if(destination)location.replace(destination);
+    return
   }
-  setTimeout(()=>document.getElementById('access-name').focus(),100);
-  document.getElementById('show-access-password').addEventListener('change',event=>document.getElementById('access-password').type=event.target.checked?'text':'password');
-  document.getElementById('first-access-form').addEventListener('submit',async event=>{
+  document.getElementById('auth-login-tab').addEventListener('click',()=>setAuthMode('login'));
+  document.getElementById('auth-signup-tab').addEventListener('click',()=>setAuthMode('signup'));
+  document.getElementById('show-login-password').addEventListener('change',event=>document.getElementById('login-password').type=event.target.checked?'text':'password');
+  document.getElementById('show-signup-password').addEventListener('change',event=>['signup-password','signup-password-confirm'].forEach(id=>document.getElementById(id).type=event.target.checked?'text':'password'));
+  document.getElementById('login-form').addEventListener('submit',async event=>{
+    event.preventDefault();const email=document.getElementById('login-email').value.trim().toLowerCase(),password=document.getElementById('login-password').value;
+    if(!validContact(email)||password.length<6)return authMessage('login-status','Informe um e-mail válido e sua senha.',true);
+    const button=event.currentTarget.querySelector('[type="submit"]');button.disabled=true;button.textContent='ENTRANDO...';authMessage('login-status','');
+    try{
+      const {data,error}=await client.auth.signInWithPassword({email,password});
+      if(error){
+        if(error.code==='email_not_confirmed')throw new Error('Confirme seu e-mail antes de entrar.');
+        if(error.code==='invalid_credentials')throw new Error('E-mail ou senha incorretos.');
+        throw error;
+      }
+      await finishAuthenticatedAccess(data.user||data.session?.user);
+    }catch(error){authMessage('login-status',error.message||'Não foi possível entrar.',true)}
+    finally{button.disabled=false;button.textContent='ENTRAR →'}
+  });
+  document.getElementById('signup-form').addEventListener('submit',async event=>{
     event.preventDefault();
-    const name=document.getElementById('access-name').value;
-    const contact=document.getElementById('access-login').value;
-    const password=document.getElementById('access-password').value;
-    if(!name.trim()||!validContact(contact)||password.length<6||!document.getElementById('access-consent').checked)return toast('Informe nome, e-mail válido, senha e confirmação.');
-    const button=event.currentTarget.querySelector('[type="submit"]');button.disabled=true;button.textContent='CONECTANDO...';
-    try{await completeFirstAccess(name,contact,password)}catch(error){console.error(error);toast(error?.message||'Não foi possível entrar. Confira seu e-mail e senha.')}finally{button.disabled=false;button.textContent='ENTRAR NA PLATAFORMA →'}
-  })
+    const name=document.getElementById('signup-name').value.trim(),email=document.getElementById('signup-email').value.trim().toLowerCase(),password=document.getElementById('signup-password').value,confirm=document.getElementById('signup-password-confirm').value;
+    if(!name||!validContact(email)||password.length<6)return authMessage('signup-status','Preencha nome, e-mail válido e uma senha com pelo menos 6 caracteres.',true);
+    if(password!==confirm)return authMessage('signup-status','As senhas não são iguais.',true);
+    if(!document.getElementById('signup-consent').checked)return authMessage('signup-status','Confirme a criação da conta para continuar.',true);
+    const button=event.currentTarget.querySelector('[type="submit"]');button.disabled=true;button.textContent='CRIANDO CONTA...';authMessage('signup-status','');
+    try{
+      const emailRedirectTo=new URL('index.html',location.href).href;
+      const {data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo,data:{full_name:name}}});
+      if(error){
+        if(error.code==='user_already_exists')throw new Error('Este e-mail já possui conta. Use a opção Entrar.');
+        throw error;
+      }
+      if(!data.session){authMessage('signup-status','Conta criada. Confira seu e-mail para confirmar o cadastro e depois use Entrar.');setTimeout(()=>setAuthMode('login'),3500);return}
+      await client.from('profiles').update({full_name:name,email}).eq('id',data.user.id);
+      await finishAuthenticatedAccess(data.user,name);
+    }catch(error){authMessage('signup-status',error.message||'Não foi possível criar a conta.',true)}
+    finally{button.disabled=false;button.textContent='CRIAR MINHA CONTA →'}
+  });
+  setAuthMode('login');
 }
 // Evita o acúmulo de abas: toda a plataforma navega na mesma janela.
 document.querySelectorAll('a[target="_blank"]').forEach(link=>link.removeAttribute('target'));
