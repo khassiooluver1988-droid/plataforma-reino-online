@@ -6,7 +6,10 @@
   <title>Quiz Bíblico | Plataforma Reino</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23071a34'/%3E%3Cpath d='M29 10h6v14h12v6H35v24h-6V30H17v-6h12z' fill='%23d8b05d'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="assets/styles.css">
-  <script>try{const access=JSON.parse(localStorage.getItem('reino_access_granted_v2')||'{}');if(!access.connected){const back=encodeURIComponent('quiz.html'+location.search+location.hash);location.replace('index.html?return='+back)}}catch{location.replace('index.html')}</script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
+  <script src="assets/supabase-config.js"></script>
+  <script src="assets/auth-guard.js"></script>
 </head>
 <body class="quiz-body">
   <div class="game-grid-bg" aria-hidden="true"></div>
@@ -29,7 +32,6 @@
       </div>
       <aside class="gamer-setup-card">
         <div class="setup-level"><span>NÍVEL 01</span><b>PREPARE-SE PARA JOGAR</b></div>
-        <div class="gamer-avatar" id="gamer-avatar">G</div>
         <label class="player-name-label">ESCOLHA SEU NOME GAMER<input id="player-name" maxlength="18" placeholder="Ex.: GuerreiroDaFé" autocomplete="nickname"></label>
         <fieldset class="game-mode-picker"><legend>ESCOLHA A ARENA</legend><button class="active" type="button" data-quiz-mode="TODOS">Tudo</button><button type="button" data-quiz-mode="BÍBLIA">Bíblia</button><button type="button" data-quiz-mode="ANTIGO TESTAMENTO">Antigo Testamento</button><button type="button" data-quiz-mode="NOVO">Novo Testamento</button><button type="button" data-quiz-mode="VIDA CRISTÃ">Vida Cristã</button></fieldset>
         <button class="game-start-button" type="button" id="start-quiz"><span>▶</span> INICIAR PARTIDA</button>
@@ -40,7 +42,7 @@
 
     <section class="quiz-game hidden" id="quiz-game" aria-live="polite">
       <div class="game-hud">
-        <div class="hud-player"><span class="avatar" id="hud-avatar">G</span><div><small>JOGADOR</small><strong id="hud-player-name">Gamer</strong></div></div>
+        <div class="hud-player"><div><small>JOGADOR</small><strong id="hud-player-name">Gamer</strong></div></div>
         <div class="hud-stat"><small>XP TOTAL</small><strong><span id="score-now">0</span> XP</strong></div>
         <div class="hud-stat combo"><small>COMBO</small><strong>×<span id="streak-now">0</span></strong></div>
       </div>
@@ -67,8 +69,8 @@
     </section>
   </main>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="assets/quiz-bank.js?v=20260927-1150"></script>
-  <script src="assets/quiz-extra-bank.js?v=20260927-1150"></script>
-  <script src="assets/quiz.js?v=20260927-1150"></script>
+  <script src="assets/quiz-bank.js"></script>
+  <script src="assets/quiz-extra-bank.js"></script>
+  <script src="assets/quiz.js"></script>
 </body>
 </html>

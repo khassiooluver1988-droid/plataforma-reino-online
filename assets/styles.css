@@ -165,3 +165,10 @@ dialog{border:0;border-radius:22px;padding:0;box-shadow:0 30px 90px rgba(0,0,0,.
 
 /* QUIZ DO REINO: cronometro removido */
 .hud-timer{display:none!important}
+
+.support-request-form{margin-top:22px;padding-top:20px;border-top:1px solid var(--line);display:grid;gap:12px}.support-request-form h3{margin:0}.support-request-form p{margin:0;line-height:1.5}.support-request-form label{display:grid;gap:6px;font-weight:700}.support-request-form input,.support-request-form textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit}.support-request-form button{justify-self:start}.support-request-form [role=status]{font-weight:700}
+
+.reino-paths,.market-grid,.care-paths{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:22px 0}.reino-paths a,.care-paths a{display:flex;flex-direction:column;gap:5px;padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--paper);color:var(--navy);text-decoration:none}.reino-paths a:hover,.care-paths a:hover{border-color:var(--gold)}.reino-paths b{font-size:15px;letter-spacing:.04em}.market-grid .panel{display:flex;flex-direction:column;align-items:flex-start;gap:12px}.market-grid .panel h3,.market-grid .panel p{margin:0}.market-grid .panel>a{margin-top:auto}.market-author{display:flex;align-items:center;justify-content:space-between;gap:20px}.market-author h3{margin:6px 0}.market-author p{margin:0}.market-author>a{flex:0 0 auto}@media(max-width:650px){.reino-paths,.market-grid,.care-paths{grid-template-columns:1fr}.market-author{display:block}.market-author>a{margin-top:16px}}
+
+/* Quiz: identificação apenas pelo nome gamer, sem avatar. */
+.gamer-setup-card .gamer-avatar,.quiz-game .hud-player .avatar{display:none}

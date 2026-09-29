@@ -18,17 +18,86 @@ function toast(message){const el=document.getElementById('toast');el.textContent
 function initials(name='Visitante'){return name.split(/\s+/).filter(Boolean).slice(0,2).map(v=>v[0]).join('').toUpperCase()||'V'}
 function escapeHtml(value){return String(value).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function safeReturnDestination(){const value=new URLSearchParams(location.search).get('return')||'';return /^(quiz|historia)\.html(?:[?#].*)?$/.test(value)?value:''}
-function validContact(value){const clean=value.trim();return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)||clean.replace(/\D/g,'').length>=10}
+function validContact(value){const clean=value.trim();return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)}
 async function passwordFingerprint(value){if(window.crypto?.subtle){const bytes=new TextEncoder().encode(`reino:${value}`);const hash=await crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(hash)].map(byte=>byte.toString(16).padStart(2,'0')).join('')}let hash=5381;for(const char of value)hash=((hash<<5)+hash)^char.charCodeAt(0);return`local-${(hash>>>0).toString(16)}`}
-async function completeFirstAccess(name,contact,password){const normalized=contact.trim().toLowerCase();const credentialHash=await passwordFingerprint(password);write(STORE.user,{name:name.trim(),contact:normalized,email:normalized.includes('@')?normalized:'',phone:normalized.includes('@')?'':normalized,credentialHash});write(STORE.access,{connected:true,createdAt:Date.now()});refreshUser();document.body.classList.remove('auth-locked');document.getElementById('auth-gate').classList.add('authenticated');const destination=safeReturnDestination();if(destination)setTimeout(()=>location.href=destination,360)}
-function setupFirstAccess(){const gate=document.getElementById('auth-gate');const user=read(STORE.user,{});const access=read(STORE.access,{});if(access.connected&&user.name&&user.contact){gate.classList.add('authenticated');const destination=safeReturnDestination();if(destination)location.replace(destination);return}document.body.classList.add('auth-locked');setTimeout(()=>document.getElementById('access-name').focus(),100);document.getElementById('show-access-password').addEventListener('change',event=>document.getElementById('access-password').type=event.target.checked?'text':'password');document.getElementById('first-access-form').addEventListener('submit',async event=>{event.preventDefault();const name=document.getElementById('access-name').value;const contact=document.getElementById('access-login').value;const password=document.getElementById('access-password').value;if(!name.trim()||!validContact(contact)||password.length<6||!document.getElementById('access-consent').checked)return toast('Informe nome, e-mail ou telefone válido, senha e confirmação.');const button=event.currentTarget.querySelector('[type="submit"]');button.disabled=true;button.textContent='CONECTANDO...';try{await completeFirstAccess(name,contact,password)}finally{button.disabled=false;button.textContent='ENTRAR NA PLATAFORMA →'}})}
+async function loadSupabaseProfile(authUser){
+  const client=window.REINO_SUPABASE;
+  if(!client||!authUser)return null;
+  const {data,error}=await client.from('profiles').select('id,email,full_name,phone,avatar_url').eq('id',authUser.id).maybeSingle();
+  if(error){console.warn('Perfil Supabase:',error.message);return null}
+  return data
+}
+const PROFILE_PHOTO_BUCKET='reino-avatars';
+function profilePhotoPath(userId){return `${userId}/profile-${crypto.randomUUID()}.jpg`}
+async function signedProfilePhoto(path){
+  if(!path)return '';
+  if(/^data:image\//.test(path))return path;
+  const {data,error}=await window.REINO_SUPABASE.storage.from(PROFILE_PHOTO_BUCKET).createSignedUrl(path,60*60*24);
+  if(error){console.warn('Foto do perfil:',error.message);return ''}
+  return data.signedUrl
+}
+async function cacheAuthenticatedUser(authUser,fallbackName=''){
+  const profile=await loadSupabaseProfile(authUser);
+  const name=(profile?.full_name||authUser.user_metadata?.full_name||fallbackName||authUser.email?.split('@')[0]||'Usuário').trim();
+  const email=authUser.email||profile?.email||'';
+  const photo=await signedProfilePhoto(profile?.avatar_url);
+  write(STORE.user,{name,contact:email,email,phone:profile?.phone||'',photo});
+  write(STORE.access,{connected:true,userId:authUser.id,createdAt:Date.now()});
+  refreshUser();
+}
+async function completeFirstAccess(name,contact,password){
+  const client=window.REINO_SUPABASE;
+  if(!client)throw new Error('Conexão com Supabase indisponível.');
+  const email=contact.trim().toLowerCase();
+  if(!validContact(email))throw new Error('Informe um e-mail válido.');
+  let {data,error}=await client.auth.signInWithPassword({email,password});
+  if(error){
+    const signup=await client.auth.signUp({email,password,options:{data:{full_name:name.trim()}}});
+    if(signup.error)throw signup.error;
+    data=signup.data;
+    if(!data.session){toast('Conta criada. Confira seu e-mail para confirmar o cadastro e depois entre novamente.');return false}
+  }
+  const authUser=data.user||data.session?.user;
+  if(!authUser)throw new Error('Não foi possível validar o usuário.');
+  await client.from('profiles').update({full_name:name.trim(),email}).eq('id',authUser.id);
+  await cacheAuthenticatedUser(authUser,name);
+  document.body.classList.remove('auth-locked');
+  document.getElementById('auth-gate').classList.add('authenticated');
+  const destination=safeReturnDestination();
+  if(destination)setTimeout(()=>location.href=destination,250);
+  return true
+}
+async function setupFirstAccess(){
+  const gate=document.getElementById('auth-gate');
+  const client=window.REINO_SUPABASE;
+  document.body.classList.add('auth-locked');
+  if(client){
+    const {data:{user},error}=await client.auth.getUser();
+    if(!error&&user){
+      await cacheAuthenticatedUser(user);
+      gate.classList.add('authenticated');
+      document.body.classList.remove('auth-locked');
+      const destination=safeReturnDestination();
+      if(destination)location.replace(destination);
+      return
+    }
+  }
+  setTimeout(()=>document.getElementById('access-name').focus(),100);
+  document.getElementById('show-access-password').addEventListener('change',event=>document.getElementById('access-password').type=event.target.checked?'text':'password');
+  document.getElementById('first-access-form').addEventListener('submit',async event=>{
+    event.preventDefault();
+    const name=document.getElementById('access-name').value;
+    const contact=document.getElementById('access-login').value;
+    const password=document.getElementById('access-password').value;
+    if(!name.trim()||!validContact(contact)||password.length<6||!document.getElementById('access-consent').checked)return toast('Informe nome, e-mail válido, senha e confirmação.');
+    const button=event.currentTarget.querySelector('[type="submit"]');button.disabled=true;button.textContent='CONECTANDO...';
+    try{await completeFirstAccess(name,contact,password)}catch(error){console.error(error);toast(error?.message||'Não foi possível entrar. Confira seu e-mail e senha.')}finally{button.disabled=false;button.textContent='ENTRAR NA PLATAFORMA →'}
+  })
+}
 // Evita o acúmulo de abas: toda a plataforma navega na mesma janela.
 document.querySelectorAll('a[target="_blank"]').forEach(link=>link.removeAttribute('target'));
-function activateRoute(routeOverride){const route=(routeOverride||(location.hash||'#inicio').slice(1)).replace(/^#/,'');const page=document.getElementById(route)||document.getElementById('inicio');document.querySelectorAll('.page').forEach(item=>item.classList.remove('active'));page.classList.add('active');document.querySelectorAll('[data-route]').forEach(link=>link.classList.toggle('active',link.dataset.route===page.id));const title=document.getElementById('page-title');if(title)title.textContent=page.dataset.title||'Plataforma Reino';document.title=`${page.dataset.title||'Plataforma Reino'} | Plataforma Reino`;document.body.classList.remove('menu-open');window.scrollTo({top:0,left:0,behavior:'auto'})}
-document.addEventListener('click',event=>{const link=event.target.closest('a[data-route]');if(!link)return;const route=link.dataset.route;if(!route||!document.getElementById(route))return;event.preventDefault();if(location.hash!=='#'+route)history.pushState(null,'','#'+route);activateRoute(route)});
-window.addEventListener('hashchange',()=>activateRoute());
-window.addEventListener('popstate',()=>activateRoute());
-activateRoute();
+function activateRoute(){const route=(location.hash||'#inicio').slice(1);const page=document.getElementById(route)||document.getElementById('inicio');document.querySelectorAll('.page').forEach(item=>item.classList.remove('active'));page.classList.add('active');document.querySelectorAll('[data-route]').forEach(link=>link.classList.toggle('active',link.dataset.route===page.id));document.getElementById('page-title').textContent=page.dataset.title;document.title=`${page.dataset.title} | Plataforma Reino`;window.scrollTo(0,0);document.body.classList.remove('menu-open')}
+window.addEventListener('hashchange',activateRoute);activateRoute();
 const promoSlides=[...document.querySelectorAll('[data-promo-slide]')];
 const promoDots=[...document.querySelectorAll('[data-promo-dot]')];
 const promoCarousel=document.getElementById('promo-carousel');
@@ -72,13 +141,50 @@ document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('cli
 function renderUserAvatar(element,user){if(!element)return;element.replaceChildren();element.classList.toggle('has-photo',Boolean(user.photo));if(user.photo){const image=document.createElement('img');image.src=user.photo;image.alt=`Foto de ${user.name||'perfil'}`;element.appendChild(image)}else element.textContent=initials(user.name)}
 let pendingProfilePhoto;
 function refreshUser(){const user=read(STORE.user,{name:'Visitante',contact:'',email:'',phone:'',city:'',photo:''});const contact=user.contact||user.email||user.phone||'';document.getElementById('header-name').textContent=user.name;['header-avatar','profile-avatar','profile-photo-preview','community-avatar','composer-avatar'].forEach(id=>renderUserAvatar(document.getElementById(id),user));document.getElementById('profile-display-name').textContent=user.name;document.getElementById('profile-display-email').textContent=[contact,user.city].filter(Boolean).join(' • ')||'Perfil opcional neste aparelho.';document.getElementById('profile-name').value=user.name==='Visitante'?'':user.name;document.getElementById('profile-contact').value=contact;document.getElementById('remove-profile-photo').hidden=!user.photo&&pendingProfilePhoto===undefined}
-function saveUser(name,contact){if(!name.trim()||!validContact(contact))return false;const current=read(STORE.user,{});const normalized=contact.trim().toLowerCase();const photo=pendingProfilePhoto===undefined?(current.photo||''):pendingProfilePhoto;write(STORE.user,{...current,name:name.trim(),contact:normalized,email:normalized.includes('@')?normalized:'',phone:normalized.includes('@')?'':normalized,photo});pendingProfilePhoto=undefined;refreshUser();toast('Perfil e foto salvos com sucesso.');return true}
+async function saveUser(name,contact){
+  if(!name.trim()||!validContact(contact))throw new Error('Preencha nome e e-mail válido.');
+  const client=window.REINO_SUPABASE;
+  if(!client)throw new Error('Conexão com Supabase indisponível.');
+  const {data:{user},error:authError}=await client.auth.getUser();
+  if(authError||!user)throw new Error('Entre novamente para salvar seu perfil.');
+  const normalized=contact.trim().toLowerCase();
+  const oldProfile=await loadSupabaseProfile(user);
+  const oldPath=oldProfile?.avatar_url||'';
+  let path=oldPath;
+  if(pendingProfilePhoto){
+    const response=await fetch(pendingProfilePhoto);
+    const blob=await response.blob();
+    const target=profilePhotoPath(user.id);
+    const {error:uploadError}=await client.storage.from(PROFILE_PHOTO_BUCKET).upload(target,blob,{contentType:'image/jpeg',upsert:false,cacheControl:'3600'});
+    if(uploadError)throw uploadError;
+    path=target;
+  }else if(pendingProfilePhoto==='')path='';
+  const {error:updateError}=await client.from('profiles').update({full_name:name.trim(),email:normalized,avatar_url:path||null}).eq('id',user.id);
+  if(updateError)throw updateError;
+  if(pendingProfilePhoto!==undefined&&oldPath&&oldPath!==path&&!oldPath.startsWith('data:')){
+    const {error:removeError}=await client.storage.from(PROFILE_PHOTO_BUCKET).remove([oldPath]);
+    if(removeError)console.warn('Remoção da foto antiga:',removeError.message);
+  }
+  pendingProfilePhoto=undefined;
+  await cacheAuthenticatedUser(user,name);
+  toast('Perfil salvo na sua conta.');
+}
 function prepareProfilePhoto(file){return new Promise((resolve,reject)=>{if(!file?.type.startsWith('image/'))return reject(new Error('Escolha uma imagem válida.'));if(file.size>8*1024*1024)return reject(new Error('A imagem deve ter no máximo 8 MB.'));const reader=new FileReader();reader.onerror=()=>reject(new Error('Não foi possível ler a imagem.'));reader.onload=()=>{const source=new Image();source.onerror=()=>reject(new Error('Não foi possível abrir a imagem.'));source.onload=()=>{const size=Math.min(source.naturalWidth,source.naturalHeight);const sx=(source.naturalWidth-size)/2,sy=(source.naturalHeight-size)/2;const canvas=document.createElement('canvas');canvas.width=canvas.height=420;canvas.getContext('2d').drawImage(source,sx,sy,size,size,0,0,420,420);resolve(canvas.toDataURL('image/jpeg',.82))};source.src=reader.result};reader.readAsDataURL(file)})}
 document.getElementById('profile-photo').addEventListener('change',async event=>{const file=event.target.files[0];if(!file)return;try{pendingProfilePhoto=await prepareProfilePhoto(file);const current=read(STORE.user,{name:'Visitante'});renderUserAvatar(document.getElementById('profile-photo-preview'),{...current,photo:pendingProfilePhoto});document.getElementById('remove-profile-photo').hidden=false;toast('Foto pronta. Toque em Salvar alterações.')}catch(error){toast(error.message)}finally{event.target.value=''}});
 document.getElementById('remove-profile-photo').addEventListener('click',()=>{pendingProfilePhoto='';const current=read(STORE.user,{name:'Visitante'});renderUserAvatar(document.getElementById('profile-photo-preview'),{...current,photo:''});document.getElementById('remove-profile-photo').hidden=true;toast('Foto removida. Salve as alterações.')});
 document.getElementById('profile-dialog').addEventListener('close',event=>{if(event.target.returnValue!=='default'){pendingProfilePhoto=undefined;refreshUser()}});
-document.getElementById('save-profile').addEventListener('click',event=>{if(!saveUser(document.getElementById('profile-name').value,document.getElementById('profile-contact').value)){event.preventDefault();toast('Preencha nome e e-mail ou telefone válido.')}});refreshUser();
-document.getElementById('reset-access').addEventListener('click',()=>{localStorage.removeItem(STORE.access);localStorage.removeItem('reino_access_granted_v1');localStorage.removeItem(STORE.user);location.href='index.html#inicio'});setupFirstAccess();
+document.querySelector('#profile-dialog form').addEventListener('submit',async event=>{
+  if(event.submitter?.id!=='save-profile')return;
+  event.preventDefault();
+  const button=event.submitter;
+  button.disabled=true;
+  try{
+    await saveUser(document.getElementById('profile-name').value,document.getElementById('profile-contact').value);
+    document.getElementById('profile-dialog').close('default');
+  }catch(error){console.error('Perfil:',error);toast(error.message||'Não foi possível salvar o perfil.')}
+  finally{button.disabled=false}
+});refreshUser();
+document.getElementById('reset-access').addEventListener('click',async()=>{try{await window.REINO_SUPABASE?.auth.signOut()}catch{}localStorage.removeItem(STORE.access);localStorage.removeItem('reino_access_granted_v1');localStorage.removeItem(STORE.user);location.href='index.html#inicio'});setupFirstAccess();
 
 function refreshStats(){const favorites=read(STORE.favorites,[]).length;const posts=read(STORE.posts,[]).length;const score=Number(read(STORE.score,0));[['home-best-score',`${score}/10`],['home-favorites',favorites],['home-posts',posts],['profile-score',`${score}/10`],['profile-favorites',favorites],['profile-posts',posts]].forEach(([id,value])=>{const element=document.getElementById(id);if(element)element.textContent=value})}
 
@@ -234,6 +340,49 @@ function sendCareTopic(topic){appendCareMessage(document.querySelector(`[data-ch
 document.querySelectorAll('[data-chat-topic]').forEach(button=>button.addEventListener('click',()=>sendCareTopic(button.dataset.chatTopic)));
 function isCrisisText(text){return /(suic[ií]d|me matar|quero morrer|n[aã]o quero viver|acabar com tudo|me machucar|me ferir|tirar minha vida|sem motivo para viver)/i.test(text)}
 document.getElementById('care-chat-form').addEventListener('submit',event=>{event.preventDefault();const input=document.getElementById('care-chat-input');const text=input.value.trim();if(!text)return;appendCareMessage(text,'user');input.value='';if(isCrisisText(text)){setTimeout(()=>appendCareMessage('Sua segurança é prioridade agora. Este chat automático não consegue prestar atendimento de emergência. Não fique sozinho: ligue gratuitamente para o CVV no 188, chame alguém de confiança para ficar com você ou, se houver perigo imediato, ligue para o SAMU no 192 ou vá a um pronto atendimento.', 'bot',true),180);return}setTimeout(()=>appendCareMessage('Obrigado por confiar isso aqui. O que você sente merece ser ouvido sem julgamento. Este chat não faz diagnóstico, mas pode ajudar no próximo passo: escolha uma pessoa segura para conversar hoje e, se isso estiver persistindo ou afetando sua rotina, procure um profissional de saúde. Você prefere falar sobre ansiedade, perda, autoestima ou apoio?'),220)});
+document.getElementById('support-request-form').addEventListener('submit',async event=>{
+  event.preventDefault();
+  const form=event.currentTarget,button=form.querySelector('[type="submit"]'),status=document.getElementById('support-request-status');
+  const subject=form.elements.subject.value.trim(),message=form.elements.message.value.trim();
+  if(!subject||!message){status.textContent='Preencha o assunto e a mensagem.';return}
+  const client=window.REINO_SUPABASE;
+  if(!client){status.textContent='Conexão indisponível. Tente novamente mais tarde.';return}
+  button.disabled=true;status.textContent='Registrando...';
+  try{
+    const {data:{user},error:authError}=await client.auth.getUser();
+    if(authError||!user)throw new Error('Entre na sua conta para registrar o pedido.');
+    const {error}=await client.from('support_requests').insert({user_id:user.id,subject,message});
+    if(error)throw error;
+    form.reset();status.textContent='Pedido registrado na sua conta. Este canal ainda não tem atendimento humano ativo.';
+  }catch(error){console.warn('Pedido de acolhimento:',error);status.textContent=error.message||'Não foi possível registrar. Tente novamente.'}
+  finally{button.disabled=false}
+});
+async function submitReinoForm(event,table,fields,honeypot){
+  event.preventDefault();
+  const form=event.currentTarget;
+  if(form.elements[honeypot]?.value)return;
+  const button=form.querySelector('[type="submit"]');
+  const status=form.querySelector('.form-status');
+  const client=window.REINO_SUPABASE;
+  if(!client){status.textContent='Conexão indisponível. Tente novamente.';return}
+  button.disabled=true;
+  status.textContent='Enviando...';
+  try{
+    const {data:{user},error:authError}=await client.auth.getUser();
+    if(authError||!user)throw new Error('Entre na sua conta para enviar.');
+    const values=Object.fromEntries(fields.map(field=>[field,form.elements[field].value.trim()]));
+    const row=table==='contact_submissions'
+      ?{user_id:user.id,name:values.nome,email:values.email,subject:values.assunto,message:values.mensagem,consent:form.elements.consentimento.checked}
+      :{user_id:user.id,display_name:values.nome,city:values.cidade,title:values.titulo,testimony:values.testemunho,consent:form.elements.autorizacao.checked};
+    const {error}=await client.from(table).insert(row);
+    if(error)throw error;
+    form.reset();
+    status.textContent=table==='contact_submissions'?'Mensagem registrada. A equipe poderá analisá-la.':'Testemunho recebido para análise. Ele não será publicado automaticamente.';
+  }catch(error){console.warn('Envio do formulário:',error);status.textContent=error.message||'Não foi possível enviar. Tente novamente.'}
+  finally{button.disabled=false}
+}
+document.querySelector('.contact-form').addEventListener('submit',event=>submitReinoForm(event,'contact_submissions',['nome','email','assunto','mensagem'],'site-confirmacao'));
+document.querySelector('.public-testimony-form').addEventListener('submit',event=>submitReinoForm(event,'testimony_submissions',['nome','cidade','titulo','testemunho'],'empresa-site'));
 document.getElementById('clear-care-chat').addEventListener('click',()=>{document.getElementById('care-chat-messages').innerHTML='<div class="chat-message bot">Olá. Eu estou aqui para ajudar você a organizar este momento. O que está pesando mais hoje?</div>';toast('Conversa local apagada.')});
 
 const testimonyText=document.getElementById('testimony-text');testimonyText.addEventListener('input',()=>document.getElementById('testimony-count').textContent=testimonyText.value.length);
@@ -290,9 +439,31 @@ document.querySelectorAll('[data-community-view]').forEach(button=>button.addEve
 document.querySelectorAll('[data-community-topic]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-community-topic]').forEach(item=>item.classList.toggle('active',item.dataset.communityTopic===button.dataset.communityTopic));selectedPostKind=button.dataset.communityTopic;postBox.placeholder=`Compartilhe uma ideia sobre ${button.dataset.communityTopic}...`;showCommunityView('feed');postBox.focus();toast(`Tema ${button.dataset.communityTopic} selecionado.`)}));
 function openGroup(id){activeChatRoom=id;showCommunityView('chat');renderGroupChat();document.getElementById('comunidade').scrollIntoView({behavior:'smooth',block:'start'})}
 function renderGroups(){document.getElementById('community-groups-grid').innerHTML=communityGroups.map(group=>`<article class="community-group-card"><span>${group.icon}</span><div><small>${group.topic.toUpperCase()}</small><h3>${group.name}</h3><p>${group.description}</p><b>${group.members} participantes</b></div><button type="button" data-enter-group="${group.id}">Entrar no grupo →</button></article>`).join('');document.querySelectorAll('[data-enter-group]').forEach(button=>button.addEventListener('click',()=>openGroup(button.dataset.enterGroup)))}
-function groupChats(){return read(STORE.groupChats,{})}
-function renderGroupChat(){const group=communityGroups.find(item=>item.id===activeChatRoom)||communityGroups[0];activeChatRoom=group.id;document.getElementById('chat-room-title').textContent=group.name;document.getElementById('chat-room-list').innerHTML=communityGroups.map(item=>`<button class="${item.id===activeChatRoom?'active':''}" type="button" data-chat-room="${item.id}"><span>${item.icon}</span><b>${item.name}</b></button>`).join('');document.querySelectorAll('[data-chat-room]').forEach(button=>button.addEventListener('click',()=>{activeChatRoom=button.dataset.chatRoom;renderGroupChat()}));const saved=groupChats()[activeChatRoom]||[];const seed=[{name:'Moderador Reino',text:`Bem-vindo à sala ${group.name}. Compartilhe conhecimento com respeito e não exponha dados pessoais.`,time:'Agora'},{name:'Ana Clara',text:'Paz! Quem mais está chegando para conversar?',time:'Agora'}];const messages=[...seed,...saved];document.getElementById('group-chat-messages').innerHTML=messages.map(message=>`<div class="group-chat-message ${message.name==='Moderador Reino'?'moderator':''}"><span>${initials(message.name)}</span><div><b>${escapeHtml(message.name)} <small>${escapeHtml(message.time)}</small></b><p>${escapeHtml(message.text)}</p></div></div>`).join('');const box=document.getElementById('group-chat-messages');box.scrollTop=box.scrollHeight}
-document.getElementById('group-chat-form').addEventListener('submit',event=>{event.preventDefault();const input=document.getElementById('group-chat-input');const text=input.value.trim();if(!text)return;const chats=groupChats();const user=read(STORE.user,{name:'Visitante'});chats[activeChatRoom]=[...(chats[activeChatRoom]||[]),{name:user.name||'Visitante',text,time:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}].slice(-80);write(STORE.groupChats,chats);input.value='';renderGroupChat()});
+async function renderGroupChat(){
+  const group=communityGroups.find(item=>item.id===activeChatRoom)||communityGroups[0];activeChatRoom=group.id;
+  document.getElementById('chat-room-title').textContent=group.name;
+  document.getElementById('chat-room-list').innerHTML=communityGroups.map(item=>`<button class="${item.id===activeChatRoom?'active':''}" type="button" data-chat-room="${item.id}"><span>${item.icon}</span><b>${item.name}</b></button>`).join('');
+  document.querySelectorAll('[data-chat-room]').forEach(button=>button.addEventListener('click',()=>{activeChatRoom=button.dataset.chatRoom;renderGroupChat()}));
+  const box=document.getElementById('group-chat-messages');box.textContent='Carregando mensagens...';
+  const client=window.REINO_SUPABASE;
+  if(!client){box.textContent='Conexão indisponível.';return}
+  const room=activeChatRoom;
+  const {data,error}=await client.from('group_messages').select('display_name,body,created_at').eq('room_id',room).order('created_at',{ascending:false}).limit(80);
+  if(room!==activeChatRoom)return;
+  if(error){box.textContent='Não foi possível carregar as mensagens. Entre na sua conta e tente novamente.';return}
+  box.innerHTML=(data||[]).reverse().map(message=>`<div class="group-chat-message"><span>${initials(message.display_name)}</span><div><b>${escapeHtml(message.display_name)} <small>${new Date(message.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</small></b><p>${escapeHtml(message.body)}</p></div></div>`).join('')||'<p>Ainda não há mensagens nesta sala.</p>';
+  box.scrollTop=box.scrollHeight;
+}
+document.getElementById('group-chat-form').addEventListener('submit',async event=>{
+  event.preventDefault();const form=event.currentTarget,input=document.getElementById('group-chat-input'),text=input.value.trim();if(!text)return;
+  const button=form.querySelector('[type="submit"]'),client=window.REINO_SUPABASE;if(!client)return toast('Conexão indisponível.');button.disabled=true;
+  try{
+    const {data:{user},error:authError}=await client.auth.getUser();if(authError||!user)throw new Error('Entre na sua conta para conversar.');
+    const name=(read(STORE.user,{}).name||user.email?.split('@')[0]||'Jogador').slice(0,80);
+    const {error}=await client.from('group_messages').insert({room_id:activeChatRoom,user_id:user.id,display_name:name,body:text});if(error)throw error;
+    input.value='';await renderGroupChat();
+  }catch(error){console.warn('Chat:',error);toast('Mensagem não enviada. Tente novamente.')}finally{button.disabled=false}
+});
 document.querySelectorAll('[data-open-group]').forEach(button=>button.addEventListener('click',()=>openGroup(button.dataset.openGroup)));
 const communityUser=read(STORE.user,{name:'Visitante'});['community-avatar','composer-avatar'].forEach(id=>{const element=document.getElementById(id);if(element)element.textContent=initials(communityUser.name)});renderGroups();renderGroupChat();renderPosts();
 
