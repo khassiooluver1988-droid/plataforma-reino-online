@@ -250,3 +250,12 @@ input,select,textarea,button{max-width:100%}
 
 .launch-countdown{margin:28px 0;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;padding:24px}.launch-countdown h2{margin:6px 0}.launch-units{display:grid;grid-template-columns:repeat(4,minmax(72px,1fr));gap:10px}.launch-units span{padding:14px 10px;border:1px solid var(--line);border-radius:14px;text-align:center}.launch-units strong{display:block;font-size:28px}.launch-units small{font-size:10px;letter-spacing:1px}.reino-footer{display:grid;grid-template-columns:1.2fr 1.4fr .9fr .9fr;gap:20px;align-items:start}.footer-credits,.footer-security,.footer-social{display:grid;gap:6px}.footer-security{grid-template-columns:auto 1fr}.footer-security small,.footer-social small{display:block;opacity:.72}@media(max-width:900px){.launch-countdown,.reino-footer{grid-template-columns:1fr}.launch-units{grid-template-columns:repeat(4,1fr)}}@media(max-width:520px){.launch-units{grid-template-columns:repeat(2,1fr)}}
 .news-category-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 22px}.news-category-tabs button{border:1px solid var(--line);border-radius:999px;padding:9px 13px;background:transparent;color:inherit;cursor:pointer;font-weight:700}.news-category-tabs button.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+
+/* REINO 01 — revisão geral 29/09/2026 */
+.reino-footer.reino-footer-compact{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.35rem .9rem;padding:1rem 1.25rem;font-size:.72rem;line-height:1.35;font-weight:400;text-align:center;opacity:.88}
+.reino-footer.reino-footer-compact span{font-weight:400}
+.community-lock-note{margin:.75rem 0 1rem;padding:.7rem 1rem;border:1px solid var(--border,#d9d9d9);border-radius:12px;font-size:.82rem;text-align:center}
+.community-nav-tabs button:disabled{cursor:not-allowed;opacity:.55}
+.community-locked-panel{display:flex;flex-direction:column;justify-content:center}
+@media(max-width:720px){.reino-footer.reino-footer-compact{gap:.3rem .65rem;font-size:.68rem}.reino-footer.reino-footer-compact span{width:auto}.community-lock-note{text-align:left}}
