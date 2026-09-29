@@ -536,33 +536,7 @@ function showCommunityView(view){if(view!=='feed'){toast('Grupos e bate-papo est
 document.querySelectorAll('[data-community-view]').forEach(button=>button.addEventListener('click',()=>showCommunityView(button.dataset.communityView)));
 document.querySelectorAll('[data-community-topic]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-community-topic]').forEach(item=>item.classList.toggle('active',item.dataset.communityTopic===button.dataset.communityTopic));selectedPostKind=button.dataset.communityTopic;postBox.placeholder=`Compartilhe uma ideia sobre ${button.dataset.communityTopic}...`;showCommunityView('feed');postBox.focus();toast(`Tema ${button.dataset.communityTopic} selecionado.`)}));
 function openGroup(){toast('Grupos e bate-papo estarão disponíveis em breve.');showCommunityView('feed');document.getElementById('comunidade').scrollIntoView({behavior:'smooth',block:'start'})}
-function renderGroups(){document.getElementById('community-groups-grid').innerHTML=communityGroups.map(group=>`<article class="community-group-card"><span>${group.icon}</span><div><small>${group.topic.toUpperCase()}</small><h3>${group.name}</h3><p>${group.description}</p><b>${group.members} participantes</b></div><button type="button" data-enter-group="${group.id}">Entrar no grupo →</button></article>`).join('');document.querySelectorAll('[data-enter-group]').forEach(button=>button.addEventListener('click',()=>openGroup(button.dataset.enterGroup)))}
-async function renderGroupChat(){
-  const group=communityGroups.find(item=>item.id===activeChatRoom)||communityGroups[0];activeChatRoom=group.id;
-  document.getElementById('chat-room-title').textContent=group.name;
-  document.getElementById('chat-room-list').innerHTML=communityGroups.map(item=>`<button class="${item.id===activeChatRoom?'active':''}" type="button" data-chat-room="${item.id}"><span>${item.icon}</span><b>${item.name}</b></button>`).join('');
-  document.querySelectorAll('[data-chat-room]').forEach(button=>button.addEventListener('click',()=>{activeChatRoom=button.dataset.chatRoom;renderGroupChat()}));
-  const box=document.getElementById('group-chat-messages');box.textContent='Carregando mensagens...';
-  const client=window.REINO_SUPABASE;
-  if(!client){box.textContent='Conexão indisponível.';return}
-  const room=activeChatRoom;
-  const {data,error}=await client.from('group_messages').select('display_name,body,created_at').eq('room_id',room).order('created_at',{ascending:false}).limit(80);
-  if(room!==activeChatRoom)return;
-  if(error){box.textContent='Não foi possível carregar as mensagens. Entre na sua conta e tente novamente.';return}
-  box.innerHTML=(data||[]).reverse().map(message=>`<div class="group-chat-message"><span>${initials(message.display_name)}</span><div><b>${escapeHtml(message.display_name)} <small>${new Date(message.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</small></b><p>${escapeHtml(message.body)}</p></div></div>`).join('')||'<p>Ainda não há mensagens nesta sala.</p>';
-  box.scrollTop=box.scrollHeight;
-}
-document.getElementById('group-chat-form').addEventListener('submit',async event=>{
-  event.preventDefault();const form=event.currentTarget,input=document.getElementById('group-chat-input'),text=input.value.trim();if(!text)return;
-  const button=form.querySelector('[type="submit"]'),client=window.REINO_SUPABASE;if(!client)return toast('Conexão indisponível.');button.disabled=true;
-  try{
-    const {data:{user},error:authError}=await client.auth.getUser();if(authError||!user)throw new Error('Entre na sua conta para conversar.');
-    const name=(read(STORE.user,{}).name||user.email?.split('@')[0]||'Jogador').slice(0,80);
-    const {error}=await client.from('group_messages').insert({room_id:activeChatRoom,user_id:user.id,display_name:name,body:text});if(error)throw error;
-    input.value='';await renderGroupChat();
-  }catch(error){console.warn('Chat:',error);toast('Mensagem não enviada. Tente novamente.')}finally{button.disabled=false}
-});
-document.querySelectorAll('[data-open-group]').forEach(button=>button.addEventListener('click',()=>openGroup(button.dataset.openGroup)));
+// Grupos e bate-papo permanecem bloqueados nesta versão.
 const communityUser=read(STORE.user,{name:'Visitante'});['community-avatar','composer-avatar'].forEach(id=>{const element=document.getElementById(id);if(element)element.textContent=initials(communityUser.name)});renderGroups();renderGroupChat();loadCommunityPosts();
 
 function renderUsers(query=''){const normalized=query.toLocaleLowerCase('pt-BR');document.getElementById('user-table').innerHTML=users.filter(user=>(user.name+user.role).toLocaleLowerCase('pt-BR').includes(normalized)).map(user=>`<tr><td>${user.name}</td><td>${user.role}</td><td><span class="badge ${user.active?'':'paused'}">${user.active?'Ativo':'Pausado'}</span></td><td><button class="table-action" type="button" data-user="${users.indexOf(user)}">${user.active?'Pausar':'Ativar'}</button></td></tr>`).join('');document.querySelectorAll('[data-user]').forEach(button=>button.addEventListener('click',()=>{const user=users[Number(button.dataset.user)];user.active=!user.active;renderUsers(document.getElementById('user-search').value);toast(`Usuário ${user.active?'ativado':'pausado'}.`)}))}
