@@ -345,8 +345,28 @@ document.querySelectorAll('[data-course-filter]').forEach(button=>button.addEven
 
 const followPodcast=document.getElementById('follow-podcast');function refreshPodcast(){const followed=read(STORE.podcast,false);followPodcast.textContent=followed?'✓ Seguindo o ReinoCast':'＋ Seguir o ReinoCast';followPodcast.classList.toggle('soft',followed)}followPodcast.addEventListener('click',()=>{const followed=!read(STORE.podcast,false);write(STORE.podcast,followed);refreshPodcast();toast(followed?'ReinoCast adicionado aos seus interesses.':'Você deixou de seguir o ReinoCast.')});refreshPodcast();
 
-function refreshConnections(){const list=read(STORE.connections,[]);document.getElementById('connection-count').textContent=list.length?`${list.length} ${list.length===1?'conexão solicitada':'conexões solicitadas'}`:'Nenhuma conexão solicitada';document.querySelectorAll('[data-connection]').forEach(button=>{const active=list.includes(button.dataset.connection);if(button.closest('.next-steps'))button.innerHTML=active?'<b>✓ Interesse em mentoria registrado</b><small>Salvo somente neste aparelho</small>':'<b>Registrar interesse em mentoria</b><small>Para futura conexão com liderança validada</small>';else button.textContent=active?'✓ Interesse registrado':button.dataset.connection==='oração'?'Entrar na sala':button.dataset.connection==='mentoria'?'Solicitar contato':'Tenho interesse';button.disabled=active})}
-document.querySelectorAll('[data-connection]').forEach(button=>button.addEventListener('click',()=>{const list=read(STORE.connections,[]);if(!list.includes(button.dataset.connection))list.push(button.dataset.connection);write(STORE.connections,list);refreshConnections();toast('Interesse salvo neste aparelho. A equipe poderá conectar esta função ao servidor depois.')}));document.getElementById('clear-connections').addEventListener('click',()=>{write(STORE.connections,[]);refreshConnections();toast('Interesses locais removidos.')});refreshConnections();
+let connectionRequests=[];
+async function refreshConnections(){
+  const client=window.REINO_SUPABASE;if(!client)return;
+  const {data:{user}}=await client.auth.getUser();
+  if(!user){connectionRequests=[];document.getElementById('connection-count').textContent='Entre na sua conta para acompanhar conexões';return}
+  const {data,error}=await client.from('connection_requests').select('connection_type,status,created_at').eq('user_id',user.id).order('created_at',{ascending:false});
+  if(error){console.warn('Conexão Reino:',error);return}
+  connectionRequests=data||[];
+  document.getElementById('connection-count').textContent=connectionRequests.length?`${connectionRequests.length} ${connectionRequests.length===1?'conexão solicitada':'conexões solicitadas'}`:'Nenhuma conexão solicitada';
+  document.querySelectorAll('[data-connection]').forEach(button=>{const active=connectionRequests.some(item=>item.connection_type===button.dataset.connection);button.textContent=active?'✓ Interesse registrado':button.dataset.connection==='oração'?'Entrar na sala':button.dataset.connection==='mentoria'?'Solicitar contato':'Tenho interesse';button.disabled=active});
+}
+document.querySelectorAll('[data-connection]').forEach(button=>button.addEventListener('click',async()=>{
+  const client=window.REINO_SUPABASE;if(!client)return toast('Conexão indisponível.');
+  try{const {data:{user},error:authError}=await client.auth.getUser();if(authError||!user)throw new Error('Entre na sua conta para continuar.');
+    const type=button.dataset.connection;
+    if(type==='oração'){showCommunityView('chat');activeChatRoom='biblia';await renderGroupChat();document.getElementById('comunidade').scrollIntoView({behavior:'smooth'});return}
+    const {error}=await client.from('connection_requests').upsert({user_id:user.id,connection_type:type,status:'requested'},{onConflict:'user_id,connection_type'});if(error)throw error;
+    await refreshConnections();toast('Interesse registrado na sua conta.');
+  }catch(error){console.warn('Conexão Reino:',error);toast(error.message||'Não foi possível registrar o interesse.')}
+}));
+document.getElementById('clear-connections').addEventListener('click',async()=>{const client=window.REINO_SUPABASE;if(!client)return;try{const {data:{user}}=await client.auth.getUser();if(!user)throw new Error('Entre na sua conta.');const {error}=await client.from('connection_requests').delete().eq('user_id',user.id);if(error)throw error;await refreshConnections();toast('Interesses removidos da sua conta.')}catch(error){toast(error.message||'Não foi possível limpar.')}});
+refreshConnections();
 
 document.getElementById('focus-support-request')?.addEventListener('click',()=>{document.querySelector('#support-request-form textarea[name="message"]')?.focus();document.getElementById('support-request-form')?.scrollIntoView({behavior:'smooth',block:'center'})});
 document.getElementById('support-request-form').addEventListener('submit',async event=>{
