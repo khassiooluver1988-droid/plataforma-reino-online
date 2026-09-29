@@ -350,7 +350,14 @@ let activeCourseFilter='Todos';
 function renderCourses(){const items=freeCourses.filter(course=>activeCourseFilter==='Todos'||course.area===activeCourseFilter);document.getElementById('courses-grid').innerHTML=items.map((course,index)=>`<article class="course-card"><small>CURSO ${String(index+1).padStart(2,'0')} • ${course.audience.toUpperCase()}</small><h3>${escapeHtml(course.title)}</h3><span class="provider">${escapeHtml(course.provider)}</span><p>${escapeHtml(course.description)}</p><div class="course-tags"><span>${course.area}</span><span>Online</span><span>Fonte oficial</span></div><a class="button navy" href="${course.url}" rel="noopener noreferrer">Ver curso gratuito →</a></article>`).join('')}
 document.querySelectorAll('[data-course-filter]').forEach(button=>button.addEventListener('click',()=>{activeCourseFilter=button.dataset.courseFilter;document.querySelectorAll('[data-course-filter]').forEach(item=>item.classList.toggle('active',item===button));renderCourses()}));renderCourses();
 
-const followPodcast=document.getElementById('follow-podcast');function refreshPodcast(){const followed=read(STORE.podcast,false);followPodcast.textContent=followed?'✓ Seguindo o ReinoCast':'＋ Seguir o ReinoCast';followPodcast.classList.toggle('soft',followed)}followPodcast.addEventListener('click',()=>{const followed=!read(STORE.podcast,false);write(STORE.podcast,followed);refreshPodcast();toast(followed?'ReinoCast adicionado aos seus interesses.':'Você deixou de seguir o ReinoCast.')});refreshPodcast();
+const followPodcast=document.getElementById('follow-podcast');
+let podcastFollowed=false;
+function paintPodcastFollow(){followPodcast.textContent=podcastFollowed?'✓ Seguindo o ReinoCast':'＋ Seguir o ReinoCast';followPodcast.classList.toggle('soft',podcastFollowed)}
+async function refreshPodcast(){
+  const client=window.REINO_SUPABASE;if(!client){podcastFollowed=read(STORE.podcast,false);paintPodcastFollow();return}
+  try{const {data:{user}}=await client.auth.getUser();if(!user){podcastFollowed=false;paintPodcastFollow();return}const {data,error}=await client.from('podcast_follows').select('followed').eq('user_id',user.id).maybeSingle();if(error)throw error;podcastFollowed=Boolean(data?.followed);paintPodcastFollow()}catch(error){console.warn('Podcast:',error);paintPodcastFollow()}
+}
+followPodcast.addEventListener('click',async()=>{const client=window.REINO_SUPABASE;if(!client)return toast('Conexão indisponível.');try{const {data:{user}}=await client.auth.getUser();if(!user)throw new Error('Entre na sua conta para seguir o ReinoCast.');podcastFollowed=!podcastFollowed;const {error}=await client.from('podcast_follows').upsert({user_id:user.id,podcast_key:'reinocast',followed:podcastFollowed,updated_at:new Date().toISOString()},{onConflict:'user_id'});if(error)throw error;paintPodcastFollow();toast(podcastFollowed?'ReinoCast adicionado à sua conta.':'Você deixou de seguir o ReinoCast.')}catch(error){toast(error.message||'Não foi possível atualizar agora.')}});refreshPodcast();
 
 let connectionRequests=[];
 async function refreshConnections(){
@@ -431,7 +438,7 @@ document.getElementById('clear-care-chat').addEventListener('click',()=>{documen
 
 const radio=document.getElementById('radio-stream');const radioToggle=document.getElementById('radio-toggle');const radioStatus=document.getElementById('radio-status');radio.volume=.8;
 radioToggle.addEventListener('click',async()=>{if(radio.paused){radioStatus.textContent='Conectando à transmissão...';try{await radio.play()}catch{radioStatus.textContent='Não foi possível iniciar. Tente novamente.'}}else radio.pause()});
-radio.addEventListener('playing',()=>{radioToggle.textContent='❚❚';radioStatus.textContent='Rádio Gospel • ao vivo'});radio.addEventListener('pause',()=>{radioToggle.textContent='▶';radioStatus.textContent='Transmissão pausada'});radio.addEventListener('error',()=>{radioToggle.textContent='▶';radioStatus.textContent='Rádio temporariamente indisponível'});document.getElementById('radio-volume').addEventListener('input',event=>radio.volume=Number(event.target.value));
+radio.addEventListener('playing',()=>{radioToggle.textContent='❚❚';radioStatus.textContent='Viver é Cristo • ao vivo'});radio.addEventListener('pause',()=>{radioToggle.textContent='▶';radioStatus.textContent='Transmissão pausada'});radio.addEventListener('error',()=>{radioToggle.textContent='▶';radioStatus.textContent='Rádio temporariamente indisponível'});document.getElementById('radio-volume').addEventListener('input',event=>radio.volume=Number(event.target.value));
 
 const communityGroups=[
   {id:'musicos',icon:'♫',name:'Músicos do Reino',topic:'Música',members:346,description:'Louvor, técnica, repertório, composição e experiências de ministério.'},
