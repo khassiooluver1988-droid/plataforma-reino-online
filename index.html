@@ -14,23 +14,37 @@
     <div class="auth-brand-panel">
       <img class="auth-cover-image" src="assets/capa-comunidade-rede.webp" alt="Comunidade cristã conectada pela Plataforma Reino">
       <a class="brand" href="index.html" aria-label="Plataforma Reino"><span class="brand-mark">✦</span><span><strong>PLATAFORMA</strong><b>REINO</b></span></a>
-      <div class="auth-welcome-copy"><span class="hero-label">SEU PRIMEIRO ACESSO</span><h1>Entre uma vez.<br>Viva toda a jornada.</h1><p>Informe seus dados somente agora. Nos próximos acessos, este aparelho levará você diretamente para a Plataforma Reino.</p></div>
+      <div class="auth-welcome-copy"><span class="hero-label">BEM-VINDO</span><h1>Entre na Plataforma Reino.</h1><p>Use sua conta para manter seu perfil e sua sessão neste dispositivo.</p></div>
       <small>Cristo é o encontro. A tecnologia é a ferramenta. As pessoas são a missão.</small>
     </div>
     <div class="auth-form-panel">
-      <form class="auth-card" id="first-access-form">
-        <span class="eyebrow">BEM-VINDO À PLATAFORMA REINO</span>
-        <h2 id="access-title">Faça seu primeiro acesso</h2>
-        <p>É rápido: depois desta entrada, você não precisará preencher novamente neste aparelho.</p>
-        <label>Como podemos chamar você?<input id="access-name" name="nome" required maxlength="80" autocomplete="name" placeholder="Seu nome ou apelido"></label>
-        <label>E-mail<input id="access-login" name="login" type="email" required maxlength="120" autocomplete="email" placeholder="voce@email.com"></label>
-        <label>Crie sua senha<input id="access-password" name="senha" type="password" required minlength="6" maxlength="80" autocomplete="new-password" placeholder="Mínimo de 6 caracteres"></label>
-        <label class="show-password"><input id="show-access-password" type="checkbox"><span>Mostrar senha</span></label>
-        <label class="consent-check"><input id="access-consent" type="checkbox" required><span>Concordo com o acesso à Plataforma Reino e com a manutenção segura da minha sessão.</span></label>
-        <button class="button gold full auth-enter-button" type="submit">ENTRAR NA PLATAFORMA →</button>
-        <div class="access-trust"><span>✓ Acesso único</span><span>✓ Senha protegida</span><span>✓ Dados neste aparelho</span></div>
-        <p class="auth-note">Seu acesso é autenticado pelo Supabase. Sua senha não é salva no código da plataforma.</p>
-      </form>
+      <div class="auth-card">
+        <span class="eyebrow">PLATAFORMA REINO</span>
+        <h2 id="access-title">Acesse sua conta</h2>
+        <div class="auth-mode-tabs" role="tablist" aria-label="Acesso à conta">
+          <button class="active" id="auth-login-tab" type="button" role="tab" aria-selected="true">Entrar</button>
+          <button id="auth-signup-tab" type="button" role="tab" aria-selected="false">Criar conta</button>
+        </div>
+        <form id="login-form" class="auth-mode-form">
+          <label>E-mail<input id="login-email" type="email" required maxlength="120" autocomplete="email" placeholder="voce@email.com"></label>
+          <label>Senha<input id="login-password" type="password" required minlength="6" maxlength="80" autocomplete="current-password" placeholder="Sua senha"></label>
+          <label class="show-password"><input id="show-login-password" type="checkbox"><span>Mostrar senha</span></label>
+          <button class="button gold full auth-enter-button" type="submit">ENTRAR →</button>
+          <p class="auth-form-status" id="login-status" role="status" aria-live="polite"></p>
+        </form>
+        <form id="signup-form" class="auth-mode-form hidden">
+          <label>Nome completo<input id="signup-name" required maxlength="80" autocomplete="name" placeholder="Seu nome completo"></label>
+          <label>E-mail<input id="signup-email" type="email" required maxlength="120" autocomplete="email" placeholder="voce@email.com"></label>
+          <label>Senha<input id="signup-password" type="password" required minlength="6" maxlength="80" autocomplete="new-password" placeholder="Mínimo de 6 caracteres"></label>
+          <label>Confirme a senha<input id="signup-password-confirm" type="password" required minlength="6" maxlength="80" autocomplete="new-password" placeholder="Digite a senha novamente"></label>
+          <label class="show-password"><input id="show-signup-password" type="checkbox"><span>Mostrar senhas</span></label>
+          <label class="consent-check"><input id="signup-consent" type="checkbox" required><span>Concordo com a criação da minha conta e com a manutenção segura da sessão.</span></label>
+          <button class="button gold full auth-enter-button" type="submit">CRIAR MINHA CONTA →</button>
+          <p class="auth-form-status" id="signup-status" role="status" aria-live="polite"></p>
+        </form>
+        <div class="access-trust"><span>✓ Supabase Auth</span><span>✓ Sessão persistente</span><span>✓ Senha protegida</span></div>
+        <p class="auth-note">Sua senha é processada pelo Supabase Auth e não é salva no código da Plataforma Reino.</p>
+      </div>
     </div>
   </section>
   <div class="app-shell">
