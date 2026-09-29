@@ -155,7 +155,7 @@ const editorialArticles={
 };
 async function loadNewsFromSupabase(){
   const client=window.REINO_SUPABASE;if(!client)return;
-  try{const {data,error}=await client.from('news_cache').select('category,published_label,title,lead,image_url,source_name,source_url,published_at').eq('active',true).order('published_at',{ascending:false}).limit(12);if(error||!data?.length)return;
+  try{const {data,error}=await client.from('news_cache').select('category,published_label,title,lead,image_url,source_name,source_url,published_at').eq('active',true).order('published_at',{ascending:false}).limit(70);if(error||!data?.length)return;
     editorialArticles.noticias=data.map(item=>({category:item.category,date:item.published_label||new Date(item.published_at).toLocaleDateString('pt-BR'),title:item.title,lead:item.lead||'',image:item.image_url||'assets/capa-noticias-cristas.webp',alt:item.title,body:[item.lead||'Confira os detalhes na fonte original.'],verse:'',source:item.source_name,url:item.source_url}));
     renderEditorial();bindEditorialButtons();
   }catch(error){console.warn('Notícias:',error)}
@@ -462,7 +462,7 @@ const communityGroups=[
 ];
 const postBox=document.getElementById('new-post');
 const postPhoto=document.getElementById('post-photo');
-const postVideo=document.getElementById('post-video');
+
 const mediaPreview=document.getElementById('community-media-preview');
 let selectedCommunityMedia=null,selectedPostKind='Novo post',activeChatRoom='musicos',communityPostsCache=[];
 postBox.addEventListener('input',()=>document.getElementById('char-count').textContent=postBox.value.length);
@@ -497,24 +497,45 @@ async function toggleCommunityReaction(postId,reaction){
 async function submitCommunityComment(event){
   event.preventDefault();const form=event.currentTarget,input=form.querySelector('input'),body=input.value.trim();if(!body)return;
   try{const client=window.REINO_SUPABASE,user=await currentCommunityUser();const name=(read(STORE.user,{}).name||user.email?.split('@')[0]||'Usuário').slice(0,80);const {error}=await client.from('community_comments').insert({post_id:form.dataset.commentForm,user_id:user.id,display_name:name,body});if(error)throw error;input.value='';await loadCommunityPosts();toast('Comentário publicado.')}catch(error){console.warn('Comentário:',error);toast(error.message||'Comentário não enviado.')}}
-function clearSelectedMedia(){selectedCommunityMedia=null;postPhoto.value='';postVideo.value='';mediaPreview.classList.add('hidden');mediaPreview.innerHTML=''}
-function showMediaPreview(file,type){if(!file)return;if(type==='video')return toast('Vídeo será ativado em uma próxima etapa. Use uma foto nesta publicação.');if(file.size>1500000)return toast('Escolha uma foto de até 1,5 MB.');const reader=new FileReader();reader.onload=()=>{selectedCommunityMedia={file,url:reader.result};mediaPreview.innerHTML=`<img src="${reader.result}" alt="Prévia da foto"><button type="button" id="remove-post-media">× Remover</button>`;mediaPreview.classList.remove('hidden');document.getElementById('remove-post-media').addEventListener('click',clearSelectedMedia)};reader.readAsDataURL(file)}
-postPhoto.addEventListener('change',event=>showMediaPreview(event.target.files[0],'image'));postVideo.addEventListener('change',event=>showMediaPreview(event.target.files[0],'video'));
+function clearSelectedMedia(){selectedCommunityMedia=null;if(postPhoto)postPhoto.value='';mediaPreview.classList.add('hidden');mediaPreview.innerHTML=''}
+function showMediaPreview(file){
+  if(!file)return;
+  if(!/^image\/(jpeg|png|webp)$/i.test(file.type))return toast('Use uma foto JPG, PNG ou WebP.');
+  if(file.size>6000000)return toast('Escolha uma foto de até 6 MB.');
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const max=1200,scale=Math.min(1,max/Math.max(img.width,img.height));
+      const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));
+      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+      const url=canvas.toDataURL('image/jpeg',0.82);
+      selectedCommunityMedia={url};
+      mediaPreview.innerHTML=`<img src="${url}" alt="Prévia da foto"><button type="button" id="remove-post-media">× Remover</button>`;
+      mediaPreview.classList.remove('hidden');
+      document.getElementById('remove-post-media').addEventListener('click',clearSelectedMedia);
+    };
+    img.onerror=()=>toast('Não foi possível abrir esta foto.');
+    img.src=reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+postPhoto?.addEventListener('change',event=>showMediaPreview(event.target.files[0]));
 document.querySelectorAll('[data-post-kind]').forEach(button=>button.addEventListener('click',()=>{selectedPostKind=button.dataset.postKind;postBox.placeholder=`Compartilhe seu ${selectedPostKind.toLowerCase()}...`;postBox.focus();toast(`${selectedPostKind} selecionado.`)}));
 document.getElementById('publish-post').addEventListener('click',async()=>{
   const text=postBox.value.trim();if(!text)return toast('Escreva uma mensagem para publicar.');
   const button=document.getElementById('publish-post');button.disabled=true;
   try{const client=window.REINO_SUPABASE,user=await currentCommunityUser();const local=read(STORE.user,{}),name=(local.name||user.email?.split('@')[0]||'Usuário').slice(0,80);let mediaUrl=null;
-    if(selectedCommunityMedia){toast('A publicação será enviada sem a foto até ativarmos o armazenamento de mídia da comunidade.')}
+    if(selectedCommunityMedia)mediaUrl=selectedCommunityMedia.url;
     const body=selectedPostKind==='Novo post'?text:`[${selectedPostKind}] ${text}`;
     const {error}=await client.from('community_posts').insert({user_id:user.id,display_name:name,body,media_url:mediaUrl});if(error)throw error;
     postBox.value='';selectedPostKind='Novo post';document.getElementById('char-count').textContent='0';clearSelectedMedia();await loadCommunityPosts();toast('Publicação salva na Comunidade Reino.');
   }catch(error){console.warn('Publicação:',error);toast(error.message||'Não foi possível publicar.')}finally{button.disabled=false}
 });
-function showCommunityView(view){document.querySelectorAll('[data-community-view]').forEach(button=>button.classList.toggle('active',button.dataset.communityView===view));document.querySelectorAll('[data-community-container]').forEach(panel=>panel.classList.toggle('hidden',panel.dataset.communityContainer!==view));if(view==='chat')renderGroupChat()}
+function showCommunityView(view){if(view!=='feed'){toast('Grupos e bate-papo estarão disponíveis em breve.');view='feed'}document.querySelectorAll('[data-community-view]').forEach(button=>button.classList.toggle('active',button.dataset.communityView===view));document.querySelectorAll('[data-community-container]').forEach(panel=>panel.classList.toggle('hidden',panel.dataset.communityContainer!==view))}
 document.querySelectorAll('[data-community-view]').forEach(button=>button.addEventListener('click',()=>showCommunityView(button.dataset.communityView)));
 document.querySelectorAll('[data-community-topic]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-community-topic]').forEach(item=>item.classList.toggle('active',item.dataset.communityTopic===button.dataset.communityTopic));selectedPostKind=button.dataset.communityTopic;postBox.placeholder=`Compartilhe uma ideia sobre ${button.dataset.communityTopic}...`;showCommunityView('feed');postBox.focus();toast(`Tema ${button.dataset.communityTopic} selecionado.`)}));
-function openGroup(id){activeChatRoom=id;showCommunityView('chat');renderGroupChat();document.getElementById('comunidade').scrollIntoView({behavior:'smooth',block:'start'})}
+function openGroup(){toast('Grupos e bate-papo estarão disponíveis em breve.');showCommunityView('feed');document.getElementById('comunidade').scrollIntoView({behavior:'smooth',block:'start'})}
 function renderGroups(){document.getElementById('community-groups-grid').innerHTML=communityGroups.map(group=>`<article class="community-group-card"><span>${group.icon}</span><div><small>${group.topic.toUpperCase()}</small><h3>${group.name}</h3><p>${group.description}</p><b>${group.members} participantes</b></div><button type="button" data-enter-group="${group.id}">Entrar no grupo →</button></article>`).join('');document.querySelectorAll('[data-enter-group]').forEach(button=>button.addEventListener('click',()=>openGroup(button.dataset.enterGroup)))}
 async function renderGroupChat(){
   const group=communityGroups.find(item=>item.id===activeChatRoom)||communityGroups[0];activeChatRoom=group.id;
