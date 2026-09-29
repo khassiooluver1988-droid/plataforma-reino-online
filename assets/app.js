@@ -414,11 +414,13 @@ async function loadTestimonyHistory(){
 document.querySelector('.contact-form').addEventListener('submit',event=>submitReinoForm(event,'contact_submissions',['nome','email','assunto','mensagem'],'site-confirmacao'));
 document.querySelector('.public-testimony-form').addEventListener('submit',async event=>{await submitReinoForm(event,'testimony_submissions',['nome','cidade','titulo','testemunho'],'empresa-site');await loadTestimonyHistory()});loadTestimonyHistory();
 
-const radio=document.getElementById('radio-stream');const radioToggle=document.getElementById('radio-toggle');const radioStatus=document.getElementById('radio-status');radio.volume=.55;
-async function startRadio(){if(!radio||!radio.paused)return;radioStatus.textContent='Conectando à transmissão...';try{await radio.play()}catch{radioStatus.textContent='Toque na página para ligar a rádio';document.addEventListener('pointerdown',startRadio,{once:true});document.addEventListener('keydown',startRadio,{once:true})}}
-radioToggle.addEventListener('click',async()=>{if(radio.paused)await startRadio();else radio.pause()});
-startRadio();
-radio.addEventListener('playing',()=>{radioToggle.textContent='❚❚';radioStatus.textContent='Viver é Cristo • ao vivo'});radio.addEventListener('pause',()=>{radioToggle.textContent='▶';radioStatus.textContent='Transmissão pausada'});radio.addEventListener('error',()=>{radioToggle.textContent='▶';radioStatus.textContent='Rádio temporariamente indisponível'});document.getElementById('radio-volume').addEventListener('input',event=>radio.volume=Number(event.target.value));
+const radio=document.getElementById('radio-stream');const radioStatus=document.getElementById('radio-status');radio.volume=.55;
+async function startHomeRadio(){if(!radio||!radio.paused)return;radioStatus.textContent='Conectando à transmissão...';try{await radio.play()}catch{radioStatus.textContent='Rádio pronta para iniciar';document.addEventListener('pointerdown',startHomeRadio,{once:true});document.addEventListener('keydown',startHomeRadio,{once:true})}}
+function syncHomeRadio(){const home=document.getElementById('inicio');const onHome=location.hash===''||location.hash==='#inicio'||home?.classList.contains('active');if(onHome){startHomeRadio()}else if(!radio.paused){radio.pause()}}
+radio.addEventListener('playing',()=>{radioStatus.textContent='Viver é Cristo • ao vivo'});
+radio.addEventListener('error',()=>{radioStatus.textContent='Rádio temporariamente indisponível'});
+window.addEventListener('hashchange',syncHomeRadio);
+startHomeRadio();
 
 const communityGroups=[
   {id:'musicos',icon:'♫',name:'Músicos do Reino',topic:'Música',members:346,description:'Louvor, técnica, repertório, composição e experiências de ministério.'},
