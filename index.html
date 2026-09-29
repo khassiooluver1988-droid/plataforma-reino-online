@@ -384,70 +384,40 @@
 
       <section class="page" id="acolhimento" data-title="Oração e Conversa">
         <div class="care-hero section-cover">
-          <img src="assets/banner-acolhimento.webp" alt="Pessoa recebendo acolhimento e apoio em um momento difícil">
-          <div><span class="hero-label">ORAÇÃO E CONVERSA</span><h2>Você não precisa caminhar sozinho.</h2><p>Encontre oração, Palavra, comunidade e caminhos responsáveis para pedir ajuda. Este espaço não oferece atendimento clínico ou de emergência.</p><div class="care-hero-actions"><button class="button gold" type="button" id="start-care-chat">Quero conversar</button><a class="button outline" href="tel:188">Ligar gratuitamente 188</a></div></div>
+          <img src="assets/banner-acolhimento.webp" alt="Duas pessoas conversando em um ambiente acolhedor">
+          <div><span class="hero-label">ORAÇÃO E CONVERSA</span><h2>O que você gostaria de compartilhar hoje?</h2><p>Escreva livremente. Você pode pedir uma oração, deixar uma mensagem ou solicitar uma conversa com nossa equipe.</p><div class="care-hero-actions"><button class="button gold" type="button" id="focus-support-request">Quero escrever agora</button><a class="button outline" href="index.html#conexao">Pedir uma oração</a></div></div>
           <blockquote>“Perto está o Senhor dos que têm o coração quebrantado.”<strong>Salmos 34:18</strong></blockquote>
         </div>
 
-        <aside class="urgent-help" role="note" aria-label="Ajuda imediata">
-          <span class="urgent-icon">!</span><div><strong>Está em perigo ou pensando em se machucar?</strong><p>Não fique sozinho. Ligue para o CVV no 188, procure alguém de confiança que possa ficar com você ou, em uma emergência, ligue 192.</p></div><div class="urgent-actions"><a href="tel:188">CVV 188</a><a href="https://cvv.org.br/chat/" target="_blank" rel="noopener noreferrer">Chat do CVV ↗</a><a href="tel:192">SAMU 192</a></div>
-        </aside>
-
-        <div class="care-paths" aria-label="Caminhos de acolhimento">
-          <a href="index.html#conexao">Pedir oração →</a>
-          <a href="index.html#acolhimento">Conversar com o guia automático →</a>
-          <a href="index.html#comunidade">Encontrar comunidade →</a>
-          <a href="index.html#acolhimento">Registrar interesse em falar com a equipe →</a>
-          <a href="index.html#palavra">Encontrar uma palavra →</a>
-          <a href="tel:188">Ajuda urgente: CVV 188 →</a>
-        </div>
-        <div class="section-heading compact-heading"><div><span class="eyebrow">COMO VOCÊ ESTÁ?</span><h2>Escolha o que mais se aproxima</h2></div><p>Não é diagnóstico. É apenas um primeiro passo para organizar o que você sente.</p></div>
-        <div class="feeling-grid">
-          <button type="button" data-feeling="ansiedade"><span>≈</span><strong>Ansiedade</strong><small>Minha mente não desacelera</small></button>
-          <button type="button" data-feeling="tristeza"><span>○</span><strong>Tristeza profunda</strong><small>Está difícil encontrar forças</small></button>
-          <button type="button" data-feeling="luto"><span>◇</span><strong>Luto ou perda</strong><small>Estou enfrentando uma ausência</small></button>
-          <button type="button" data-feeling="autoestima"><span>♡</span><strong>Baixa autoestima</strong><small>Não consigo reconhecer meu valor</small></button>
-        </div>
-        <article class="panel care-suggestion hidden" id="care-suggestion" aria-live="polite"></article>
-
-        <div class="care-layout top-gap" id="guided-chat">
+        <div class="care-layout top-gap">
           <article class="panel guided-chat">
-            <div class="chat-head"><div class="chat-symbol">♡</div><div><span class="eyebrow">CONVERSA GUIADA</span><h3>Oração e Conversa automático</h3></div><span class="chat-status">Disponível agora</span></div>
-            <div class="chat-disclaimer">Este recurso oferece orientação inicial e não substitui psicólogo, médico, pastor capacitado ou serviço de emergência.</div>
-            <div class="chat-messages" id="care-chat-messages" aria-live="polite"><div class="chat-message bot">Olá. Eu estou aqui para ajudar você a organizar este momento. O que está pesando mais hoje?</div></div>
-            <div class="chat-quick" id="care-chat-quick"><button type="button" data-chat-topic="ansiedade">Estou ansioso</button><button type="button" data-chat-topic="luto">Sofri uma perda</button><button type="button" data-chat-topic="autoestima">Não me sinto suficiente</button><button type="button" data-chat-topic="apoio">Preciso de apoio</button></div>
-            <form class="chat-compose" id="care-chat-form"><label class="sr-only" for="care-chat-input">Escreva como você está se sentindo</label><input id="care-chat-input" maxlength="500" placeholder="Escreva como você está se sentindo..." autocomplete="off"><button class="button navy" type="submit">Enviar</button></form>
-            <button class="text-button clear-chat" id="clear-care-chat" type="button">Limpar conversa</button>
+            <span class="eyebrow">FALE COM LIBERDADE</span>
+            <h3>Como podemos estar com você?</h3>
+            <p>Não é necessário escolher um problema ou categoria. Conte apenas o que desejar. Sua mensagem ficará vinculada à sua conta para que a equipe possa acompanhar o pedido.</p>
             <form class="support-request-form" id="support-request-form">
-              <h3>Registrar interesse em contato</h3>
-              <p>Este pedido fica salvo na sua conta. Este canal ainda não tem atendimento humano ativo e não atende emergências. Para ajuda imediata, ligue 188 ou 192.</p>
-              <label>Assunto<input name="subject" required maxlength="120" placeholder="Ex.: Preciso conversar sobre uma perda"></label>
-              <label>Mensagem<textarea name="message" required maxlength="2000" rows="4" placeholder="Conte apenas o que deseja registrar. Evite dados de outras pessoas."></textarea></label>
-              <button class="button navy" type="submit">Registrar pedido</button>
+              <label>Como podemos ajudar?
+                <select name="subject" required>
+                  <option value="">Escolha uma opção</option>
+                  <option value="Pedido de oração">Quero pedir uma oração</option>
+                  <option value="Quero conversar">Quero conversar</option>
+                  <option value="Mensagem para a equipe">Quero deixar uma mensagem</option>
+                  <option value="Outro assunto">Outro assunto</option>
+                </select>
+              </label>
+              <label>Sua mensagem<textarea name="message" required maxlength="2000" rows="7" placeholder="Escreva aqui, do seu jeito..."></textarea></label>
+              <label class="support-contact-choice"><input name="wants_contact" type="checkbox"> Quero que a equipe entre em contato comigo.</label>
+              <button class="button navy" type="submit">Enviar para a equipe</button>
               <p id="support-request-status" role="status" aria-live="polite"></p>
             </form>
           </article>
           <aside class="panel next-steps">
-            <span class="eyebrow">PRÓXIMOS PASSOS SEGUROS</span><h3>Você não precisa escolher só um</h3>
-            <a href="https://cvv.org.br/quero-conversar/" target="_blank" rel="noopener noreferrer"><b>Conversar com o CVV</b><small>Apoio emocional, sigiloso e gratuito ↗</small></a>
-            <a href="https://www.gov.br/saude/pt-br/composicao/saes/desmad/raps" target="_blank" rel="noopener noreferrer"><b>Conhecer a rede do SUS</b><small>Serviços públicos de cuidado psicossocial ↗</small></a>
-            <a href="index.html#comunidade"><b>Conversar com a comunidade</b><small>Encontre apoio e interesses em comum →</small></a>
-            <button type="button" data-connection="mentoria"><b>Registrar interesse em mentoria</b><small>Para futura conexão com liderança validada</small></button>
+            <span class="eyebrow">VOCÊ TAMBÉM PODE</span><h3>Escolher outro caminho</h3>
+            <a href="index.html#conexao"><b>Pedir oração</b><small>Compartilhe seu pedido com a Plataforma Reino →</small></a>
+            <a href="index.html#comunidade"><b>Ir para a comunidade</b><small>Conecte-se com outras pessoas →</small></a>
+            <a href="index.html#palavra"><b>Encontrar uma palavra</b><small>Leia a Bíblia e conteúdos de fé →</small></a>
+            <p class="support-privacy-note">Compartilhe somente o que se sentir confortável em registrar. A equipe verá a mensagem para poder responder ao pedido.</p>
           </aside>
         </div>
-
-        <div class="section-heading"><div><span class="eyebrow">HISTÓRIAS QUE INSPIRAM</span><h2>Esperança também tem testemunho</h2></div><p>Relatos ilustrativos mostram que pedir ajuda, aceitar cuidado e recomeçar são atitudes de coragem.</p></div>
-        <div class="story-grid">
-          <article class="story-card"><span>LUTO</span><h3>“Aprendi a viver um dia de cada vez.”</h3><p>Depois de uma perda, Ana buscou apoio da família, acompanhamento profissional e sua comunidade de fé. A dor não desapareceu de uma vez, mas deixou de ser carregada sozinha.</p><small>História ilustrativa • identidade fictícia</small></article>
-          <article class="story-card"><span>ANSIEDADE</span><h3>“Pedir ajuda não diminuiu minha fé.”</h3><p>Rafael percebeu que oração e cuidado profissional não eram rivais. Com acompanhamento, rotina e pessoas seguras, começou a compreender seus limites.</p><small>História ilustrativa • identidade fictícia</small></article>
-          <article class="story-card"><span>AUTOESTIMA</span><h3>“Meu valor não depende do meu pior dia.”</h3><p>Luísa aprendeu a questionar pensamentos duros sobre si e a reconhecer pequenas conquistas, cercada por apoio responsável e esperança.</p><small>História ilustrativa • identidade fictícia</small></article>
-        </div>
-
-        <div class="two-columns top-gap testimony-area">
-          <article class="panel"><span class="eyebrow">SEU DEPOIMENTO</span><h3>Sua história pode encorajar alguém</h3><p>Escreva uma mensagem de esperança. Nesta demonstração ela fica somente neste aparelho e não é publicada na internet.</p><textarea id="testimony-text" maxlength="600" placeholder="Conte o que ajudou você a continuar..."></textarea><div class="composer-footer"><small><span id="testimony-count">0</span>/600 caracteres</small><button class="button gold" type="button" id="save-testimony">Salvar depoimento</button></div></article>
-          <article class="panel saved-testimony"><span class="eyebrow">MEU RELATO SALVO</span><div id="saved-testimony"><p>Nenhum depoimento salvo neste aparelho.</p></div></article>
-        </div>
-        <p class="care-principle">A Plataforma Reino oferece acolhimento espiritual e informação. Depressão e transtornos de ansiedade são condições de saúde e podem precisar de avaliação e tratamento profissional.</p>
       </section>
 
       <section class="page" id="comunidade" data-title="Comunidade">
