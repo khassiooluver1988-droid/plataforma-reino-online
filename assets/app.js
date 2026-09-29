@@ -82,7 +82,7 @@ async function setupFirstAccess(){
   document.getElementById('auth-login-tab').addEventListener('click',()=>setAuthMode('login'));
   document.getElementById('auth-signup-tab').addEventListener('click',()=>setAuthMode('signup'));
   document.getElementById('show-login-password').addEventListener('change',event=>document.getElementById('login-password').type=event.target.checked?'text':'password');
-  document.getElementById('show-signup-password').addEventListener('change',event=>document.getElementById('signup-password').type=event.target.checked?'text':'password');
+  document.getElementById('show-signup-password').addEventListener('change',event=>['signup-password','signup-password-confirm'].forEach(id=>document.getElementById(id).type=event.target.checked?'text':'password'));
   document.getElementById('login-form').addEventListener('submit',async event=>{
     event.preventDefault();const email=document.getElementById('login-email').value.trim().toLowerCase(),password=document.getElementById('login-password').value;
     if(!validContact(email)||password.length<6)return authMessage('login-status','Informe um e-mail válido e sua senha.',true);
@@ -100,8 +100,9 @@ async function setupFirstAccess(){
   });
   document.getElementById('signup-form').addEventListener('submit',async event=>{
     event.preventDefault();
-    const name=document.getElementById('signup-name').value.trim(),email=document.getElementById('signup-email').value.trim().toLowerCase(),password=document.getElementById('signup-password').value;
+    const name=document.getElementById('signup-name').value.trim(),email=document.getElementById('signup-email').value.trim().toLowerCase(),password=document.getElementById('signup-password').value,confirm=document.getElementById('signup-password-confirm').value;
     if(!name||!validContact(email)||password.length<6)return authMessage('signup-status','Preencha nome, e-mail válido e uma senha com pelo menos 6 caracteres.',true);
+    if(password!==confirm)return authMessage('signup-status','As senhas não são iguais.',true);
     const button=event.currentTarget.querySelector('[type="submit"]');button.disabled=true;button.textContent='CRIANDO CONTA...';authMessage('signup-status','');
     try{
       const emailRedirectTo=new URL('index.html',location.href).href;
