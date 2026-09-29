@@ -52,10 +52,12 @@ async function completeFirstAccess(name,contact,password){
   if(!validContact(email))throw new Error('Informe um e-mail válido.');
   let {data,error}=await client.auth.signInWithPassword({email,password});
   if(error){
+    if(error.code==='email_not_confirmed')throw new Error('Confirme seu cadastro pelo link enviado ao seu e-mail e depois entre com a mesma senha. Confira também a pasta de spam.');
+    if(error.code!=='invalid_credentials')throw error;
     const signup=await client.auth.signUp({email,password,options:{data:{full_name:name.trim()}}});
     if(signup.error)throw signup.error;
     data=signup.data;
-    if(!data.session){toast('Conta criada. Confira seu e-mail para confirmar o cadastro e depois entre novamente.');return false}
+    if(!data.session){toast('Confira o e-mail para confirmar o cadastro. Depois, entre com a mesma senha.');return false}
   }
   const authUser=data.user||data.session?.user;
   if(!authUser)throw new Error('Não foi possível validar o usuário.');
