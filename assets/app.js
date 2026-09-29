@@ -326,7 +326,7 @@ document.querySelectorAll('[data-mission]').forEach(button=>button.addEventListe
 loadContentPreferences();
 
 const reinoCourses=window.REINO_COURSES||[];
-function renderCourses(){const grid=document.getElementById('courses-grid');if(!grid)return;grid.innerHTML=reinoCourses.map((course,index)=>`<article class="course-card"><small>CURSO ${String(index+1).padStart(2,'0')} • 5 HORAS</small><h3>${escapeHtml(course.title)}</h3><span class="provider">Plataforma Reino</span><p>${escapeHtml(course.goal)}</p><div class="course-tags"><span>5 módulos</span><span>Exercícios</span><span>Teste final</span></div><a class="button navy" href="curso.html?id=${encodeURIComponent(course.id)}">Começar curso →</a></article>`).join('')||'<article class="panel"><p>Cursos indisponíveis no momento.</p></article>'}
+function renderCourses(){const grid=document.getElementById('courses-grid');if(!grid)return;if(!reinoCourses.length)return;grid.innerHTML=reinoCourses.map((course,index)=>`<a class="course-card course-card-link" href="./curso.html?id=${encodeURIComponent(course.id)}" aria-label="Abrir curso ${escapeHtml(course.title)}"><small>CURSO ${String(index+1).padStart(2,'0')} • 5 HORAS</small><h3>${escapeHtml(course.title)}</h3><span class="provider">Plataforma Reino</span><p>${escapeHtml(course.goal)}</p><div class="course-tags"><span>5 módulos</span><span>Exercícios</span><span>Teste final</span></div><span class="button navy">Iniciar curso →</span></a>`).join('')}
 renderCourses();
 
 const followPodcast=document.getElementById('follow-podcast');
