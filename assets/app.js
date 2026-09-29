@@ -370,21 +370,22 @@ function sendCareTopic(topic){appendCareMessage(document.querySelector(`[data-ch
 document.querySelectorAll('[data-chat-topic]').forEach(button=>button.addEventListener('click',()=>sendCareTopic(button.dataset.chatTopic)));
 function isCrisisText(text){return /(suic[ií]d|me matar|quero morrer|n[aã]o quero viver|acabar com tudo|me machucar|me ferir|tirar minha vida|sem motivo para viver)/i.test(text)}
 document.getElementById('care-chat-form').addEventListener('submit',event=>{event.preventDefault();const input=document.getElementById('care-chat-input');const text=input.value.trim();if(!text)return;appendCareMessage(text,'user');input.value='';if(isCrisisText(text)){setTimeout(()=>appendCareMessage('Sua segurança é prioridade agora. Este chat automático não consegue prestar atendimento de emergência. Não fique sozinho: ligue gratuitamente para o CVV no 188, chame alguém de confiança para ficar com você ou, se houver perigo imediato, ligue para o SAMU no 192 ou vá a um pronto atendimento.', 'bot',true),180);return}setTimeout(()=>appendCareMessage('Obrigado por confiar isso aqui. O que você sente merece ser ouvido sem julgamento. Este chat não faz diagnóstico, mas pode ajudar no próximo passo: escolha uma pessoa segura para conversar hoje e, se isso estiver persistindo ou afetando sua rotina, procure um profissional de saúde. Você prefere falar sobre ansiedade, perda, autoestima ou apoio?'),220)});
+document.getElementById('focus-support-request')?.addEventListener('click',()=>{document.querySelector('#support-request-form textarea[name="message"]')?.focus();document.getElementById('support-request-form')?.scrollIntoView({behavior:'smooth',block:'center'})});
 document.getElementById('support-request-form').addEventListener('submit',async event=>{
   event.preventDefault();
   const form=event.currentTarget,button=form.querySelector('[type="submit"]'),status=document.getElementById('support-request-status');
-  const subject=form.elements.subject.value.trim(),message=form.elements.message.value.trim();
-  if(!subject||!message){status.textContent='Preencha o assunto e a mensagem.';return}
+  const subject=form.elements.subject.value.trim(),message=form.elements.message.value.trim(),wantsContact=form.elements.wants_contact.checked;
+  if(!subject||!message){status.textContent='Escolha uma opção e escreva sua mensagem.';return}
   const client=window.REINO_SUPABASE;
   if(!client){status.textContent='Conexão indisponível. Tente novamente mais tarde.';return}
-  button.disabled=true;status.textContent='Registrando...';
+  button.disabled=true;status.textContent='Enviando sua mensagem...';
   try{
     const {data:{user},error:authError}=await client.auth.getUser();
-    if(authError||!user)throw new Error('Entre na sua conta para registrar o pedido.');
-    const {error}=await client.from('support_requests').insert({user_id:user.id,subject,message});
+    if(authError||!user)throw new Error('Entre na sua conta para enviar a mensagem.');
+    const {error}=await client.from('support_requests').insert({user_id:user.id,subject,message,wants_contact:wantsContact});
     if(error)throw error;
-    form.reset();status.textContent='Pedido registrado na sua conta. Este canal ainda não tem atendimento humano ativo.';
-  }catch(error){console.warn('Pedido de acolhimento:',error);status.textContent=error.message||'Não foi possível registrar. Tente novamente.'}
+    form.reset();status.textContent=wantsContact?'Mensagem enviada. A equipe poderá entrar em contato usando os dados da sua conta.':'Mensagem enviada para a equipe da Plataforma Reino.';
+  }catch(error){console.warn('Oração e Conversa:',error);status.textContent=error.message||'Não foi possível enviar. Tente novamente.'}
   finally{button.disabled=false}
 });
 async function submitReinoForm(event,table,fields,honeypot){
