@@ -172,3 +172,11 @@ dialog{border:0;border-radius:22px;padding:0;box-shadow:0 30px 90px rgba(0,0,0,.
 
 /* Quiz: identificação apenas pelo nome gamer, sem avatar. */
 .gamer-setup-card .gamer-avatar,.quiz-game .hud-player .avatar{display:none}
+
+/* REINO 01 — Login e criação de conta separados */
+.auth-mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:20px 0 18px;padding:5px;border:1px solid var(--line);border-radius:13px;background:#f3f5f7}
+.auth-mode-tabs button{border:0;border-radius:9px;padding:11px;background:transparent;color:var(--muted);font-weight:900}
+.auth-mode-tabs button.active{background:var(--navy);color:#fff;box-shadow:0 6px 16px rgba(7,26,52,.16)}
+.auth-mode-form{display:grid;gap:12px}.auth-mode-form label{display:grid;gap:6px;font-weight:800}.auth-mode-form>label>input:not([type="checkbox"]){width:100%;border:1px solid var(--line);border-radius:11px;padding:12px;background:#fff}
+.auth-mode-form>label>input:focus{outline:0;border-color:var(--gold);box-shadow:0 0 0 3px rgba(216,176,93,.15)}
+.auth-form-status{min-height:22px;margin:0;color:var(--green);font-size:13px;font-weight:800}.auth-form-status.error{color:var(--red)}
