@@ -180,3 +180,8 @@ dialog{border:0;border-radius:22px;padding:0;box-shadow:0 30px 90px rgba(0,0,0,.
 .auth-mode-form{display:grid;gap:12px}.auth-mode-form label{display:grid;gap:6px;font-weight:800}.auth-mode-form>label>input:not([type="checkbox"]){width:100%;border:1px solid var(--line);border-radius:11px;padding:12px;background:#fff}
 .auth-mode-form>label>input:focus{outline:0;border-color:var(--gold);box-shadow:0 0 0 3px rgba(216,176,93,.15)}
 .auth-form-status{min-height:22px;margin:0;color:var(--green);font-size:13px;font-weight:800}.auth-form-status.error{color:var(--red)}
+
+/* REINO 01 — Perfil persistente */
+.profile-field-note{display:block;margin-top:6px;color:var(--muted);font-size:10px;line-height:1.4}
+#profile-contact[readonly]{background:#f2f4f6;color:#687386;cursor:not-allowed}
+.profile-save-status{min-height:20px;margin:10px 0 0;color:var(--green);font-size:12px;font-weight:800}
