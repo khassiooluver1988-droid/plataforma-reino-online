@@ -35,9 +35,7 @@ jobs:
           <div><span class="hero-label">ORAÇÃO E CONVERSA</span><h2>Este é um espaço para você falar com liberdade.</h2><p>Você não precisa escolher ou identificar um problema específico. Com suas próprias palavras, conte como podemos acolher você.</p></div>
           <blockquote>“Perto está o Senhor dos que têm o coração quebrantado.”<strong>Salmos 34:18</strong></blockquote>
         </div>
-
         <div class="section-heading compact-heading"><div><span class="eyebrow">COMO PODEMOS AJUDAR?</span><h2>Escolha apenas como deseja começar</h2></div><p>Independentemente do que você esteja vivendo, você pode escrever livremente.</p></div>
-
         <form class="panel support-request-form" id="support-request-form">
           <div class="feeling-grid" id="support-type-options">
             <button type="button" data-support-subject="Quero pedir uma oração"><span>✦</span><strong>Quero pedir uma oração</strong><small>Compartilhe seu pedido com suas próprias palavras</small></button>
