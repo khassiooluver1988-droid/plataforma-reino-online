@@ -166,8 +166,8 @@ document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('cli
 
 function renderUserAvatar(element,user){if(!element)return;element.replaceChildren();element.classList.toggle('has-photo',Boolean(user.photo));if(user.photo){const image=document.createElement('img');image.src=user.photo;image.alt=`Foto de ${user.name||'perfil'}`;element.appendChild(image)}else element.textContent=initials(user.name)}
 let pendingProfilePhoto;
-function refreshUser(){const user=read(STORE.user,{name:'Visitante',contact:'',email:'',phone:'',city:'',photo:''});const contact=user.contact||user.email||user.phone||'';document.getElementById('header-name').textContent=user.name;['header-avatar','profile-avatar','profile-photo-preview','community-avatar','composer-avatar'].forEach(id=>renderUserAvatar(document.getElementById(id),user));document.getElementById('profile-display-name').textContent=user.name;document.getElementById('profile-display-email').textContent=[contact,user.city].filter(Boolean).join(' • ')||'Perfil opcional neste aparelho.';document.getElementById('profile-name').value=user.name==='Visitante'?'':user.name;document.getElementById('profile-contact').value=contact;document.getElementById('remove-profile-photo').hidden=!user.photo&&pendingProfilePhoto===undefined}
-async function saveUser(name,contact){
+function refreshUser(){const user=read(STORE.user,{name:'Visitante',contact:'',email:'',phone:'',photo:''});const email=user.email||user.contact||'';document.getElementById('header-name').textContent=user.name;['header-avatar','profile-avatar','profile-photo-preview','community-avatar','composer-avatar'].forEach(id=>renderUserAvatar(document.getElementById(id),user));document.getElementById('profile-display-name').textContent=user.name;document.getElementById('profile-display-email').textContent=[email,user.phone].filter(Boolean).join(' • ')||'Perfil da Plataforma Reino';document.getElementById('profile-name').value=user.name==='Visitante'?'':user.name;document.getElementById('profile-contact').value=email;const phone=document.getElementById('profile-phone');if(phone)phone.value=user.phone||'';document.getElementById('remove-profile-photo').hidden=!user.photo&&pendingProfilePhoto===undefined}
+async function saveUser(name,contact,phone=''){
   if(!name.trim()||!validContact(contact))throw new Error('Preencha nome e e-mail válido.');
   const client=window.REINO_SUPABASE;
   if(!client)throw new Error('Conexão com Supabase indisponível.');
@@ -185,7 +185,9 @@ async function saveUser(name,contact){
     if(uploadError)throw uploadError;
     path=target;
   }else if(pendingProfilePhoto==='')path='';
-  const {error:updateError}=await client.from('profiles').update({full_name:name.trim(),email:normalized,avatar_url:path||null}).eq('id',user.id);
+  const cleanPhone=phone.trim();
+  if(cleanPhone&&!/^[0-9()+\-\s.]{8,20}$/.test(cleanPhone))throw new Error('Informe um telefone válido.');
+  const {error:updateError}=await client.from('profiles').update({full_name:name.trim(),email:normalized,phone:cleanPhone||null,avatar_url:path||null,updated_at:new Date().toISOString()}).eq('id',user.id);
   if(updateError)throw updateError;
   if(pendingProfilePhoto!==undefined&&oldPath&&oldPath!==path&&!oldPath.startsWith('data:')){
     const {error:removeError}=await client.storage.from(PROFILE_PHOTO_BUCKET).remove([oldPath]);
@@ -205,7 +207,9 @@ document.querySelector('#profile-dialog form').addEventListener('submit',async e
   const button=event.submitter;
   button.disabled=true;
   try{
-    await saveUser(document.getElementById('profile-name').value,document.getElementById('profile-contact').value);
+    const status=document.getElementById('profile-save-status');if(status)status.textContent='Salvando...';
+    await saveUser(document.getElementById('profile-name').value,document.getElementById('profile-contact').value,document.getElementById('profile-phone').value);
+    if(status)status.textContent='Perfil salvo com sucesso.';
     document.getElementById('profile-dialog').close('default');
   }catch(error){console.error('Perfil:',error);toast(error.message||'Não foi possível salvar o perfil.')}
   finally{button.disabled=false}
