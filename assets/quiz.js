@@ -59,7 +59,7 @@ function discoveryRate(){
 async function supabaseUser(){try{const {data}=await window.REINO_SUPABASE?.auth.getUser();return data?.user||null}catch{return null}}
 async function syncQuizEvent(item,correct){try{const user=await supabaseUser();if(!user)return;await window.REINO_SUPABASE.from('quiz_events').insert({user_id:user.id,question_id:String(item.id||''),category:item.category||null,is_correct:Boolean(correct)})}catch(error){console.warn('quiz_events',error)}}
 async function markBibleOpen(item){try{bumpMetric('bibleOpens');const user=await supabaseUser();if(!user)return;await window.REINO_SUPABASE.from('quiz_events').insert({user_id:user.id,question_id:String(item.id||''),category:item.category||null,opened_bible:true})}catch(error){console.warn('bible_open',error)}}
-async function syncQuizProgress(best){try{const user=await supabaseUser();if(!user)return;const m=metrics();await window.REINO_SUPABASE.from('quiz_progress').upsert({user_id:user.id,xp:Number(xp||0),best_score:Number(best||0),current_streak:Number(streak||0),max_streak:Number(maxStreak||0),questions_answered:Number(m.answered||0),correct_answers:Number(m.correct||0),bible_opens:Number(m.bibleOpens||0)},{onConflict:'user_id'});await window.REINO_SUPABASE.from('quiz_scores').insert({user_id:user.id,gamer_name:gamerName()||'Jogador',correct_answers:Number(correctCount||0),xp:Number(xp||0),max_combo:Number(maxStreak||0)});await loadSupabaseLeaderboard()}catch(error){console.warn('quiz_progress',error)}}
+async function syncQuizProgress(best){try{const user=await supabaseUser();if(!user)return;const m=metrics();const {data:cloud}=await window.REINO_SUPABASE.from('quiz_progress').select('xp,best_score,max_streak,questions_answered,correct_answers,bible_opens').eq('user_id',user.id).maybeSingle();await window.REINO_SUPABASE.from('quiz_progress').upsert({user_id:user.id,xp:Number(cloud?.xp||0)+Number(xp||0),best_score:Math.max(Number(cloud?.best_score||0),Number(best||0)),current_streak:Number(streak||0),max_streak:Math.max(Number(cloud?.max_streak||0),Number(maxStreak||0)),questions_answered:Number(cloud?.questions_answered||0)+Number(questions.length||0),correct_answers:Number(cloud?.correct_answers||0)+Number(correctCount||0),bible_opens:Math.max(Number(cloud?.bible_opens||0),Number(m.bibleOpens||0)),updated_at:new Date().toISOString()},{onConflict:'user_id'});await window.REINO_SUPABASE.from('quiz_scores').insert({user_id:user.id,gamer_name:gamerName()||'Jogador',correct_answers:Number(correctCount||0),xp:Number(xp||0),max_combo:Number(maxStreak||0)});await loadSupabaseLeaderboard()}catch(error){console.warn('quiz_progress',error)}}
 async function loadSupabaseLeaderboard(){try{const client=window.REINO_SUPABASE;if(!client)return;const {data,error}=await client.from('quiz_scores').select('gamer_name,correct_answers,xp,max_combo,created_at').order('xp',{ascending:false}).order('correct_answers',{ascending:false}).limit(5);if(error||!data?.length)return;const medals=['◆','◇','○','4','5'];const html=data.map((item,index)=>`<li><span><b>${medals[index]}</b><span>${escapeHtml(item.gamer_name)}<small>${item.correct_answers}/10 acertos • combo ${item.max_combo||0}</small></span></span><strong>${item.xp||0} XP</strong></li>`).join('');[$('leaderboard-start'),$('leaderboard-result')].forEach(list=>{if(list)list.innerHTML=html})}catch(error){console.warn('ranking',error)}}
 
 function ensureAudio(){const AudioContextClass=window.AudioContext||window.webkitAudioContext;if(!AudioContextClass)return false;try{if(!audioContext)audioContext=new AudioContextClass();if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});return true}catch(error){console.warn('Áudio indisponível:',error);return false}}
@@ -73,14 +73,14 @@ function buildRound(){const pool=poolForMode();const seenState=read(KEYS.seen,{}
 
 async function restoreCloudQuizState(){
   const user=await supabaseUser();if(!user)return;
-  const {data,error}=await window.REINO_SUPABASE.from('quiz_state').select('seen').eq('user_id',user.id).maybeSingle();
+  const {data,error}=await window.REINO_SUPABASE.from('quiz_state').select('seen,gamer_name').eq('user_id',user.id).maybeSingle();
   if(error){console.warn('Estado do quiz:',error);return}
   // A conta é a fonte do histórico para impedir repetição entre dispositivos.
-  write(KEYS.seen,data?.seen&&typeof data.seen==='object'?data.seen:{});
+  write(KEYS.seen,data?.seen&&typeof data.seen==='object'?data.seen:{});if(data?.gamer_name){write(KEYS.gamer,data.gamer_name);$('player-name').value=data.gamer_name}
 }
 async function saveCloudQuizState(){
   const user=await supabaseUser();if(!user)return;
-  const {error}=await window.REINO_SUPABASE.from('quiz_state').upsert({user_id:user.id,seen:read(KEYS.seen,{})},{onConflict:'user_id'});
+  const {error}=await window.REINO_SUPABASE.from('quiz_state').upsert({user_id:user.id,seen:read(KEYS.seen,{}),gamer_name:gamerName()||read(KEYS.gamer,''),updated_at:new Date().toISOString()},{onConflict:'user_id'});
   if(error)console.warn('Salvamento do quiz:',error);
 }
 function gamerName(){return $('player-name').value.trim()}

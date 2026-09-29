@@ -172,3 +172,78 @@ dialog{border:0;border-radius:22px;padding:0;box-shadow:0 30px 90px rgba(0,0,0,.
 
 /* Quiz: identificação apenas pelo nome gamer, sem avatar. */
 .gamer-setup-card .gamer-avatar,.quiz-game .hud-player .avatar{display:none}
+
+/* REINO 01 — Login e criação de conta separados */
+.auth-mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:20px 0 18px;padding:5px;border:1px solid var(--line);border-radius:13px;background:#f3f5f7}
+.auth-mode-tabs button{border:0;border-radius:9px;padding:11px;background:transparent;color:var(--muted);font-weight:900}
+.auth-mode-tabs button.active{background:var(--navy);color:#fff;box-shadow:0 6px 16px rgba(7,26,52,.16)}
+.auth-mode-form{display:grid;gap:12px}.auth-mode-form label{display:grid;gap:6px;font-weight:800}.auth-mode-form>label>input:not([type="checkbox"]){width:100%;border:1px solid var(--line);border-radius:11px;padding:12px;background:#fff}
+.auth-mode-form>label>input:focus{outline:0;border-color:var(--gold);box-shadow:0 0 0 3px rgba(216,176,93,.15)}
+.auth-form-status{min-height:22px;margin:0;color:var(--green);font-size:13px;font-weight:800}.auth-form-status.error{color:var(--red)}
+
+/* REINO 01 — Perfil persistente */
+.profile-field-note{display:block;margin-top:6px;color:var(--muted);font-size:10px;line-height:1.4}
+#profile-contact[readonly]{background:#f2f4f6;color:#687386;cursor:not-allowed}
+.profile-save-status{min-height:20px;margin:10px 0 0;color:var(--green);font-size:12px;font-weight:800}
+
+/* REINO 01 — revisão responsiva global 29/09/2026 */
+html{overflow-x:hidden}body{overflow-x:hidden}.main-content,.page,.panel{min-width:0}
+img,video,iframe,svg{max-width:100%}
+input,select,textarea,button{max-width:100%}
+@media(max-width:1100px){
+  .main-content{min-width:0}
+  .topbar{padding-left:22px;padding-right:22px}
+  .page{padding-left:22px;padding-right:22px}
+  .promo-slide{min-height:500px}
+  .promo-copy{max-width:72%}
+}
+@media(max-width:780px){
+  .topbar{min-height:72px;padding:12px 16px;gap:10px}
+  .topbar h1{font-size:clamp(20px,6vw,28px)}
+  .top-kicker{font-size:9px}
+  .top-actions{gap:7px}
+  .profile-button span:not(.avatar){display:none}
+  .page{padding-left:16px;padding-right:16px}
+  .promo-heading{align-items:flex-start;gap:12px}
+  .promo-heading h2{font-size:clamp(25px,8vw,38px)}
+  .promo-controls{flex:0 0 auto}
+  .promo-slide{min-height:560px}
+  .promo-copy{max-width:none;width:100%;padding:34px 22px;align-self:flex-end}
+  .promo-copy h2{font-size:clamp(32px,10vw,48px)}
+  .promo-highlights{flex-wrap:wrap}
+  .hero-actions,.care-hero-actions{display:flex;flex-direction:column;align-items:stretch}
+  .hero-actions .button,.care-hero-actions .button{width:100%;justify-content:center;text-align:center}
+  .community-shell,.care-layout,.connection-grid,.testimony-layout{grid-template-columns:1fr!important}
+  .dialog-card{width:min(94vw,680px);max-height:92vh;overflow:auto}
+  .news-grid,.podcast-grid,.mission-grid,.heroes-grid{grid-template-columns:1fr!important}
+}
+@media(max-width:520px){
+  .topbar{position:sticky;top:0;z-index:40}
+  .mobile-menu,.icon-button{width:42px;height:42px;min-width:42px}
+  .page{padding-left:13px;padding-right:13px}
+  .promo-heading{display:block}
+  .promo-controls{margin-top:12px}
+  .promo-slide{min-height:610px;border-radius:20px}
+  .promo-copy{padding:28px 18px}
+  .promo-copy h2{font-size:36px}
+  .promo-copy p{font-size:14px}
+  .promo-highlights span{font-size:10px}
+  .button{white-space:normal;text-align:center}
+  .section-cover{margin-left:-13px;margin-right:-13px}
+  .section-cover>div{padding-left:18px;padding-right:18px}
+  .section-cover h2{font-size:36px}
+  .panel{padding-left:16px;padding-right:16px}
+  .community-nav-tabs{overflow-x:auto;justify-content:flex-start}
+  .community-nav-tabs button{min-width:110px;flex:0 0 auto}
+  .post-reactions{font-size:11px}
+  .group-chat-message>div{max-width:86%}
+  .library-grid,.stories-grid{grid-template-columns:1fr!important}
+  .footer-grid{grid-template-columns:1fr!important}
+}
+@media(max-width:360px){
+  .topbar{padding-left:10px;padding-right:10px}
+  .page{padding-left:10px;padding-right:10px}
+  .promo-copy h2,.section-cover h2{font-size:31px}
+  .promo-slide{min-height:630px}
+  .profile-button{padding:4px}
+}

@@ -45,61 +45,84 @@ async function cacheAuthenticatedUser(authUser,fallbackName=''){
   write(STORE.access,{connected:true,userId:authUser.id,createdAt:Date.now()});
   refreshUser();
 }
-async function completeFirstAccess(name,contact,password){
-  const client=window.REINO_SUPABASE;
-  if(!client)throw new Error('Conexão com Supabase indisponível.');
-  const email=contact.trim().toLowerCase();
-  if(!validContact(email))throw new Error('Informe um e-mail válido.');
-  let {data,error}=await client.auth.signInWithPassword({email,password});
-  if(error){
-    if(error.code==='email_not_confirmed')throw new Error('Confirme seu cadastro pelo link enviado ao seu e-mail e depois entre com a mesma senha. Confira também a pasta de spam.');
-    if(error.code!=='invalid_credentials')throw error;
-    const emailRedirectTo=new URL('index.html',location.href).href;
-    const signup=await client.auth.signUp({email,password,options:{emailRedirectTo,data:{full_name:name.trim()}}});
-    if(signup.error)throw signup.error;
-    data=signup.data;
-    if(!data.session){toast('Confira o e-mail para confirmar o cadastro. Depois, entre com a mesma senha.');return false}
-  }
-  const authUser=data.user||data.session?.user;
+function authMessage(id,message,isError=false){
+  const el=document.getElementById(id);if(!el)return;el.textContent=message||'';el.classList.toggle('error',Boolean(isError));
+}
+async function finishAuthenticatedAccess(authUser,fallbackName=''){
   if(!authUser)throw new Error('Não foi possível validar o usuário.');
-  await client.from('profiles').update({full_name:name.trim(),email}).eq('id',authUser.id);
-  await cacheAuthenticatedUser(authUser,name);
+  await cacheAuthenticatedUser(authUser,fallbackName);
   document.body.classList.remove('auth-locked');
   document.getElementById('auth-gate').classList.add('authenticated');
   const destination=safeReturnDestination();
-  if(destination)setTimeout(()=>location.href=destination,250);
-  return true
+  if(destination)setTimeout(()=>location.href=destination,200);
+}
+function setAuthMode(mode){
+  const login=mode==='login';
+  document.getElementById('login-form').classList.toggle('hidden',!login);
+  document.getElementById('signup-form').classList.toggle('hidden',login);
+  document.getElementById('auth-login-tab').classList.toggle('active',login);
+  document.getElementById('auth-signup-tab').classList.toggle('active',!login);
+  document.getElementById('auth-login-tab').setAttribute('aria-selected',String(login));
+  document.getElementById('auth-signup-tab').setAttribute('aria-selected',String(!login));
+  document.getElementById('access-title').textContent=login?'Acesse sua conta':'Crie sua conta';
+  authMessage('login-status','');authMessage('signup-status','');
+  setTimeout(()=>document.getElementById(login?'login-email':'signup-name')?.focus(),50);
 }
 async function setupFirstAccess(){
-  const gate=document.getElementById('auth-gate');
-  const client=window.REINO_SUPABASE;
+  const gate=document.getElementById('auth-gate'),client=window.REINO_SUPABASE;
   document.body.classList.add('auth-locked');
-  if(client){
-    const {data:{user},error}=await client.auth.getUser();
-    if(!error&&user){
-      await cacheAuthenticatedUser(user);
-      gate.classList.add('authenticated');
-      document.body.classList.remove('auth-locked');
-      const destination=safeReturnDestination();
-      if(destination)location.replace(destination);
-      return
-    }
+  if(!client){authMessage('login-status','Conexão com Supabase indisponível.',true);return}
+  const {data:{session}}=await client.auth.getSession();
+  if(session?.user){
+    await cacheAuthenticatedUser(session.user);
+    gate.classList.add('authenticated');document.body.classList.remove('auth-locked');
+    const destination=safeReturnDestination();if(destination)location.replace(destination);
+    return
   }
-  setTimeout(()=>document.getElementById('access-name').focus(),100);
-  document.getElementById('show-access-password').addEventListener('change',event=>document.getElementById('access-password').type=event.target.checked?'text':'password');
-  document.getElementById('first-access-form').addEventListener('submit',async event=>{
+  document.getElementById('auth-login-tab').addEventListener('click',()=>setAuthMode('login'));
+  document.getElementById('auth-signup-tab').addEventListener('click',()=>setAuthMode('signup'));
+  document.getElementById('show-login-password').addEventListener('change',event=>document.getElementById('login-password').type=event.target.checked?'text':'password');
+  document.getElementById('show-signup-password').addEventListener('change',event=>['signup-password','signup-password-confirm'].forEach(id=>document.getElementById(id).type=event.target.checked?'text':'password'));
+  document.getElementById('login-form').addEventListener('submit',async event=>{
+    event.preventDefault();const email=document.getElementById('login-email').value.trim().toLowerCase(),password=document.getElementById('login-password').value;
+    if(!validContact(email)||password.length<6)return authMessage('login-status','Informe um e-mail válido e sua senha.',true);
+    const button=event.currentTarget.querySelector('[type="submit"]');button.disabled=true;button.textContent='ENTRANDO...';authMessage('login-status','');
+    try{
+      const {data,error}=await client.auth.signInWithPassword({email,password});
+      if(error){
+        if(error.code==='email_not_confirmed')throw new Error('Confirme seu e-mail antes de entrar.');
+        if(error.code==='invalid_credentials')throw new Error('E-mail ou senha incorretos.');
+        throw error;
+      }
+      await finishAuthenticatedAccess(data.user||data.session?.user);
+    }catch(error){authMessage('login-status',error.message||'Não foi possível entrar.',true)}
+    finally{button.disabled=false;button.textContent='ENTRAR →'}
+  });
+  document.getElementById('signup-form').addEventListener('submit',async event=>{
     event.preventDefault();
-    const name=document.getElementById('access-name').value;
-    const contact=document.getElementById('access-login').value;
-    const password=document.getElementById('access-password').value;
-    if(!name.trim()||!validContact(contact)||password.length<6||!document.getElementById('access-consent').checked)return toast('Informe nome, e-mail válido, senha e confirmação.');
-    const button=event.currentTarget.querySelector('[type="submit"]');button.disabled=true;button.textContent='CONECTANDO...';
-    try{await completeFirstAccess(name,contact,password)}catch(error){console.error(error);toast(error?.message||'Não foi possível entrar. Confira seu e-mail e senha.')}finally{button.disabled=false;button.textContent='ENTRAR NA PLATAFORMA →'}
-  })
+    const name=document.getElementById('signup-name').value.trim(),email=document.getElementById('signup-email').value.trim().toLowerCase(),password=document.getElementById('signup-password').value,confirm=document.getElementById('signup-password-confirm').value;
+    if(!name||!validContact(email)||password.length<6)return authMessage('signup-status','Preencha nome, e-mail válido e uma senha com pelo menos 6 caracteres.',true);
+    if(password!==confirm)return authMessage('signup-status','As senhas não são iguais.',true);
+    if(!document.getElementById('signup-consent').checked)return authMessage('signup-status','Confirme a criação da conta para continuar.',true);
+    const button=event.currentTarget.querySelector('[type="submit"]');button.disabled=true;button.textContent='CRIANDO CONTA...';authMessage('signup-status','');
+    try{
+      const emailRedirectTo=new URL('index.html',location.href).href;
+      const {data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo,data:{full_name:name}}});
+      if(error){
+        if(error.code==='user_already_exists')throw new Error('Este e-mail já possui conta. Use a opção Entrar.');
+        throw error;
+      }
+      if(!data.session){authMessage('signup-status','Conta criada. Confira seu e-mail para confirmar o cadastro e depois use Entrar.');setTimeout(()=>setAuthMode('login'),3500);return}
+      await client.from('profiles').update({full_name:name,email}).eq('id',data.user.id);
+      await finishAuthenticatedAccess(data.user,name);
+    }catch(error){authMessage('signup-status',error.message||'Não foi possível criar a conta.',true)}
+    finally{button.disabled=false;button.textContent='CRIAR MINHA CONTA →'}
+  });
+  setAuthMode('login');
 }
 // Evita o acúmulo de abas: toda a plataforma navega na mesma janela.
 document.querySelectorAll('a[target="_blank"]').forEach(link=>link.removeAttribute('target'));
-function activateRoute(){const route=(location.hash||'#inicio').slice(1);const page=document.getElementById(route)||document.getElementById('inicio');document.querySelectorAll('.page').forEach(item=>item.classList.remove('active'));page.classList.add('active');document.querySelectorAll('[data-route]').forEach(link=>link.classList.toggle('active',link.dataset.route===page.id));document.getElementById('page-title').textContent=page.dataset.title;document.title=`${page.dataset.title} | Plataforma Reino`;window.scrollTo(0,0);document.body.classList.remove('menu-open')}
+function activateRoute(){const route=(location.hash||'#inicio').slice(1);const page=document.getElementById(route)||document.getElementById('inicio');if(page.id!==route&&route!=='inicio')history.replaceState(null,'','#inicio');document.querySelectorAll('.page').forEach(item=>item.classList.remove('active'));page.classList.add('active');document.querySelectorAll('[data-route]').forEach(link=>{const active=link.dataset.route===page.id;link.classList.toggle('active',active);if(active)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current')});document.getElementById('page-title').textContent=page.dataset.title;document.title=`${page.dataset.title} | Plataforma Reino`;window.scrollTo({top:0,left:0,behavior:'instant'});document.body.classList.remove('menu-open');document.querySelector('.mobile-menu')?.setAttribute('aria-expanded','false')}
 window.addEventListener('hashchange',activateRoute);activateRoute();
 const promoSlides=[...document.querySelectorAll('[data-promo-slide]')];
 const promoDots=[...document.querySelectorAll('[data-promo-dot]')];
@@ -131,9 +154,16 @@ const editorialArticles={
     {category:'HISTÓRIA CRISTÃ',date:'VOCÊ SABIA?',title:'O Dia da Bíblia começou a ser celebrado no Brasil no século XIX',lead:'A celebração busca destacar a importância das Escrituras para a vida, a igreja e a sociedade.',image:'assets/capa-noticias-cristas.webp',alt:'Bíblia aberta em ambiente de estudo e comunicação',body:['Segundo a Sociedade Bíblica do Brasil, a celebração chegou ao país em 1850, com missionários evangélicos vindos da Europa e dos Estados Unidos.','Hoje, igrejas e comunidades usam a data para incentivar leitura, estudo, distribuição responsável e ações de serviço inspiradas pela Palavra.'],verse:'“Bem-aventurados os que ouvem a palavra de Deus e a guardam.” — Lucas 11:28',source:'Sociedade Bíblica do Brasil',url:'https://www.sbb.org.br/dia-da-biblia'}
   ]
 };
+async function loadNewsFromSupabase(){
+  const client=window.REINO_SUPABASE;if(!client)return;
+  try{const {data,error}=await client.from('news_cache').select('category,published_label,title,lead,image_url,source_name,source_url,published_at').eq('active',true).order('published_at',{ascending:false}).limit(12);if(error||!data?.length)return;
+    editorialArticles.noticias=data.map(item=>({category:item.category,date:item.published_label||new Date(item.published_at).toLocaleDateString('pt-BR'),title:item.title,lead:item.lead||'',image:item.image_url||'assets/capa-noticias-cristas.webp',alt:item.title,body:[item.lead||'Confira os detalhes na fonte original.'],verse:'',source:item.source_name,url:item.source_url}));
+    renderEditorial();bindEditorialButtons();
+  }catch(error){console.warn('Notícias:',error)}
+}
 function renderEditorial(){document.querySelectorAll('[data-editorial-grid]').forEach(grid=>{const items=editorialArticles[grid.dataset.editorialGrid]||[];grid.innerHTML=items.map((article,index)=>`<article class="news-card"><div class="news-image"><img src="${article.image}" alt="${escapeHtml(article.alt)}"><span>${article.category}</span></div><div class="news-copy"><small>${article.date}</small><h3>${article.title}</h3><p>${article.lead}</p><button class="news-open" type="button" data-article-category="${grid.dataset.editorialGrid}" data-article-index="${index}">Ler matéria completa →</button></div></article>`).join('')})}
 function openEditorialArticle(category,index){const article=editorialArticles[category]?.[Number(index)];if(!article)return;document.getElementById('article-dialog-image').src=article.image;document.getElementById('article-dialog-image').alt=article.alt;document.getElementById('article-dialog-category').textContent=`${article.category} • ${article.date}`;document.getElementById('article-dialog-title').textContent=article.title;document.getElementById('article-dialog-lead').textContent=article.lead;document.getElementById('article-dialog-body').innerHTML=article.body.map(text=>`<p>${text}</p>`).join('');document.getElementById('article-dialog-verse').textContent=article.verse;document.getElementById('article-dialog-source').textContent=`Fonte: ${article.source}`;document.getElementById('article-dialog-link').href=article.url;document.getElementById('article-dialog').showModal()}
-renderEditorial();document.querySelectorAll('.news-open').forEach(button=>button.addEventListener('click',()=>openEditorialArticle(button.dataset.articleCategory,button.dataset.articleIndex)));document.getElementById('close-article-dialog').addEventListener('click',()=>document.getElementById('article-dialog').close());
+function bindEditorialButtons(){document.querySelectorAll('.news-open').forEach(button=>button.addEventListener('click',()=>openEditorialArticle(button.dataset.articleCategory,button.dataset.articleIndex)))}renderEditorial();bindEditorialButtons();loadNewsFromSupabase();document.getElementById('close-article-dialog').addEventListener('click',()=>document.getElementById('article-dialog').close());
 document.querySelectorAll('[data-scroll-target]').forEach(button=>button.addEventListener('click',()=>document.getElementById(button.dataset.scrollTarget)?.scrollIntoView({behavior:'smooth',block:'start'})));
 document.querySelector('.mobile-menu').addEventListener('click',event=>{document.body.classList.toggle('menu-open');event.currentTarget.setAttribute('aria-expanded',document.body.classList.contains('menu-open'))});
 document.querySelector('.main-content').addEventListener('click',event=>{if(innerWidth<781&&!event.target.closest('.mobile-menu'))document.body.classList.remove('menu-open')});
@@ -143,8 +173,8 @@ document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('cli
 
 function renderUserAvatar(element,user){if(!element)return;element.replaceChildren();element.classList.toggle('has-photo',Boolean(user.photo));if(user.photo){const image=document.createElement('img');image.src=user.photo;image.alt=`Foto de ${user.name||'perfil'}`;element.appendChild(image)}else element.textContent=initials(user.name)}
 let pendingProfilePhoto;
-function refreshUser(){const user=read(STORE.user,{name:'Visitante',contact:'',email:'',phone:'',city:'',photo:''});const contact=user.contact||user.email||user.phone||'';document.getElementById('header-name').textContent=user.name;['header-avatar','profile-avatar','profile-photo-preview','community-avatar','composer-avatar'].forEach(id=>renderUserAvatar(document.getElementById(id),user));document.getElementById('profile-display-name').textContent=user.name;document.getElementById('profile-display-email').textContent=[contact,user.city].filter(Boolean).join(' • ')||'Perfil opcional neste aparelho.';document.getElementById('profile-name').value=user.name==='Visitante'?'':user.name;document.getElementById('profile-contact').value=contact;document.getElementById('remove-profile-photo').hidden=!user.photo&&pendingProfilePhoto===undefined}
-async function saveUser(name,contact){
+function refreshUser(){const user=read(STORE.user,{name:'Visitante',contact:'',email:'',phone:'',photo:''});const email=user.email||user.contact||'';document.getElementById('header-name').textContent=user.name;['header-avatar','profile-avatar','profile-photo-preview','community-avatar','composer-avatar'].forEach(id=>renderUserAvatar(document.getElementById(id),user));document.getElementById('profile-display-name').textContent=user.name;document.getElementById('profile-display-email').textContent=[email,user.phone].filter(Boolean).join(' • ')||'Perfil da Plataforma Reino';document.getElementById('profile-name').value=user.name==='Visitante'?'':user.name;document.getElementById('profile-contact').value=email;const phone=document.getElementById('profile-phone');if(phone)phone.value=user.phone||'';document.getElementById('remove-profile-photo').hidden=!user.photo&&pendingProfilePhoto===undefined}
+async function saveUser(name,contact,phone=''){
   if(!name.trim()||!validContact(contact))throw new Error('Preencha nome e e-mail válido.');
   const client=window.REINO_SUPABASE;
   if(!client)throw new Error('Conexão com Supabase indisponível.');
@@ -162,7 +192,9 @@ async function saveUser(name,contact){
     if(uploadError)throw uploadError;
     path=target;
   }else if(pendingProfilePhoto==='')path='';
-  const {error:updateError}=await client.from('profiles').update({full_name:name.trim(),email:normalized,avatar_url:path||null}).eq('id',user.id);
+  const cleanPhone=phone.trim();
+  if(cleanPhone&&!/^[0-9()+\-\s.]{8,20}$/.test(cleanPhone))throw new Error('Informe um telefone válido.');
+  const {error:updateError}=await client.from('profiles').update({full_name:name.trim(),email:normalized,phone:cleanPhone||null,avatar_url:path||null,updated_at:new Date().toISOString()}).eq('id',user.id);
   if(updateError)throw updateError;
   if(pendingProfilePhoto!==undefined&&oldPath&&oldPath!==path&&!oldPath.startsWith('data:')){
     const {error:removeError}=await client.storage.from(PROFILE_PHOTO_BUCKET).remove([oldPath]);
@@ -182,14 +214,16 @@ document.querySelector('#profile-dialog form').addEventListener('submit',async e
   const button=event.submitter;
   button.disabled=true;
   try{
-    await saveUser(document.getElementById('profile-name').value,document.getElementById('profile-contact').value);
+    const status=document.getElementById('profile-save-status');if(status)status.textContent='Salvando...';
+    await saveUser(document.getElementById('profile-name').value,document.getElementById('profile-contact').value,document.getElementById('profile-phone').value);
+    if(status)status.textContent='Perfil salvo com sucesso.';
     document.getElementById('profile-dialog').close('default');
   }catch(error){console.error('Perfil:',error);toast(error.message||'Não foi possível salvar o perfil.')}
   finally{button.disabled=false}
 });refreshUser();
 document.getElementById('reset-access').addEventListener('click',async()=>{try{await window.REINO_SUPABASE?.auth.signOut()}catch{}localStorage.removeItem(STORE.access);localStorage.removeItem('reino_access_granted_v1');localStorage.removeItem(STORE.user);location.href='index.html#inicio'});setupFirstAccess();
 
-function refreshStats(){const favorites=read(STORE.favorites,[]).length;const posts=read(STORE.posts,[]).length;const score=Number(read(STORE.score,0));[['home-best-score',`${score}/10`],['home-favorites',favorites],['home-posts',posts],['profile-score',`${score}/10`],['profile-favorites',favorites],['profile-posts',posts]].forEach(([id,value])=>{const element=document.getElementById(id);if(element)element.textContent=value})}
+function refreshStats(){const favorites=read(STORE.favorites,[]).length;const posts=communityPostsCache?.filter?.(post=>post.user_id===read(STORE.access,{}).userId).length||0;const score=Number(read(STORE.score,0));[['home-best-score',`${score}/10`],['home-favorites',favorites],['home-posts',posts],['profile-score',`${score}/10`],['profile-favorites',favorites],['profile-posts',posts]].forEach(([id,value])=>{const element=document.getElementById(id);if(element)element.textContent=value})}
 
 function populateBookSelect(){const select=document.getElementById('bible-book-select');select.innerHTML=BIBLE.books.map((book,index)=>`<option value="${index}">${escapeHtml(book.name)}</option>`).join('')}
 function populateChapterSelect(){const book=BIBLE.books[currentBookIndex];const select=document.getElementById('bible-chapter-select');select.innerHTML=book.chapters.map((_,index)=>`<option value="${index+1}">${index+1}</option>`).join('');select.value=String(currentChapter)}
@@ -203,14 +237,11 @@ document.getElementById('bible-chapter-select').addEventListener('change',event=
 document.getElementById('previous-chapter').addEventListener('click',()=>{if(currentChapter>1)loadChapter(currentBookIndex,currentChapter-1);else if(currentBookIndex>0){currentBookIndex--;loadChapter(currentBookIndex,BIBLE.books[currentBookIndex].chapters.length)}});
 document.getElementById('next-chapter').addEventListener('click',()=>{const book=BIBLE.books[currentBookIndex];if(currentChapter<book.chapters.length)loadChapter(currentBookIndex,currentChapter+1);else if(currentBookIndex<BIBLE.books.length-1)loadChapter(currentBookIndex+1,1)});
 const params=new URLSearchParams(location.search);const requestedSlug=params.get('book');const requestedChapter=Number(params.get('chapter')||1);const requestedIndex=BIBLE.books.findIndex(book=>book.slug===requestedSlug);if(requestedIndex>=0)selectBook(requestedIndex,requestedChapter,false);else loadChapter();
-document.getElementById('favorite-verse').addEventListener('click',()=>{const ref=`${BIBLE.books[currentBookIndex].name} ${currentChapter}`;const favorites=read(STORE.favorites,[]);const exists=favorites.includes(ref);write(STORE.favorites,exists?favorites.filter(item=>item!==ref):[...favorites,ref]);refreshStats();toast(exists?'Capítulo removido dos favoritos.':'Capítulo salvo nos favoritos.')});
+document.getElementById('favorite-verse').addEventListener('click',()=>{const ref=`${BIBLE.books[currentBookIndex].name} ${currentChapter}`;const favorites=read(STORE.favorites,[]);const exists=favorites.includes(ref);const next=exists?favorites.filter(item=>item!==ref):[...favorites,ref];write(STORE.favorites,next);saveContentPreferences({bible_favorites:next});refreshStats();toast(exists?'Capítulo removido dos favoritos.':'Capítulo salvo nos favoritos.')});
 async function shareText(text){if(navigator.share){try{await navigator.share({text});return}catch{}}if(navigator.clipboard){await navigator.clipboard.writeText(text);toast('Texto copiado para compartilhar.');return}toast('Selecione e copie o texto para compartilhar.')}
 document.getElementById('share-verse').addEventListener('click',()=>shareText(`${BIBLE.books[currentBookIndex].name} ${currentChapter} — Plataforma Reino`));
 const copyDaily=document.getElementById('copy-daily');if(copyDaily)copyDaily.addEventListener('click',()=>shareText('João 15:5 — Eu sou a videira; vocês são os ramos. Se alguém permanecer em mim e eu nele, esse dará muito fruto. — Plataforma Reino'));
 
-function localDate(){return new Date().toLocaleDateString('en-CA')}
-function previousDate(){const date=new Date();date.setDate(date.getDate()-1);return date.toLocaleDateString('en-CA')}
-function refreshDaily(){if(!document.getElementById('daily-streak'))return;const today=localDate();let daily=read(STORE.daily,{date:today,completed:[]});if(daily.date!==today)daily={date:today,completed:[]};write(STORE.daily,daily);let streak=read(STORE.streak,{last:'',count:0});if(streak.last!==today){streak={last:today,count:streak.last===previousDate()?streak.count+1:1};write(STORE.streak,streak)}document.getElementById('daily-streak').textContent=streak.count;document.getElementById('daily-completed').textContent=`${daily.completed.length} de 3`;document.getElementById('daily-progress-bar').style.width=`${daily.completed.length/3*100}%`;document.querySelectorAll('[data-daily]').forEach(button=>button.classList.toggle('done',daily.completed.includes(button.dataset.daily)))}
 document.querySelectorAll('[data-daily]').forEach(button=>button.addEventListener('click',()=>{const today=localDate();const daily=read(STORE.daily,{date:today,completed:[]});if(daily.date!==today)daily.completed=[];daily.date=today;if(!daily.completed.includes(button.dataset.daily))daily.completed.push(button.dataset.daily);write(STORE.daily,daily);refreshDaily();if(button.dataset.daily==='palavra')location.href='index.html?book=john&chapter=3#palavra';if(button.dataset.daily==='quiz')location.href='quiz.html';if(button.dataset.daily==='oracao')toast('Momento de oração marcado. Que este tempo fortaleça sua caminhada.')}));refreshDaily();
 
 const libraryItems=[
@@ -241,10 +272,18 @@ const libraryItems=[
   {id:'louco-amor',kind:'Livro',category:'Vida cristã',title:'Louco Amor',author:'Francis Chan',description:'Um chamado a responder ao amor de Deus com entrega e vida cristã coerente.',reason:'Estimula autoavaliação sobre prioridades, generosidade e compromisso.'},
   {id:'em-seus-passos',kind:'Livro',category:'Clássicos',title:'Em Seus Passos, o Que Faria Jesus?',author:'Charles M. Sheldon',description:'Romance cristão sobre uma comunidade que decide orientar escolhas pelo exemplo de Jesus.',reason:'Transforma uma pergunta simples em reflexão prática sobre ética, trabalho e serviço.'}
 ];
+async function loadContentPreferences(){
+  const client=window.REINO_SUPABASE;if(!client)return;
+  try{const {data:{user}}=await client.auth.getUser();if(!user)return;const {data,error}=await client.from('user_content_preferences').select('library_items,bible_favorites,mission_interests,heroes_best_score').eq('user_id',user.id).maybeSingle();if(error)throw error;if(data){write(STORE.library,data.library_items||[]);write(STORE.favorites,data.bible_favorites||[]);write(STORE.missions,data.mission_interests||[]);renderLibrary();refreshMissions();refreshStats()}}catch(error){console.warn('Preferências de conteúdo:',error)}
+}
+async function saveContentPreferences(patch){
+  const client=window.REINO_SUPABASE;if(!client)return;
+  try{const {data:{user}}=await client.auth.getUser();if(!user)return;const {error}=await client.from('user_content_preferences').upsert({user_id:user.id,...patch,updated_at:new Date().toISOString()},{onConflict:'user_id'});if(error)throw error}catch(error){console.warn('Preferências de conteúdo:',error)}
+}
 let activeLibraryFilter='Todos';
 let selectedBookId='';
 function libraryMatches(item){if(activeLibraryFilter==='Todos')return true;if(activeLibraryFilter==='Livros')return item.kind==='Livro';if(activeLibraryFilter==='Planos')return item.kind==='Plano';return item.category===activeLibraryFilter}
-function toggleLibrarySave(id){let list=read(STORE.library,[]);list=list.includes(id)?list.filter(item=>item!==id):[...list,id];write(STORE.library,list);renderLibrary();updateBookDialogButton();toast(list.includes(id)?'Item salvo na sua biblioteca.':'Item removido dos salvos.')}
+function toggleLibrarySave(id){let list=read(STORE.library,[]);list=list.includes(id)?list.filter(item=>item!==id):[...list,id];write(STORE.library,list);saveContentPreferences({library_items:list});renderLibrary();updateBookDialogButton();toast(list.includes(id)?'Item salvo na sua biblioteca.':'Item removido dos salvos.')}
 function openBook(id){const item=libraryItems.find(entry=>entry.id===id&&entry.kind==='Livro');if(!item)return;selectedBookId=id;document.getElementById('book-dialog-category').textContent=`${item.category.toUpperCase()} • EDIÇÃO EM PORTUGUÊS`;document.getElementById('book-dialog-title').textContent=item.title;document.getElementById('book-dialog-author').textContent=item.author;document.getElementById('book-dialog-description').textContent=item.description;document.getElementById('book-dialog-reason').textContent=item.reason;updateBookDialogButton();document.getElementById('book-dialog').showModal()}
 function updateBookDialogButton(){const button=document.getElementById('save-dialog-book');if(!button||!selectedBookId)return;button.textContent=read(STORE.library,[]).includes(selectedBookId)?'★ Salvo na biblioteca':'☆ Salvar na biblioteca'}
 function renderLibrary(){const query=document.getElementById('library-search').value.trim().toLocaleLowerCase('pt-BR');const saved=read(STORE.library,[]);const items=libraryItems.filter(item=>libraryMatches(item)&&(item.title+(item.author||'')+item.description+item.category).toLocaleLowerCase('pt-BR').includes(query));let bookNumber=0;document.getElementById('library-grid').innerHTML=items.map(item=>{if(item.kind==='Livro')bookNumber++;const action=item.kind==='Livro'?`<button type="button" class="library-open" data-open-book="${item.id}">Conhecer livro</button>`:`<a href="index.html?book=${item.book}&chapter=${item.chapter}#palavra" rel="noopener">Começar plano →</a>`;const meta=item.kind==='Livro'?`Livro cristão • português`:`${item.days} dias • plano bíblico`;return `<article class="library-card ${item.kind==='Livro'?'book-card':''}">${item.kind==='Livro'?`<span class="book-index">${String(bookNumber).padStart(2,'0')}</span>`:''}<small>${item.category.toUpperCase()}</small><h3>${escapeHtml(item.title)}</h3>${item.author?`<b class="library-author">${escapeHtml(item.author)}</b>`:''}<p>${escapeHtml(item.description)}</p><div class="library-meta"><span>${meta}</span><span>${action} <button type="button" class="${saved.includes(item.id)?'saved':''}" data-save-library="${item.id}" aria-label="Salvar item">${saved.includes(item.id)?'★':'☆'}</button></span></div></article>`}).join('')||'<article class="panel"><p>Nenhum item encontrado para esta busca.</p></article>';document.querySelectorAll('[data-save-library]').forEach(button=>button.addEventListener('click',()=>toggleLibrarySave(button.dataset.saveLibrary)));document.querySelectorAll('[data-open-book]').forEach(button=>button.addEventListener('click',()=>openBook(button.dataset.openBook)))}
@@ -279,10 +318,11 @@ const heroesQuestions=[
 let heroesQuestionIndex=0,heroesCorrect=0,heroesAnswered=false;
 function renderHeroesQuestion(){const item=heroesQuestions[heroesQuestionIndex];heroesAnswered=false;document.getElementById('heroes-question-number').textContent=`PERGUNTA ${heroesQuestionIndex+1} DE ${heroesQuestions.length}`;document.getElementById('heroes-question').textContent=item.question;document.getElementById('heroes-options').innerHTML=item.options.map((option,index)=>`<button type="button" data-hero-answer="${index}"><span>${String.fromCharCode(65+index)}</span>${option}</button>`).join('');document.getElementById('heroes-feedback').classList.add('hidden');document.getElementById('heroes-next').classList.add('hidden');document.querySelectorAll('[data-hero-answer]').forEach(button=>button.addEventListener('click',()=>answerHeroQuestion(Number(button.dataset.heroAnswer))))}
 function answerHeroQuestion(answer){if(heroesAnswered)return;heroesAnswered=true;const item=heroesQuestions[heroesQuestionIndex];if(answer===item.correct)heroesCorrect++;document.getElementById('heroes-score').textContent=`${heroesCorrect}/${heroesQuestions.length}`;document.querySelectorAll('[data-hero-answer]').forEach((button,index)=>{button.disabled=true;if(index===item.correct)button.classList.add('correct');if(index===answer&&answer!==item.correct)button.classList.add('wrong')});const feedback=document.getElementById('heroes-feedback');feedback.innerHTML=`<strong>${answer===item.correct?'Acertou!':'Quase!'}</strong><p>${item.explanation}</p>`;feedback.classList.remove('hidden');const next=document.getElementById('heroes-next');next.textContent=heroesQuestionIndex===heroesQuestions.length-1?'Refazer prova':'Próxima pergunta';next.classList.remove('hidden')}
-document.getElementById('heroes-next').addEventListener('click',()=>{if(heroesQuestionIndex===heroesQuestions.length-1){heroesQuestionIndex=0;heroesCorrect=0;document.getElementById('heroes-score').textContent=`0/${heroesQuestions.length}`}else heroesQuestionIndex++;renderHeroesQuestion()});renderHeroesQuestion();
+document.getElementById('heroes-next').addEventListener('click',()=>{if(heroesQuestionIndex===heroesQuestions.length-1){saveContentPreferences({heroes_best_score:heroesCorrect});heroesQuestionIndex=0;heroesCorrect=0;document.getElementById('heroes-score').textContent=`0/${heroesQuestions.length}`}else heroesQuestionIndex++;renderHeroesQuestion()});renderHeroesQuestion();
 
 function refreshMissions(){const selected=read(STORE.missions,[]);document.getElementById('mission-interest-count').textContent=selected.length?`${selected.length} ${selected.length===1?'frente selecionada':'frentes selecionadas'}`:'Nenhuma frente selecionada';document.querySelectorAll('[data-mission]').forEach(button=>{const active=selected.includes(button.dataset.mission);button.classList.toggle('selected',active);button.textContent=active?'✓ Interesse registrado':button.dataset.mission==='Missão digital'?'Quero colaborar':button.dataset.mission==='Missão social'?'Quero ajudar':button.dataset.mission==='Missão global'?'Conhecer melhor':'Tenho interesse'})}
-document.querySelectorAll('[data-mission]').forEach(button=>button.addEventListener('click',()=>{let selected=read(STORE.missions,[]);const mission=button.dataset.mission;selected=selected.includes(mission)?selected.filter(item=>item!==mission):[...selected,mission];write(STORE.missions,selected);refreshMissions();toast(selected.includes(mission)?'Interesse missionário salvo neste aparelho.':'Interesse removido.')}));document.getElementById('clear-missions').addEventListener('click',()=>{write(STORE.missions,[]);refreshMissions();toast('Escolhas missionárias removidas.')});refreshMissions();
+document.querySelectorAll('[data-mission]').forEach(button=>button.addEventListener('click',()=>{let selected=read(STORE.missions,[]);const mission=button.dataset.mission;selected=selected.includes(mission)?selected.filter(item=>item!==mission):[...selected,mission];write(STORE.missions,selected);saveContentPreferences({mission_interests:selected});refreshMissions();toast(selected.includes(mission)?'Interesse missionário salvo na sua conta.':'Interesse removido.')}));document.getElementById('clear-missions').addEventListener('click',()=>{write(STORE.missions,[]);saveContentPreferences({mission_interests:[]});refreshMissions();toast('Escolhas missionárias removidas.')});refreshMissions();
+loadContentPreferences();
 
 const freeCourses=[
   {title:'Vídeo Maker para Projetos da Igreja',provider:'Escola Criativa do Canva',audience:'Jovens e adultos',area:'Mídia para Igreja',description:'Aprenda princípios de gravação e edição para avisos, testemunhos, eventos e conteúdos cristãos.',url:'https://www.canva.com/pt_br/design-school/explore/'},
@@ -316,48 +356,54 @@ let activeCourseFilter='Todos';
 function renderCourses(){const items=freeCourses.filter(course=>activeCourseFilter==='Todos'||course.area===activeCourseFilter);document.getElementById('courses-grid').innerHTML=items.map((course,index)=>`<article class="course-card"><small>CURSO ${String(index+1).padStart(2,'0')} • ${course.audience.toUpperCase()}</small><h3>${escapeHtml(course.title)}</h3><span class="provider">${escapeHtml(course.provider)}</span><p>${escapeHtml(course.description)}</p><div class="course-tags"><span>${course.area}</span><span>Online</span><span>Fonte oficial</span></div><a class="button navy" href="${course.url}" rel="noopener noreferrer">Ver curso gratuito →</a></article>`).join('')}
 document.querySelectorAll('[data-course-filter]').forEach(button=>button.addEventListener('click',()=>{activeCourseFilter=button.dataset.courseFilter;document.querySelectorAll('[data-course-filter]').forEach(item=>item.classList.toggle('active',item===button));renderCourses()}));renderCourses();
 
-const followPodcast=document.getElementById('follow-podcast');function refreshPodcast(){const followed=read(STORE.podcast,false);followPodcast.textContent=followed?'✓ Seguindo o ReinoCast':'＋ Seguir o ReinoCast';followPodcast.classList.toggle('soft',followed)}followPodcast.addEventListener('click',()=>{const followed=!read(STORE.podcast,false);write(STORE.podcast,followed);refreshPodcast();toast(followed?'ReinoCast adicionado aos seus interesses.':'Você deixou de seguir o ReinoCast.')});refreshPodcast();
+const followPodcast=document.getElementById('follow-podcast');
+let podcastFollowed=false;
+function paintPodcastFollow(){followPodcast.textContent=podcastFollowed?'✓ Seguindo o ReinoCast':'＋ Seguir o ReinoCast';followPodcast.classList.toggle('soft',podcastFollowed)}
+async function refreshPodcast(){
+  const client=window.REINO_SUPABASE;if(!client){podcastFollowed=read(STORE.podcast,false);paintPodcastFollow();return}
+  try{const {data:{user}}=await client.auth.getUser();if(!user){podcastFollowed=false;paintPodcastFollow();return}const {data,error}=await client.from('podcast_follows').select('followed').eq('user_id',user.id).maybeSingle();if(error)throw error;podcastFollowed=Boolean(data?.followed);paintPodcastFollow()}catch(error){console.warn('Podcast:',error);paintPodcastFollow()}
+}
+followPodcast.addEventListener('click',async()=>{const client=window.REINO_SUPABASE;if(!client)return toast('Conexão indisponível.');try{const {data:{user}}=await client.auth.getUser();if(!user)throw new Error('Entre na sua conta para seguir o ReinoCast.');podcastFollowed=!podcastFollowed;const {error}=await client.from('podcast_follows').upsert({user_id:user.id,podcast_key:'reinocast',followed:podcastFollowed,updated_at:new Date().toISOString()},{onConflict:'user_id'});if(error)throw error;paintPodcastFollow();toast(podcastFollowed?'ReinoCast adicionado à sua conta.':'Você deixou de seguir o ReinoCast.')}catch(error){toast(error.message||'Não foi possível atualizar agora.')}});refreshPodcast();
 
-function refreshConnections(){const list=read(STORE.connections,[]);document.getElementById('connection-count').textContent=list.length?`${list.length} ${list.length===1?'conexão solicitada':'conexões solicitadas'}`:'Nenhuma conexão solicitada';document.querySelectorAll('[data-connection]').forEach(button=>{const active=list.includes(button.dataset.connection);if(button.closest('.next-steps'))button.innerHTML=active?'<b>✓ Interesse em mentoria registrado</b><small>Salvo somente neste aparelho</small>':'<b>Registrar interesse em mentoria</b><small>Para futura conexão com liderança validada</small>';else button.textContent=active?'✓ Interesse registrado':button.dataset.connection==='oração'?'Entrar na sala':button.dataset.connection==='mentoria'?'Solicitar contato':'Tenho interesse';button.disabled=active})}
-document.querySelectorAll('[data-connection]').forEach(button=>button.addEventListener('click',()=>{const list=read(STORE.connections,[]);if(!list.includes(button.dataset.connection))list.push(button.dataset.connection);write(STORE.connections,list);refreshConnections();toast('Interesse salvo neste aparelho. A equipe poderá conectar esta função ao servidor depois.')}));document.getElementById('clear-connections').addEventListener('click',()=>{write(STORE.connections,[]);refreshConnections();toast('Interesses locais removidos.')});refreshConnections();
+let connectionRequests=[];
+async function refreshConnections(){
+  const client=window.REINO_SUPABASE;if(!client)return;
+  const {data:{user}}=await client.auth.getUser();
+  if(!user){connectionRequests=[];document.getElementById('connection-count').textContent='Entre na sua conta para acompanhar conexões';return}
+  const {data,error}=await client.from('connection_requests').select('connection_type,status,created_at').eq('user_id',user.id).order('created_at',{ascending:false});
+  if(error){console.warn('Conexão Reino:',error);return}
+  connectionRequests=data||[];
+  document.getElementById('connection-count').textContent=connectionRequests.length?`${connectionRequests.length} ${connectionRequests.length===1?'conexão solicitada':'conexões solicitadas'}`:'Nenhuma conexão solicitada';
+  document.querySelectorAll('[data-connection]').forEach(button=>{const active=connectionRequests.some(item=>item.connection_type===button.dataset.connection);button.textContent=active?'✓ Interesse registrado':button.dataset.connection==='oração'?'Entrar na sala':button.dataset.connection==='mentoria'?'Solicitar contato':'Tenho interesse';button.disabled=active});
+}
+document.querySelectorAll('[data-connection]').forEach(button=>button.addEventListener('click',async()=>{
+  const client=window.REINO_SUPABASE;if(!client)return toast('Conexão indisponível.');
+  try{const {data:{user},error:authError}=await client.auth.getUser();if(authError||!user)throw new Error('Entre na sua conta para continuar.');
+    const type=button.dataset.connection;
+    if(type==='oração'){showCommunityView('chat');activeChatRoom='biblia';await renderGroupChat();document.getElementById('comunidade').scrollIntoView({behavior:'smooth'});return}
+    const {error}=await client.from('connection_requests').upsert({user_id:user.id,connection_type:type,status:'requested'},{onConflict:'user_id,connection_type'});if(error)throw error;
+    await refreshConnections();toast('Interesse registrado na sua conta.');
+  }catch(error){console.warn('Conexão Reino:',error);toast(error.message||'Não foi possível registrar o interesse.')}
+}));
+document.getElementById('clear-connections').addEventListener('click',async()=>{const client=window.REINO_SUPABASE;if(!client)return;try{const {data:{user}}=await client.auth.getUser();if(!user)throw new Error('Entre na sua conta.');const {error}=await client.from('connection_requests').delete().eq('user_id',user.id);if(error)throw error;await refreshConnections();toast('Interesses removidos da sua conta.')}catch(error){toast(error.message||'Não foi possível limpar.')}});
+refreshConnections();
 
-const careGuidance={
-  ansiedade:{title:'Vamos diminuir o ritmo por um instante',text:'Apoie os pés no chão e observe cinco coisas que você vê, quatro que pode tocar, três que escuta, duas que sente pelo cheiro e uma pelo sabor. Depois, procure alguém seguro para contar como você está.',reference:'Filipenses 4:6–7'},
-  tristeza:{title:'Sua dor merece companhia e cuidado',text:'Tente não atravessar este momento sozinho. Escolha uma pessoa de confiança e diga com clareza: “Eu não estou bem e preciso de companhia”. Se a tristeza persistir ou limitar sua rotina, procure atendimento profissional.',reference:'Salmos 42:11'},
-  luto:{title:'O luto não precisa seguir um calendário',text:'Perdas podem trazer tristeza, culpa, raiva e cansaço. Dê espaço ao que sente, mantenha contato com pessoas seguras e considere acompanhamento profissional ou um grupo de apoio.',reference:'João 11:35'},
-  autoestima:{title:'Um pensamento doloroso não define seu valor',text:'Escreva uma qualidade que alguém confiável reconhece em você e uma pequena coisa que conseguiu fazer hoje. Busque relações que ofereçam respeito, verdade e segurança.',reference:'Salmos 139:13–14'}
-};
-function showCareGuidance(key){const item=careGuidance[key];if(!item)return;document.querySelectorAll('[data-feeling]').forEach(button=>button.classList.toggle('active',button.dataset.feeling===key));const box=document.getElementById('care-suggestion');box.innerHTML=`<span class="eyebrow">UM PASSO POSSÍVEL AGORA</span><h3>${item.title}</h3><p>${item.text}</p><div class="actions"><a class="button soft" href="index.html?book=${key==='luto'?'john':'psalms'}&chapter=${key==='luto'?'11':'34'}#palavra" rel="noopener">Ler ${item.reference} →</a><button class="button navy" type="button" data-open-chat="${key}">Conversar sobre isso</button></div>`;box.classList.remove('hidden');box.querySelector('[data-open-chat]').addEventListener('click',()=>{document.getElementById('guided-chat').scrollIntoView({behavior:'smooth'});sendCareTopic(key)})}
-document.querySelectorAll('[data-feeling]').forEach(button=>button.addEventListener('click',()=>showCareGuidance(button.dataset.feeling)));
-document.getElementById('start-care-chat').addEventListener('click',()=>document.getElementById('guided-chat').scrollIntoView({behavior:'smooth'}));
-
-const chatReplies={
-  ansiedade:'Sinto que isso está deixando você em alerta. Vamos fazer uma pausa: inspire suavemente, solte o ar mais devagar e perceba seus pés no chão. Isso não resolve tudo, mas pode ajudar a atravessar este minuto. Você consegue chamar alguém de confiança para ficar perto ou conversar?',
-  tristeza:'Sinto muito que este momento esteja tão pesado. Você não precisa esconder o que sente. Tente dizer a uma pessoa segura: “Eu não estou bem e preciso de companhia”. Se essa tristeza continuar ou dificultar sua rotina, procure um profissional de saúde.',
-  luto:'Sinto muito pela sua perda. Você não precisa apressar o luto nem fingir força. Se puder, diga o nome da pessoa ou daquilo que perdeu e compartilhe uma lembrança segura com alguém de confiança. Apoio profissional ou um grupo de luto também pode ajudar.',
-  autoestima:'Quando a dor fala alto, ela pode parecer uma verdade sobre você — mas não é. Tente separar: “estou tendo o pensamento de que não sou suficiente” em vez de “não sou suficiente”. Quem poderia lembrar você do seu valor com respeito e sinceridade?',
-  apoio:'Obrigado por dizer que precisa de apoio. Isso já é um passo importante. Posso ajudar a organizar este momento, mas uma pessoa real pode oferecer presença e cuidado. Você pode chamar alguém de confiança agora, procurar sua igreja ou conversar gratuitamente com o CVV pelo 188.'
-};
-function appendCareMessage(text,type='bot',crisis=false){const message=document.createElement('div');message.className=`chat-message ${type}${crisis?' crisis':''}`;message.textContent=text;document.getElementById('care-chat-messages').appendChild(message);message.scrollIntoView({behavior:'smooth',block:'nearest'})}
-function sendCareTopic(topic){appendCareMessage(document.querySelector(`[data-chat-topic="${topic}"]`)?.textContent||'Quero conversar','user');setTimeout(()=>appendCareMessage(chatReplies[topic]||chatReplies.apoio),220)}
-document.querySelectorAll('[data-chat-topic]').forEach(button=>button.addEventListener('click',()=>sendCareTopic(button.dataset.chatTopic)));
-function isCrisisText(text){return /(suic[ií]d|me matar|quero morrer|n[aã]o quero viver|acabar com tudo|me machucar|me ferir|tirar minha vida|sem motivo para viver)/i.test(text)}
-document.getElementById('care-chat-form').addEventListener('submit',event=>{event.preventDefault();const input=document.getElementById('care-chat-input');const text=input.value.trim();if(!text)return;appendCareMessage(text,'user');input.value='';if(isCrisisText(text)){setTimeout(()=>appendCareMessage('Sua segurança é prioridade agora. Este chat automático não consegue prestar atendimento de emergência. Não fique sozinho: ligue gratuitamente para o CVV no 188, chame alguém de confiança para ficar com você ou, se houver perigo imediato, ligue para o SAMU no 192 ou vá a um pronto atendimento.', 'bot',true),180);return}setTimeout(()=>appendCareMessage('Obrigado por confiar isso aqui. O que você sente merece ser ouvido sem julgamento. Este chat não faz diagnóstico, mas pode ajudar no próximo passo: escolha uma pessoa segura para conversar hoje e, se isso estiver persistindo ou afetando sua rotina, procure um profissional de saúde. Você prefere falar sobre ansiedade, perda, autoestima ou apoio?'),220)});
+document.getElementById('focus-support-request')?.addEventListener('click',()=>{document.querySelector('#support-request-form textarea[name="message"]')?.focus();document.getElementById('support-request-form')?.scrollIntoView({behavior:'smooth',block:'center'})});
 document.getElementById('support-request-form').addEventListener('submit',async event=>{
   event.preventDefault();
   const form=event.currentTarget,button=form.querySelector('[type="submit"]'),status=document.getElementById('support-request-status');
-  const subject=form.elements.subject.value.trim(),message=form.elements.message.value.trim();
-  if(!subject||!message){status.textContent='Preencha o assunto e a mensagem.';return}
+  const subject=form.elements.subject.value.trim(),message=form.elements.message.value.trim(),wantsContact=form.elements.wants_contact.checked;
+  if(!subject||!message){status.textContent='Escolha uma opção e escreva sua mensagem.';return}
   const client=window.REINO_SUPABASE;
   if(!client){status.textContent='Conexão indisponível. Tente novamente mais tarde.';return}
-  button.disabled=true;status.textContent='Registrando...';
+  button.disabled=true;status.textContent='Enviando sua mensagem...';
   try{
     const {data:{user},error:authError}=await client.auth.getUser();
-    if(authError||!user)throw new Error('Entre na sua conta para registrar o pedido.');
-    const {error}=await client.from('support_requests').insert({user_id:user.id,subject,message});
+    if(authError||!user)throw new Error('Entre na sua conta para enviar a mensagem.');
+    const {error}=await client.from('support_requests').insert({user_id:user.id,subject,message,wants_contact:wantsContact});
     if(error)throw error;
-    form.reset();status.textContent='Pedido registrado na sua conta. Este canal ainda não tem atendimento humano ativo.';
-  }catch(error){console.warn('Pedido de acolhimento:',error);status.textContent=error.message||'Não foi possível registrar. Tente novamente.'}
+    form.reset();status.textContent=wantsContact?'Mensagem enviada. A equipe poderá entrar em contato usando os dados da sua conta.':'Mensagem enviada para a equipe da Plataforma Reino.';
+  }catch(error){console.warn('Oração e Conversa:',error);status.textContent=error.message||'Não foi possível enviar. Tente novamente.'}
   finally{button.disabled=false}
 });
 async function submitReinoForm(event,table,fields,honeypot){
@@ -384,17 +430,20 @@ async function submitReinoForm(event,table,fields,honeypot){
   }catch(error){console.warn('Envio do formulário:',error);status.textContent=error.message||'Não foi possível enviar. Tente novamente.'}
   finally{button.disabled=false}
 }
+async function loadTestimonyHistory(){
+  const box=document.getElementById('testimony-history'),client=window.REINO_SUPABASE;if(!box||!client)return;
+  try{const {data:{user}}=await client.auth.getUser();if(!user){box.innerHTML='<small>Entre na sua conta para acompanhar seus testemunhos.</small>';return}
+    const {data,error}=await client.from('testimony_submissions').select('id,title,review_status,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(5);if(error)throw error;
+    const labels={pending:'Em análise',approved:'Aprovado',rejected:'Não aprovado',published:'Publicado'};
+    box.innerHTML=(data||[]).length?'<strong>Meus últimos envios</strong>'+data.map(item=>`<div class="testimony-history-item"><span>${escapeHtml(item.title)}</span><small>${new Date(item.created_at).toLocaleDateString('pt-BR')} • ${escapeHtml(labels[item.review_status]||item.review_status)}</small></div>`).join(''):'<small>Você ainda não enviou testemunhos para análise.</small>';
+  }catch(error){console.warn('Histórico de testemunhos:',error);box.innerHTML='<small>Não foi possível carregar seus envios agora.</small>'}
+}
 document.querySelector('.contact-form').addEventListener('submit',event=>submitReinoForm(event,'contact_submissions',['nome','email','assunto','mensagem'],'site-confirmacao'));
-document.querySelector('.public-testimony-form').addEventListener('submit',event=>submitReinoForm(event,'testimony_submissions',['nome','cidade','titulo','testemunho'],'empresa-site'));
-document.getElementById('clear-care-chat').addEventListener('click',()=>{document.getElementById('care-chat-messages').innerHTML='<div class="chat-message bot">Olá. Eu estou aqui para ajudar você a organizar este momento. O que está pesando mais hoje?</div>';toast('Conversa local apagada.')});
-
-const testimonyText=document.getElementById('testimony-text');testimonyText.addEventListener('input',()=>document.getElementById('testimony-count').textContent=testimonyText.value.length);
-function renderTestimony(){const value=read(STORE.testimony,'');document.getElementById('saved-testimony').innerHTML=value?`<blockquote>“${escapeHtml(value)}”</blockquote><small>Salvo somente neste aparelho • não publicado</small><br><button class="button soft" type="button" id="delete-testimony">Excluir relato</button>`:'<p>Nenhum depoimento salvo neste aparelho.</p>';const remove=document.getElementById('delete-testimony');if(remove)remove.addEventListener('click',()=>{write(STORE.testimony,'');renderTestimony();toast('Depoimento local excluído.')})}
-document.getElementById('save-testimony').addEventListener('click',()=>{const value=testimonyText.value.trim();if(!value)return toast('Escreva seu depoimento antes de salvar.');write(STORE.testimony,value);testimonyText.value='';document.getElementById('testimony-count').textContent='0';renderTestimony();toast('Depoimento salvo somente neste aparelho.')});renderTestimony();
+document.querySelector('.public-testimony-form').addEventListener('submit',async event=>{await submitReinoForm(event,'testimony_submissions',['nome','cidade','titulo','testemunho'],'empresa-site');await loadTestimonyHistory()});loadTestimonyHistory();
 
 const radio=document.getElementById('radio-stream');const radioToggle=document.getElementById('radio-toggle');const radioStatus=document.getElementById('radio-status');radio.volume=.8;
 radioToggle.addEventListener('click',async()=>{if(radio.paused){radioStatus.textContent='Conectando à transmissão...';try{await radio.play()}catch{radioStatus.textContent='Não foi possível iniciar. Tente novamente.'}}else radio.pause()});
-radio.addEventListener('playing',()=>{radioToggle.textContent='❚❚';radioStatus.textContent='Rádio Gospel • ao vivo'});radio.addEventListener('pause',()=>{radioToggle.textContent='▶';radioStatus.textContent='Transmissão pausada'});radio.addEventListener('error',()=>{radioToggle.textContent='▶';radioStatus.textContent='Rádio temporariamente indisponível'});document.getElementById('radio-volume').addEventListener('input',event=>radio.volume=Number(event.target.value));
+radio.addEventListener('playing',()=>{radioToggle.textContent='❚❚';radioStatus.textContent='Viver é Cristo • ao vivo'});radio.addEventListener('pause',()=>{radioToggle.textContent='▶';radioStatus.textContent='Transmissão pausada'});radio.addEventListener('error',()=>{radioToggle.textContent='▶';radioStatus.textContent='Rádio temporariamente indisponível'});document.getElementById('radio-volume').addEventListener('input',event=>radio.volume=Number(event.target.value));
 
 const communityGroups=[
   {id:'musicos',icon:'♫',name:'Músicos do Reino',topic:'Música',members:346,description:'Louvor, técnica, repertório, composição e experiências de ministério.'},
@@ -414,29 +463,53 @@ const postBox=document.getElementById('new-post');
 const postPhoto=document.getElementById('post-photo');
 const postVideo=document.getElementById('post-video');
 const mediaPreview=document.getElementById('community-media-preview');
-let selectedCommunityMedia=null,selectedPostKind='Novo post',activeChatRoom='musicos';
-const sessionMedia={};
+let selectedCommunityMedia=null,selectedPostKind='Novo post',activeChatRoom='musicos',communityPostsCache=[];
 postBox.addEventListener('input',()=>document.getElementById('char-count').textContent=postBox.value.length);
-function allPosts(){const own=read(STORE.posts,[]).map((post,index)=>({...post,id:post.id||`post-local-${index}`}));return [...own,...defaultPosts]}
-function postInteractions(){return read(STORE.postInteractions,{})}
-function updateInteraction(id,key,value){const data=postInteractions();const current=data[id]||{likes:0,compliments:0,comments:[]};if(key==='comments')current.comments=value;else current[key]=(current[key]||0)+1;data[id]=current;write(STORE.postInteractions,data);renderPosts()}
-function mediaMarkup(post){const media=post.media||sessionMedia[post.id];if(!media)return'';if(media.type==='video')return`<video class="post-media" controls preload="metadata" src="${media.url}"></video>`;return`<img class="post-media" src="${media.url}" alt="Imagem compartilhada por ${escapeHtml(post.name)}">`}
-function renderPosts(){
-  const interactions=postInteractions();
-  document.getElementById('community-feed').innerHTML=allPosts().map(post=>{const state=interactions[post.id]||{likes:0,compliments:0,comments:[]};const likes=(post.likes||0)+(state.likes||0);const compliments=(post.compliments||0)+(state.compliments||0);const comments=state.comments||[];return`<article class="panel post-card social-post"><div class="post-head"><span class="avatar">${initials(post.name)}</span><span><strong>${escapeHtml(post.name)}</strong><small>${escapeHtml(post.role||post.category||'Comunidade Reino')} • ${escapeHtml(post.time||'Agora')}</small></span><button type="button" data-report="${post.id}" aria-label="Denunciar publicação">•••</button></div>${post.category?`<span class="post-topic">${escapeHtml(post.category)}</span>`:''}<p>${escapeHtml(post.text)}</p>${mediaMarkup(post)}<div class="post-reactions"><span>♡ ${likes} curtidas</span><span>★ ${compliments} elogios especiais</span><span>◯ ${comments.length} comentários</span></div><div class="post-actions"><button type="button" data-like="${post.id}">♡ Curtir</button><button class="special-praise" type="button" data-compliment="${post.id}">★ Elogio especial</button><button type="button" data-comment="${post.id}">◯ Comentar</button><button type="button" data-share-post="${post.id}">↗ Compartilhar</button></div><div class="post-comments">${comments.map(comment=>`<p><b>${escapeHtml(comment.name)}</b> ${escapeHtml(comment.text)}</p>`).join('')}</div><form class="post-comment-form hidden" data-comment-form="${post.id}"><input maxlength="220" required placeholder="Escreva um comentário respeitoso..."><button type="submit">Enviar</button></form></article>`}).join('');
-  document.querySelectorAll('[data-like]').forEach(button=>button.addEventListener('click',()=>updateInteraction(button.dataset.like,'likes')));
-  document.querySelectorAll('[data-compliment]').forEach(button=>button.addEventListener('click',()=>{updateInteraction(button.dataset.compliment,'compliments');toast('Elogio especial enviado!')}));
-  document.querySelectorAll('[data-comment]').forEach(button=>button.addEventListener('click',()=>document.querySelector(`[data-comment-form="${button.dataset.comment}"]`).classList.toggle('hidden')));
-  document.querySelectorAll('[data-comment-form]').forEach(form=>form.addEventListener('submit',event=>{event.preventDefault();const input=form.querySelector('input');const text=input.value.trim();if(!text)return;const data=postInteractions();const item=data[form.dataset.commentForm]||{likes:0,compliments:0,comments:[]};item.comments=[...(item.comments||[]),{name:read(STORE.user,{name:'Visitante'}).name||'Visitante',text}];data[form.dataset.commentForm]=item;write(STORE.postInteractions,data);renderPosts();toast('Comentário publicado.')}));
-  document.querySelectorAll('[data-share-post]').forEach(button=>button.addEventListener('click',async()=>{const post=allPosts().find(item=>item.id===button.dataset.sharePost);const text=`${post.name} na Comunidade Reino: ${post.text}`;if(navigator.share){try{await navigator.share({title:'Comunidade Reino',text});return}catch{}}if(navigator.clipboard){await navigator.clipboard.writeText(text);toast('Publicação copiada para compartilhar.')}else toast('Compartilhamento disponível em navegadores compatíveis.')}));
-  document.querySelectorAll('[data-report]').forEach(button=>button.addEventListener('click',()=>{button.disabled=true;button.textContent='Enviado';toast('A publicação foi enviada para moderação.')}));
+function communityTime(value){const date=new Date(value);return Number.isNaN(date.getTime())?'Agora':date.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
+function mediaMarkup(post){if(!post.media_url)return'';return `<img class="post-media" src="${escapeHtml(post.media_url)}" alt="Imagem compartilhada por ${escapeHtml(post.display_name)}">`}
+async function loadCommunityPosts(){
+  const client=window.REINO_SUPABASE;if(!client)return;
+  const {data:posts,error}=await client.from('community_posts').select('id,user_id,display_name,body,media_url,created_at').order('created_at',{ascending:false}).limit(80);
+  if(error){console.warn('Comunidade:',error);document.getElementById('community-feed').innerHTML='<article class="panel"><p>Não foi possível carregar a comunidade agora.</p></article>';return}
+  const ids=(posts||[]).map(post=>post.id);let comments=[],reactions=[];
+  if(ids.length){
+    const [commentResult,reactionResult]=await Promise.all([
+      client.from('community_comments').select('id,post_id,user_id,display_name,body,created_at').in('post_id',ids).order('created_at',{ascending:true}),
+      client.from('community_reactions').select('post_id,user_id,reaction').in('post_id',ids)
+    ]);
+    if(!commentResult.error)comments=commentResult.data||[];if(!reactionResult.error)reactions=reactionResult.data||[];
+  }
+  communityPostsCache=(posts||[]).map(post=>({...post,comments:comments.filter(item=>item.post_id===post.id),reactions:reactions.filter(item=>item.post_id===post.id)}));
+  renderPosts();refreshStats();
 }
+function renderPosts(){
+  const feed=document.getElementById('community-feed');
+  feed.innerHTML=communityPostsCache.map(post=>{const likes=post.reactions.filter(item=>item.reaction==='like').length,praises=post.reactions.filter(item=>item.reaction==='praise').length;return `<article class="panel post-card social-post"><div class="post-head"><span class="avatar">${initials(post.display_name)}</span><span><strong>${escapeHtml(post.display_name)}</strong><small>Comunidade Reino • ${communityTime(post.created_at)}</small></span></div><p>${escapeHtml(post.body)}</p>${mediaMarkup(post)}<div class="post-reactions"><span>♡ ${likes} curtidas</span><span>★ ${praises} elogios especiais</span><span>◯ ${post.comments.length} comentários</span></div><div class="post-actions"><button type="button" data-reaction="like" data-post-id="${post.id}">♡ Curtir</button><button class="special-praise" type="button" data-reaction="praise" data-post-id="${post.id}">★ Elogio especial</button><button type="button" data-comment="${post.id}">◯ Comentar</button><button type="button" data-share-post="${post.id}">↗ Compartilhar</button></div><div class="post-comments">${post.comments.map(comment=>`<p><b>${escapeHtml(comment.display_name)}</b> ${escapeHtml(comment.body)}</p>`).join('')}</div><form class="post-comment-form hidden" data-comment-form="${post.id}"><input maxlength="500" required placeholder="Escreva um comentário respeitoso..."><button type="submit">Enviar</button></form></article>`}).join('')||'<article class="panel"><p>A comunidade ainda não tem publicações. Seja o primeiro a compartilhar.</p></article>';
+  document.querySelectorAll('[data-reaction]').forEach(button=>button.addEventListener('click',()=>toggleCommunityReaction(button.dataset.postId,button.dataset.reaction)));
+  document.querySelectorAll('[data-comment]').forEach(button=>button.addEventListener('click',()=>document.querySelector(`[data-comment-form="${button.dataset.comment}"]`)?.classList.toggle('hidden')));
+  document.querySelectorAll('[data-comment-form]').forEach(form=>form.addEventListener('submit',submitCommunityComment));
+  document.querySelectorAll('[data-share-post]').forEach(button=>button.addEventListener('click',async()=>{const post=communityPostsCache.find(item=>item.id===button.dataset.sharePost);if(!post)return;const text=`${post.display_name} na Comunidade Reino: ${post.body}`;if(navigator.share){try{await navigator.share({title:'Comunidade Reino',text});return}catch{}}if(navigator.clipboard){await navigator.clipboard.writeText(text);toast('Publicação copiada para compartilhar.')}}));
+}
+async function currentCommunityUser(){const client=window.REINO_SUPABASE;if(!client)throw new Error('Conexão indisponível.');const {data:{user},error}=await client.auth.getUser();if(error||!user)throw new Error('Entre na sua conta para participar da comunidade.');return user}
+async function toggleCommunityReaction(postId,reaction){
+  try{const client=window.REINO_SUPABASE,user=await currentCommunityUser();const {data}=await client.from('community_reactions').select('post_id').eq('post_id',postId).eq('user_id',user.id).eq('reaction',reaction).maybeSingle();const result=data?await client.from('community_reactions').delete().eq('post_id',postId).eq('user_id',user.id).eq('reaction',reaction):await client.from('community_reactions').insert({post_id:postId,user_id:user.id,reaction});if(result.error)throw result.error;await loadCommunityPosts()}catch(error){console.warn('Reação:',error);toast(error.message||'Não foi possível registrar a reação.')}}
+async function submitCommunityComment(event){
+  event.preventDefault();const form=event.currentTarget,input=form.querySelector('input'),body=input.value.trim();if(!body)return;
+  try{const client=window.REINO_SUPABASE,user=await currentCommunityUser();const name=(read(STORE.user,{}).name||user.email?.split('@')[0]||'Usuário').slice(0,80);const {error}=await client.from('community_comments').insert({post_id:form.dataset.commentForm,user_id:user.id,display_name:name,body});if(error)throw error;input.value='';await loadCommunityPosts();toast('Comentário publicado.')}catch(error){console.warn('Comentário:',error);toast(error.message||'Comentário não enviado.')}}
 function clearSelectedMedia(){selectedCommunityMedia=null;postPhoto.value='';postVideo.value='';mediaPreview.classList.add('hidden');mediaPreview.innerHTML=''}
-function showMediaPreview(file,type){if(!file)return;if(type==='image'&&file.size>1500000)return toast('Escolha uma foto de até 1,5 MB.');if(type==='video'&&file.size>15000000)return toast('Escolha um vídeo de até 15 MB.');if(type==='image'){const reader=new FileReader();reader.onload=()=>{selectedCommunityMedia={type:'image',url:reader.result,persistent:true};mediaPreview.innerHTML=`<img src="${reader.result}" alt="Prévia da foto"><button type="button" id="remove-post-media">× Remover</button>`;mediaPreview.classList.remove('hidden');document.getElementById('remove-post-media').addEventListener('click',clearSelectedMedia)};reader.readAsDataURL(file)}else{const url=URL.createObjectURL(file);selectedCommunityMedia={type:'video',url,persistent:false};mediaPreview.innerHTML=`<video src="${url}" controls></video><button type="button" id="remove-post-media">× Remover</button>`;mediaPreview.classList.remove('hidden');document.getElementById('remove-post-media').addEventListener('click',clearSelectedMedia)}}
+function showMediaPreview(file,type){if(!file)return;if(type==='video')return toast('Vídeo será ativado em uma próxima etapa. Use uma foto nesta publicação.');if(file.size>1500000)return toast('Escolha uma foto de até 1,5 MB.');const reader=new FileReader();reader.onload=()=>{selectedCommunityMedia={file,url:reader.result};mediaPreview.innerHTML=`<img src="${reader.result}" alt="Prévia da foto"><button type="button" id="remove-post-media">× Remover</button>`;mediaPreview.classList.remove('hidden');document.getElementById('remove-post-media').addEventListener('click',clearSelectedMedia)};reader.readAsDataURL(file)}
 postPhoto.addEventListener('change',event=>showMediaPreview(event.target.files[0],'image'));postVideo.addEventListener('change',event=>showMediaPreview(event.target.files[0],'video'));
 document.querySelectorAll('[data-post-kind]').forEach(button=>button.addEventListener('click',()=>{selectedPostKind=button.dataset.postKind;postBox.placeholder=`Compartilhe seu ${selectedPostKind.toLowerCase()}...`;postBox.focus();toast(`${selectedPostKind} selecionado.`)}));
-document.getElementById('publish-post').addEventListener('click',()=>{const text=postBox.value.trim();if(!text&&!selectedCommunityMedia)return toast('Escreva uma mensagem ou escolha uma foto ou vídeo.');const user=read(STORE.user,{name:'Visitante'});const own=read(STORE.posts,[]);const id=`post-${Date.now()}`;const post={id,name:user.name||'Visitante',role:'Comunidade Reino',category:selectedPostKind,text:text||'Compartilhou uma mídia com a comunidade.',time:'Agora',likes:0,compliments:0};if(selectedCommunityMedia?.persistent)post.media=selectedCommunityMedia;else if(selectedCommunityMedia)sessionMedia[id]=selectedCommunityMedia;own.unshift(post);try{write(STORE.posts,own)}catch{toast('A foto é grande demais para ficar salva neste aparelho.');return}postBox.value='';selectedPostKind='Novo post';document.getElementById('char-count').textContent='0';clearSelectedMedia();renderPosts();refreshStats();toast('Publicação adicionada à comunidade.')});
-
+document.getElementById('publish-post').addEventListener('click',async()=>{
+  const text=postBox.value.trim();if(!text)return toast('Escreva uma mensagem para publicar.');
+  const button=document.getElementById('publish-post');button.disabled=true;
+  try{const client=window.REINO_SUPABASE,user=await currentCommunityUser();const local=read(STORE.user,{}),name=(local.name||user.email?.split('@')[0]||'Usuário').slice(0,80);let mediaUrl=null;
+    if(selectedCommunityMedia){toast('A publicação será enviada sem a foto até ativarmos o armazenamento de mídia da comunidade.')}
+    const body=selectedPostKind==='Novo post'?text:`[${selectedPostKind}] ${text}`;
+    const {error}=await client.from('community_posts').insert({user_id:user.id,display_name:name,body,media_url:mediaUrl});if(error)throw error;
+    postBox.value='';selectedPostKind='Novo post';document.getElementById('char-count').textContent='0';clearSelectedMedia();await loadCommunityPosts();toast('Publicação salva na Comunidade Reino.');
+  }catch(error){console.warn('Publicação:',error);toast(error.message||'Não foi possível publicar.')}finally{button.disabled=false}
+});
 function showCommunityView(view){document.querySelectorAll('[data-community-view]').forEach(button=>button.classList.toggle('active',button.dataset.communityView===view));document.querySelectorAll('[data-community-container]').forEach(panel=>panel.classList.toggle('hidden',panel.dataset.communityContainer!==view));if(view==='chat')renderGroupChat()}
 document.querySelectorAll('[data-community-view]').forEach(button=>button.addEventListener('click',()=>showCommunityView(button.dataset.communityView)));
 document.querySelectorAll('[data-community-topic]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-community-topic]').forEach(item=>item.classList.toggle('active',item.dataset.communityTopic===button.dataset.communityTopic));selectedPostKind=button.dataset.communityTopic;postBox.placeholder=`Compartilhe uma ideia sobre ${button.dataset.communityTopic}...`;showCommunityView('feed');postBox.focus();toast(`Tema ${button.dataset.communityTopic} selecionado.`)}));
@@ -468,7 +541,7 @@ document.getElementById('group-chat-form').addEventListener('submit',async event
   }catch(error){console.warn('Chat:',error);toast('Mensagem não enviada. Tente novamente.')}finally{button.disabled=false}
 });
 document.querySelectorAll('[data-open-group]').forEach(button=>button.addEventListener('click',()=>openGroup(button.dataset.openGroup)));
-const communityUser=read(STORE.user,{name:'Visitante'});['community-avatar','composer-avatar'].forEach(id=>{const element=document.getElementById(id);if(element)element.textContent=initials(communityUser.name)});renderGroups();renderGroupChat();renderPosts();
+const communityUser=read(STORE.user,{name:'Visitante'});['community-avatar','composer-avatar'].forEach(id=>{const element=document.getElementById(id);if(element)element.textContent=initials(communityUser.name)});renderGroups();renderGroupChat();loadCommunityPosts();
 
 function renderUsers(query=''){const normalized=query.toLocaleLowerCase('pt-BR');document.getElementById('user-table').innerHTML=users.filter(user=>(user.name+user.role).toLocaleLowerCase('pt-BR').includes(normalized)).map(user=>`<tr><td>${user.name}</td><td>${user.role}</td><td><span class="badge ${user.active?'':'paused'}">${user.active?'Ativo':'Pausado'}</span></td><td><button class="table-action" type="button" data-user="${users.indexOf(user)}">${user.active?'Pausar':'Ativar'}</button></td></tr>`).join('');document.querySelectorAll('[data-user]').forEach(button=>button.addEventListener('click',()=>{const user=users[Number(button.dataset.user)];user.active=!user.active;renderUsers(document.getElementById('user-search').value);toast(`Usuário ${user.active?'ativado':'pausado'}.`)}))}
 document.getElementById('user-search').addEventListener('input',event=>renderUsers(event.target.value));renderUsers();
