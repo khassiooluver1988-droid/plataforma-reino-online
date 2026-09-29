@@ -410,13 +410,17 @@ async function submitReinoForm(event,table,fields,honeypot){
   }catch(error){console.warn('Envio do formulário:',error);status.textContent=error.message||'Não foi possível enviar. Tente novamente.'}
   finally{button.disabled=false}
 }
+async function loadTestimonyHistory(){
+  const box=document.getElementById('testimony-history'),client=window.REINO_SUPABASE;if(!box||!client)return;
+  try{const {data:{user}}=await client.auth.getUser();if(!user){box.innerHTML='<small>Entre na sua conta para acompanhar seus testemunhos.</small>';return}
+    const {data,error}=await client.from('testimony_submissions').select('id,title,review_status,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(5);if(error)throw error;
+    const labels={pending:'Em análise',approved:'Aprovado',rejected:'Não aprovado',published:'Publicado'};
+    box.innerHTML=(data||[]).length?'<strong>Meus últimos envios</strong>'+data.map(item=>`<div class="testimony-history-item"><span>${escapeHtml(item.title)}</span><small>${new Date(item.created_at).toLocaleDateString('pt-BR')} • ${escapeHtml(labels[item.review_status]||item.review_status)}</small></div>`).join(''):'<small>Você ainda não enviou testemunhos para análise.</small>';
+  }catch(error){console.warn('Histórico de testemunhos:',error);box.innerHTML='<small>Não foi possível carregar seus envios agora.</small>'}
+}
 document.querySelector('.contact-form').addEventListener('submit',event=>submitReinoForm(event,'contact_submissions',['nome','email','assunto','mensagem'],'site-confirmacao'));
-document.querySelector('.public-testimony-form').addEventListener('submit',event=>submitReinoForm(event,'testimony_submissions',['nome','cidade','titulo','testemunho'],'empresa-site'));
+document.querySelector('.public-testimony-form').addEventListener('submit',async event=>{await submitReinoForm(event,'testimony_submissions',['nome','cidade','titulo','testemunho'],'empresa-site');await loadTestimonyHistory()});loadTestimonyHistory();
 document.getElementById('clear-care-chat').addEventListener('click',()=>{document.getElementById('care-chat-messages').innerHTML='<div class="chat-message bot">Olá. Eu estou aqui para ajudar você a organizar este momento. O que está pesando mais hoje?</div>';toast('Conversa local apagada.')});
-
-const testimonyText=document.getElementById('testimony-text');testimonyText.addEventListener('input',()=>document.getElementById('testimony-count').textContent=testimonyText.value.length);
-function renderTestimony(){const value=read(STORE.testimony,'');document.getElementById('saved-testimony').innerHTML=value?`<blockquote>“${escapeHtml(value)}”</blockquote><small>Salvo somente neste aparelho • não publicado</small><br><button class="button soft" type="button" id="delete-testimony">Excluir relato</button>`:'<p>Nenhum depoimento salvo neste aparelho.</p>';const remove=document.getElementById('delete-testimony');if(remove)remove.addEventListener('click',()=>{write(STORE.testimony,'');renderTestimony();toast('Depoimento local excluído.')})}
-document.getElementById('save-testimony').addEventListener('click',()=>{const value=testimonyText.value.trim();if(!value)return toast('Escreva seu depoimento antes de salvar.');write(STORE.testimony,value);testimonyText.value='';document.getElementById('testimony-count').textContent='0';renderTestimony();toast('Depoimento salvo somente neste aparelho.')});renderTestimony();
 
 const radio=document.getElementById('radio-stream');const radioToggle=document.getElementById('radio-toggle');const radioStatus=document.getElementById('radio-status');radio.volume=.8;
 radioToggle.addEventListener('click',async()=>{if(radio.paused){radioStatus.textContent='Conectando à transmissão...';try{await radio.play()}catch{radioStatus.textContent='Não foi possível iniciar. Tente novamente.'}}else radio.pause()});
