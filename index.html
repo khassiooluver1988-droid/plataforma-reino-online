@@ -95,6 +95,11 @@
       </header>
 
       <section class="page active" id="inicio" data-title="Início">
+        <section class="home-radio-dock top-radio-dock" aria-label="Rádio Viver é Cristo ao vivo">
+          <audio id="radio-stream" preload="auto" autoplay crossorigin="anonymous"><source src="https://stream3.svrdedicado.org/8070/stream" type="audio/mpeg"></audio>
+          <div class="radio-brand"><span>♫</span><div><small>RÁDIO ONLINE • AO VIVO</small><strong>Viver é Cristo</strong></div></div>
+          <div class="home-radio-player"><div><strong id="radio-status">Rádio automática • conectando...</strong><span id="radio-detail">Louvores e mensagens na página inicial</span></div><div class="radio-controls" aria-label="Controles da Rádio Viver é Cristo"><button type="button" id="radio-toggle" class="button outline" aria-pressed="false">Pausar</button><label for="radio-volume"><span>Volume</span><input id="radio-volume" type="range" min="0" max="100" value="35" aria-label="Volume da rádio"></label></div></div>
+        </section>
         <section class="home-promos" aria-labelledby="home-promos-title">
           <div class="promo-heading">
             <div><span class="eyebrow">ESCOLHA SEU PRÓXIMO PASSO</span><h2 id="home-promos-title">Conteúdo que chama. Experiências que transformam.</h2></div>
@@ -160,11 +165,7 @@
           <div><span class="hero-label">BÍBLIA COMPLETA • 66 LIVROS</span><h2 id="bible-invite-title">A Palavra que pode transformar o seu hoje está a um clique.</h2><p>Abra a Bíblia, escolha o livro e o capítulo e encontre direção para cada momento da sua caminhada.</p><a class="animated-bible-button bible-shaped-button" href="index.html#palavra"><span class="bible-book-icon" aria-hidden="true"><em>✝</em></span><b><small>ABRIR A</small>BÍBLIA SAGRADA</b><i>→</i></a><small>Leitura completa em português dentro da Plataforma Reino</small></div>
         </section>
 
-        <section class="home-radio-dock" aria-label="Rádio Viver é Cristo ao vivo">
-          <audio id="radio-stream" preload="auto" autoplay crossorigin="anonymous"><source src="https://stream3.svrdedicado.org/8070/stream" type="audio/mpeg"></audio>
-          <div class="radio-brand"><span>♫</span><div><small>RÁDIO ONLINE • AO VIVO</small><strong>Viver é Cristo</strong></div></div>
-          <div class="home-radio-player"><div><strong id="radio-status">Rádio automática • conectando...</strong><span id="radio-detail">Louvores e mensagens na página inicial</span></div><div class="radio-controls" aria-label="Controles da Rádio Viver é Cristo"><button type="button" id="radio-toggle" class="button outline" aria-pressed="false">Pausar</button><label for="radio-volume"><span>Volume</span><input id="radio-volume" type="range" min="0" max="100" value="35" aria-label="Volume da rádio"></label></div></div>
-        </section>
+
       </section>
 
       <section class="page editorial-page" id="noticias" data-title="Notícias Cristãs">
@@ -500,8 +501,9 @@
         </div>
       </section>
 
-      <section class="launch-countdown panel" aria-label="Contagem regressiva para o lançamento">
-  <div><span class="eyebrow">CONTAGEM REGRESSIVA</span><h2>Já, já estaremos no ar!</h2><p>Lançamento da Plataforma Reino em <strong>29 de outubro de 2026 • 00:00</strong>.</p></div>
+      <section class="launch-countdown launch-countdown-visual" aria-label="Contagem regressiva para o lançamento">
+  <img class="launch-countdown-bg" src="assets/capa-missoes-v2.webp" alt="" aria-hidden="true">
+  <div class="launch-countdown-copy"><span class="eyebrow">CONTAGEM REGRESSIVA • REINO 01</span><h2>Já, já estaremos no ar!</h2><p>Lançamento da Plataforma Reino em <strong>29 de outubro de 2026 • 00:00</strong>.</p><small>Fé, conteúdo, comunidade e propósito em um só lugar.</small></div>
   <div class="launch-units"><span><strong id="launch-days">00</strong><small>DIAS</small></span><span><strong id="launch-hours">00</strong><small>HORAS</small></span><span><strong id="launch-minutes">00</strong><small>MINUTOS</small></span><span><strong id="launch-seconds">00</strong><small>SEGUNDOS</small></span></div>
 </section>
 <footer class="reino-footer reino-footer-compact">
