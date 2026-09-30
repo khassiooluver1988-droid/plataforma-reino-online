@@ -482,25 +482,27 @@ async function submitCommunityComment(event){
 function clearSelectedMedia(){selectedCommunityMedia=null;if(postPhoto)postPhoto.value='';mediaPreview.classList.add('hidden');mediaPreview.innerHTML=''}
 function showMediaPreview(file){
   if(!file)return;
-  if(!/^image\/(jpeg|png|webp)$/i.test(file.type))return toast('Use uma foto JPG, PNG ou WebP.');
-  if(file.size>6000000)return toast('Escolha uma foto de até 6 MB.');
+  if(!/^image\/(jpeg|png)$/i.test(file.type))return toast('Escolha uma foto JPG ou PNG.');
   const reader=new FileReader();
   reader.onload=()=>{
-    const img=new Image();
-    img.onload=()=>{
-      const max=1200,scale=Math.min(1,max/Math.max(img.width,img.height));
-      const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));
-      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
-      const url=canvas.toDataURL('image/jpeg',0.82);
-      selectedCommunityMedia={url};
-      mediaPreview.innerHTML=`<img src="${url}" alt="Prévia da foto"><button type="button" id="remove-post-media">× Remover</button>`;
-      mediaPreview.classList.remove('hidden');
-      document.getElementById('remove-post-media').addEventListener('click',clearSelectedMedia);
-    };
-    img.onerror=()=>toast('Não foi possível abrir esta foto.');
-    img.src=reader.result;
+    selectedCommunityMedia={file,preview:reader.result};
+    mediaPreview.innerHTML=`<img src="${reader.result}" alt="Prévia da foto"><button type="button" id="remove-post-media">× Remover</button><small>${escapeHtml(file.name)} • ${(file.size/1024/1024).toFixed(1)} MB</small>`;
+    mediaPreview.classList.remove('hidden');
+    document.getElementById('remove-post-media').addEventListener('click',clearSelectedMedia);
   };
+  reader.onerror=()=>toast('Não foi possível abrir esta foto.');
   reader.readAsDataURL(file);
+}
+async function uploadCommunityImage(client,user){
+  if(!selectedCommunityMedia?.file)return null;
+  const file=selectedCommunityMedia.file;
+  const ext=file.type==='image/png'?'png':'jpg';
+  const path=`${user.id}/${Date.now()}-${crypto.randomUUID?.()||Math.random().toString(36).slice(2)}.${ext}`;
+  const {error}=await client.storage.from('reino-community').upload(path,file,{contentType:file.type,upsert:false,cacheControl:'3600'});
+  if(error)throw new Error('A foto não pôde ser enviada: '+error.message);
+  const {data}=client.storage.from('reino-community').getPublicUrl(path);
+  if(!data?.publicUrl)throw new Error('Não foi possível obter o endereço da foto.');
+  return data.publicUrl;
 }
 postPhoto?.addEventListener('change',event=>showMediaPreview(event.target.files[0]));
 document.querySelectorAll('[data-post-kind]').forEach(button=>button.addEventListener('click',()=>{selectedPostKind=button.dataset.postKind;postBox.placeholder=`Compartilhe seu ${selectedPostKind.toLowerCase()}...`;postBox.focus();toast(`${selectedPostKind} selecionado.`)}));
@@ -508,7 +510,7 @@ document.getElementById('publish-post').addEventListener('click',async()=>{
   const text=postBox.value.trim();if(!text)return toast('Escreva uma mensagem para publicar.');
   const button=document.getElementById('publish-post');button.disabled=true;
   try{const client=window.REINO_SUPABASE,user=await currentCommunityUser();const local=read(STORE.user,{}),name=(local.name||user.email?.split('@')[0]||'Usuário').slice(0,80);let mediaUrl=null;
-    if(selectedCommunityMedia)mediaUrl=selectedCommunityMedia.url;
+    if(selectedCommunityMedia)mediaUrl=await uploadCommunityImage(client,user);
     const body=selectedPostKind==='Novo post'?text:`[${selectedPostKind}] ${text}`;
     const {error}=await client.from('community_posts').insert({user_id:user.id,display_name:name,body,media_url:mediaUrl});if(error)throw error;
     postBox.value='';selectedPostKind='Novo post';document.getElementById('char-count').textContent='0';clearSelectedMedia();await loadCommunityPosts();toast('Publicação salva na Comunidade Reino.');
