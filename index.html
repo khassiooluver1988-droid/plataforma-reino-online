@@ -8,6 +8,16 @@
   <title>Plataforma Reino</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23071a34'/%3E%3Cpath d='M29 10h6v14h12v6H35v24h-6V30H17v-6h12z' fill='%23d8b05d'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="assets/styles.css">
+<style id="course-card-identities">
+.course-card .course-brand{min-height:78px;margin:-2px -2px 16px;padding:14px 16px;border-radius:14px;display:flex;flex-direction:column;justify-content:center;gap:4px;color:#fff;box-shadow:0 8px 20px rgba(7,26,52,.12)}
+.course-brand strong{font-size:23px;line-height:1.05}.course-brand span{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;opacity:.92}
+.course-card--marketing{border-top:5px solid #1769aa}.course-brand--marketing{background:linear-gradient(120deg,#071a34,#1769aa)}
+.course-card--vendas{border-top:5px solid #b58b36}.course-brand--vendas{background:linear-gradient(120deg,#6f4d13,#d7aa46)}
+.course-card--atendimento{border-top:5px solid #0b7a75}.course-brand--atendimento{background:linear-gradient(120deg,#064b48,#13a89e)}
+.course-card--social{border-top:5px solid #a13ac4}.course-brand--social{background:linear-gradient(120deg,#522080,#d14c9a)}
+.course-card--canva{border-top:5px solid #7d2ae8}.course-brand--canva{background:linear-gradient(120deg,#00c4cc,#7d2ae8)}.course-brand--canva strong{font-family:cursive;font-style:italic}
+.course-card--capcut{border-top:5px solid #111}.course-brand--capcut{background:#111}.course-brand--capcut span{color:#ddd}
+</style>
 </head>
 <body>
   <section class="auth-gate" id="auth-gate" aria-labelledby="access-title">
@@ -337,10 +347,10 @@
         <div class="ministry-skills"><span>📈 Marketing Digital</span><span>🤝 Vendas</span><span>☎ Atendimento</span><span>📱 Social Media</span><span>✦ Design no Canva</span><span>🎬 Edição no CapCut</span></div>
         <div class="section-heading"><div><span class="eyebrow">6 CURSOS • FORMAÇÃO PRÁTICA</span><h2>Escolha um curso</h2></div><p>Conteúdo organizado para aprender fazendo, com aplicações práticas em cada módulo.</p></div>
         <div class="courses-grid" id="courses-grid" aria-live="polite">
-<a class="course-card" href="./curso.html?id=marketing"><small>CURSO 01 • 10 HORAS</small><h3>Marketing Digital</h3><span class="provider">Plataforma Reino</span><p>Posicionamento, conteúdo, funil, campanhas e métricas para projetos e negócios.</p><span class="button navy">Começar curso grátis →</span></a>
-<a class="course-card" href="./curso.html?id=vendas"><small>CURSO 02 • 5 HORAS</small><h3>Vendas</h3><span class="provider">Plataforma Reino</span><p>Abordagem, diagnóstico, argumentação, negociação, fechamento, follow-up e indicação.</p><span class="button navy">Começar curso grátis →</span></a>
-<a class="course-card" href="./curso.html?id=telemarketing"><small>CURSO 03 • 5 HORAS</small><h3>Telemarketing e Atendimento</h3><span class="provider">Plataforma Reino</span><p>Comunicação, roteiro, escuta, registro, solução, follow-up e atendimento responsável.</p><span class="button navy">Começar curso grátis →</span></a>
-<a class="course-card" href="./curso.html?id=social-media"><small>CURSO 04 • 5 HORAS</small><h3>Social Media</h3><span class="provider">Plataforma Reino</span><p>Planejamento, posicionamento, calendário editorial, copy, Reels, comunidade e métricas.</p><span class="button navy">Começar curso grátis →</span></a>
+<a class="course-card course-card--marketing" href="./curso.html?id=marketing"><div class="course-brand course-brand--marketing"><strong>Marketing Digital</strong><span>Estratégia • Funil • Métricas</span></div><small>CURSO 01 • 10 HORAS</small><h3>Marketing Digital</h3><span class="provider">Plataforma Reino</span><p>Posicionamento, conteúdo, funil, campanhas e métricas para projetos e negócios.</p><span class="button navy">Começar curso grátis →</span></a>
+<a class="course-card course-card--vendas" href="./curso.html?id=vendas"><div class="course-brand course-brand--vendas"><strong>Vendas</strong><span>Negociação • Fechamento</span></div><small>CURSO 02 • 5 HORAS</small><h3>Vendas</h3><span class="provider">Plataforma Reino</span><p>Abordagem, diagnóstico, argumentação, negociação, fechamento, follow-up e indicação.</p><span class="button navy">Começar curso grátis →</span></a>
+<a class="course-card course-card--atendimento" href="./curso.html?id=telemarketing"><div class="course-brand course-brand--atendimento"><strong>Atendimento</strong><span>Voz • Escuta • Relacionamento</span></div><small>CURSO 03 • 5 HORAS</small><h3>Telemarketing e Atendimento</h3><span class="provider">Plataforma Reino</span><p>Comunicação, roteiro, escuta, registro, solução, follow-up e atendimento responsável.</p><span class="button navy">Começar curso grátis →</span></a>
+<a class="course-card course-card--social" href="./curso.html?id=social-media"><div class="course-brand course-brand--social"><strong>Social Media</strong><span>Conteúdo • Reels • Comunidade</span></div><small>CURSO 04 • 5 HORAS</small><h3>Social Media</h3><span class="provider">Plataforma Reino</span><p>Planejamento, posicionamento, calendário editorial, copy, Reels, comunidade e métricas.</p><span class="button navy">Começar curso grátis →</span></a>
 <a class="course-card course-card--canva" href="./curso.html?id=design"><div class="course-brand course-brand--canva" aria-label="Canva"><strong>Canva</strong><span>Ferramenta ensinada</span></div><small>CURSO 05 • 5 HORAS</small><h3>Design no Canva</h3><span class="provider">Plataforma Reino</span><p>Posts, Stories, banners, flyers e apresentações com composição, tipografia e hierarquia visual.</p><span class="button navy">Começar curso grátis →</span></a>
 <a class="course-card course-card--capcut" href="./curso.html?id=capcut"><div class="course-brand course-brand--capcut" aria-label="CapCut"><strong>CapCut</strong><span>Ferramenta ensinada</span></div><small>CURSO 06 • 5 HORAS</small><h3>Edição de Vídeos no CapCut</h3><span class="provider">Plataforma Reino</span><p>Cortes, ritmo, áudio, legendas, transições, efeitos e exportação para redes sociais.</p><span class="button navy">Começar curso grátis →</span></a>
 </div>
