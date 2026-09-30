@@ -507,11 +507,13 @@ async function uploadCommunityImage(client,user){
 postPhoto?.addEventListener('change',event=>showMediaPreview(event.target.files[0]));
 document.querySelectorAll('[data-post-kind]').forEach(button=>button.addEventListener('click',()=>{selectedPostKind=button.dataset.postKind;postBox.placeholder=`Compartilhe seu ${selectedPostKind.toLowerCase()}...`;postBox.focus();toast(`${selectedPostKind} selecionado.`)}));
 document.getElementById('publish-post').addEventListener('click',async()=>{
-  const text=postBox.value.trim();if(!text)return toast('Escreva uma mensagem para publicar.');
+  const text=postBox.value.trim();
+  if(!text&&!selectedCommunityMedia)return toast('Escreva uma mensagem ou escolha uma foto para publicar.');
   const button=document.getElementById('publish-post');button.disabled=true;
   try{const client=window.REINO_SUPABASE,user=await currentCommunityUser();const local=read(STORE.user,{}),name=(local.name||user.email?.split('@')[0]||'Usuário').slice(0,80);let mediaUrl=null;
     if(selectedCommunityMedia)mediaUrl=await uploadCommunityImage(client,user);
-    const body=selectedPostKind==='Novo post'?text:`[${selectedPostKind}] ${text}`;
+    const cleanText=text||'📷 Foto';
+    const body=selectedPostKind==='Novo post'?cleanText:`[${selectedPostKind}] ${cleanText}`;
     const {error}=await client.from('community_posts').insert({user_id:user.id,display_name:name,body,media_url:mediaUrl});if(error)throw error;
     postBox.value='';selectedPostKind='Novo post';document.getElementById('char-count').textContent='0';clearSelectedMedia();await loadCommunityPosts();toast('Publicação salva na Comunidade Reino.');
   }catch(error){console.warn('Publicação:',error);toast(error.message||'Não foi possível publicar.')}finally{button.disabled=false}
@@ -521,7 +523,7 @@ document.querySelectorAll('[data-community-view]').forEach(button=>button.addEve
 document.querySelectorAll('[data-community-topic]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-community-topic]').forEach(item=>item.classList.toggle('active',item.dataset.communityTopic===button.dataset.communityTopic));selectedPostKind=button.dataset.communityTopic;postBox.placeholder=`Compartilhe uma ideia sobre ${button.dataset.communityTopic}...`;showCommunityView('feed');postBox.focus();toast(`Tema ${button.dataset.communityTopic} selecionado.`)}));
 function openGroup(){toast('Grupos e bate-papo estarão disponíveis em breve.');showCommunityView('feed');document.getElementById('comunidade').scrollIntoView({behavior:'smooth',block:'start'})}
 // Grupos e bate-papo permanecem bloqueados nesta versão.
-const communityUser=read(STORE.user,{name:'Visitante'});['community-avatar','composer-avatar'].forEach(id=>{const element=document.getElementById(id);if(element)element.textContent=initials(communityUser.name)});renderGroups();renderGroupChat();loadCommunityPosts();
+const communityUser=read(STORE.user,{name:'Visitante'});['community-avatar','composer-avatar'].forEach(id=>{const element=document.getElementById(id);if(element)element.textContent=initials(communityUser.name)});loadCommunityPosts();
 
 function renderUsers(query=''){const normalized=query.toLocaleLowerCase('pt-BR');document.getElementById('user-table').innerHTML=users.filter(user=>(user.name+user.role).toLocaleLowerCase('pt-BR').includes(normalized)).map(user=>`<tr><td>${user.name}</td><td>${user.role}</td><td><span class="badge ${user.active?'':'paused'}">${user.active?'Ativo':'Pausado'}</span></td><td><button class="table-action" type="button" data-user="${users.indexOf(user)}">${user.active?'Pausar':'Ativar'}</button></td></tr>`).join('');document.querySelectorAll('[data-user]').forEach(button=>button.addEventListener('click',()=>{const user=users[Number(button.dataset.user)];user.active=!user.active;renderUsers(document.getElementById('user-search').value);toast(`Usuário ${user.active?'ativado':'pausado'}.`)}))}
 document.getElementById('user-search').addEventListener('input',event=>renderUsers(event.target.value));renderUsers();
