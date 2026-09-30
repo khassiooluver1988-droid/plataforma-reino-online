@@ -419,8 +419,9 @@ if(radio){const savedVolume=Number(localStorage.getItem('reino_radio_volume'));r
 function updateRadioControls(){if(!radio||!radioToggle)return;radioToggle.textContent=radio.paused?'Continuar':'Pausar';radioToggle.setAttribute('aria-pressed',String(radio.paused))}
 async function startHomeRadio(){if(!radio||radioUserPaused||!radio.paused)return;radioStatus.textContent='Conectando à transmissão...';try{await radio.play()}catch{radioStatus.textContent='Toque em Continuar para ouvir';updateRadioControls()}}
 function syncHomeRadio(){const home=document.getElementById('inicio');const onHome=location.hash===''||location.hash==='#inicio'||home?.classList.contains('active');if(onHome){startHomeRadio()}else if(radio&&!radio.paused){radio.pause()}}
+function setRadioVolume(value){if(!radio)return;const next=Math.min(1,Math.max(0,Number(value)/100));radio.volume=next;radio.muted=false;localStorage.setItem('reino_radio_volume',String(next));if(radioVolume)radioVolume.setAttribute('aria-valuenow',String(Math.round(next*100)))} 
 radioToggle?.addEventListener('click',async()=>{if(!radio)return;if(radio.paused){radioUserPaused=false;try{radioStatus.textContent='Conectando à transmissão...';await radio.play()}catch{radioStatus.textContent='Não foi possível iniciar a rádio'}}else{radioUserPaused=true;radio.pause();radioStatus.textContent='Rádio pausada'}updateRadioControls()});
-radioVolume?.addEventListener('input',()=>{if(!radio)return;radio.volume=Math.min(1,Math.max(0,Number(radioVolume.value)/100));localStorage.setItem('reino_radio_volume',String(radio.volume))});
+radioVolume?.addEventListener('input',()=>setRadioVolume(radioVolume.value));radioVolume?.addEventListener('change',()=>setRadioVolume(radioVolume.value));
 radio?.addEventListener('playing',()=>{radioStatus.textContent='Viver é Cristo • ao vivo';updateRadioControls()});
 radio?.addEventListener('pause',updateRadioControls);
 radio?.addEventListener('error',()=>{radioStatus.textContent='Rádio temporariamente indisponível';updateRadioControls()});
