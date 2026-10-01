@@ -1,0 +1,16 @@
+{
+  "reference": "DESENVOLVIMENTO/CURSOS/02/REINO/00007",
+  "registeredAt": "2026-10-01T03:13:33.491570-03:00",
+  "name": "Assistente de Recursos Humanos",
+  "version": "1.0",
+  "courseCode": "CURSO/GES/03/REINO02/00003",
+  "protocol": "PR-REINO-CURSO40H-001",
+  "hours": 40,
+  "modules": 5,
+  "lessons": 25,
+  "exercises": 100,
+  "finalQuestions": 50,
+  "status": "EM ANDAMENTO - arquivos preparados; testes e publicação pendentes",
+  "description": "Acrescentar RH à categoria Gestão de Negócios, seguindo os cursos Administrativo e Logística.",
+  "checks": []
+}
