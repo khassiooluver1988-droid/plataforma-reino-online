@@ -18,6 +18,17 @@
 .course-card--canva{border-top:5px solid #7d2ae8}.course-brand--canva{background:linear-gradient(120deg,#00c4cc,#7d2ae8)}.course-brand--canva strong{font-family:cursive;font-style:italic}
 .course-card--capcut{border-top:5px solid #111}.course-brand--capcut{background:#111}.course-brand--capcut span{color:#ddd}
 </style>
+<style id="reino-radio-layout">
+.top-actions{flex-wrap:wrap;justify-content:flex-end}
+.reino-radio{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px solid #d8b05d;border-radius:14px;background:#071a34;color:#fff;max-width:430px}
+.reino-radio-title{display:flex;flex-direction:column;gap:3px;min-width:125px}
+.reino-radio-title strong{font-size:14px}.reino-radio-title span{font-size:11px;color:#d8e4f0}
+.reino-radio-buttons,.reino-radio-volume{display:flex;align-items:center;gap:6px}
+.reino-radio button{border:1px solid #d8b05d;border-radius:8px;background:#123f6d;color:white;padding:7px 9px;min-height:36px;cursor:pointer;font-weight:700}
+.reino-radio button:disabled{opacity:.45;cursor:default}.reino-radio button:focus-visible,.reino-radio input:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.reino-radio input{width:85px;accent-color:#d8b05d}.reino-radio output{font-size:12px;min-width:32px}
+@media(max-width:760px){.top-actions{width:100%;gap:10px}.reino-radio{flex-basis:100%;max-width:100%;justify-content:space-between}.reino-radio input{width:90px}}
+</style>
 </head>
 <body>
   <section class="auth-gate" id="auth-gate" aria-labelledby="access-title">
@@ -96,6 +107,12 @@
         </div>
 
         <div class="top-actions">
+<section class="reino-radio" aria-label="Rádio Viver é Cristo">
+<audio id="reino-radio-audio" preload="none" src="https://stream3.svrdedicado.org/8070/stream"></audio>
+<div class="reino-radio-title"><strong>♫ Viver é Cristo</strong><span id="reino-radio-status" role="status">Conectando…</span></div>
+<div class="reino-radio-buttons"><button id="reino-radio-play" type="button" aria-label="Reproduzir rádio">▶ Play</button><button id="reino-radio-pause" type="button" aria-label="Pausar rádio">Ⅱ Pause</button></div>
+<div class="reino-radio-volume"><button id="reino-radio-minus" type="button" aria-label="Diminuir volume em 5%">−</button><input id="reino-radio-volume" type="range" min="0" max="100" step="1" value="49" aria-label="Volume da rádio"><button id="reino-radio-plus" type="button" aria-label="Aumentar volume em 5%">+</button><output id="reino-radio-level" for="reino-radio-volume">49%</output></div>
+</section>
           <button class="icon-button" id="theme-toggle" type="button" aria-label="Alternar contraste">◐</button>
           <button class="profile-button" type="button" data-dialog="profile-dialog">
             <span class="avatar" id="header-avatar">V</span>
@@ -206,7 +223,7 @@
         <div class="page-intro"><span class="eyebrow">WEB RÁDIO E CONTEÚDO</span><h2>Viver é Cristo</h2><p>Louvor e conteúdo cristão ao vivo para acompanhar sua jornada.</p></div>
         <div>
           <article class="panel">
-            <span class="eyebrow">RÁDIO FIXA NA PÁGINA INICIAL</span><h3>Ouça enquanto navega</h3><p>A Rádio Viver é Cristo agora está disponível na parte inferior da página inicial, com controle de reprodução e volume.</p>
+            <span class="eyebrow">RÁDIO FIXA NA PÁGINA INICIAL</span><h3>Ouça enquanto navega</h3><p>A Rádio Viver é Cristo agora está disponível no canto superior da plataforma, com controle de reprodução e volume.</p>
           </article>
           <article class="panel top-gap">
             <span class="eyebrow">CONTEÚDOS RECENTES</span>
@@ -565,6 +582,7 @@
   <script src="assets/reino-courses.js"></script>
   <script src="assets/app.js?v=20261001-profile-photo"></script>
   <script src="assets/course-hub.js?v=rh-20261001"></script>
+  <script src="assets/reino-radio.js?v=20261001-49"></script>
 </body>
 </html>
 
