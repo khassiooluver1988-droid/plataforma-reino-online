@@ -195,8 +195,9 @@ async function saveUser(name,contact,phone=''){
   }else if(pendingProfilePhoto==='')path='';
   const cleanPhone=phone.trim();
   if(cleanPhone&&!/^[0-9()+\-\s.]{8,20}$/.test(cleanPhone))throw new Error('Informe um telefone válido.');
-  const {error:updateError}=await client.from('profiles').update({full_name:name.trim(),email:normalized,phone:cleanPhone||null,avatar_url:path||null,updated_at:new Date().toISOString()}).eq('id',user.id);
+  const {data:savedProfile,error:updateError}=await client.from('profiles').update({full_name:name.trim(),email:normalized,phone:cleanPhone||null,avatar_url:path||null}).eq('id',user.id).select('id,full_name,email,phone,avatar_url').single();
   if(updateError)throw updateError;
+  if(!savedProfile||savedProfile.avatar_url!==(path||null))throw new Error('Não foi possível confirmar a foto salva. Tente novamente.');
   if(pendingProfilePhoto!==undefined&&oldPath&&oldPath!==path&&!oldPath.startsWith('data:')){
     const {error:removeError}=await client.storage.from(PROFILE_PHOTO_BUCKET).remove([oldPath]);
     if(removeError)console.warn('Remoção da foto antiga:',removeError.message);
@@ -219,7 +220,7 @@ document.querySelector('#profile-dialog form').addEventListener('submit',async e
     await saveUser(document.getElementById('profile-name').value,document.getElementById('profile-contact').value,document.getElementById('profile-phone').value);
     if(status)status.textContent='Perfil salvo com sucesso.';
     document.getElementById('profile-dialog').close('default');
-  }catch(error){console.error('Perfil:',error);toast(error.message||'Não foi possível salvar o perfil.')}
+  }catch(error){console.error('Perfil:',error);const message=error.message||'Não foi possível salvar o perfil.';const status=document.getElementById('profile-save-status');if(status)status.textContent=message;toast(message)}
   finally{button.disabled=false}
 });refreshUser();
 document.getElementById('reset-access').addEventListener('click',async()=>{try{await window.REINO_SUPABASE?.auth.signOut()}catch{}localStorage.removeItem(STORE.access);localStorage.removeItem('reino_access_granted_v1');localStorage.removeItem(STORE.user);location.href='index.html#inicio'});setupFirstAccess();
