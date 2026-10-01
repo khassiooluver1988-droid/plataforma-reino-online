@@ -10,7 +10,30 @@
   "lessons": 25,
   "exercises": 100,
   "finalQuestions": 50,
-  "status": "EM ANDAMENTO - arquivos preparados; testes e publicação pendentes",
+  "status": "PUBLICADO - testes do serviço concluídos; validação com aluno real pendente",
   "description": "Acrescentar RH à categoria Gestão de Negócios, seguindo os cursos Administrativo e Logística.",
-  "checks": []
+  "checks": [
+    "25 aulas e 25 esquemas específicos",
+    "5 módulos e práticas integradoras",
+    "100 exercícios e 50 questões finais com identificadores únicos",
+    "40h planejadas: 38h de módulos e 2h de revisão e prova",
+    "Sequência e bloqueio de prova antecipada verificados em ambiente simulado",
+    "34 acertos: reprovação; 35 acertos: aprovação",
+    "Novo ciclo preserva histórico",
+    "PDF A4 horizontal gerado e inspecionado visualmente",
+    "Gabarito final mantido no serviço privado",
+    "Serviço Supabase ativo com verify_jwt habilitado",
+    "Endpoint real sem autenticação retorna 401",
+    "Página publicada respondeu HTTP 200 com título e scripts de RH"
+  ],
+  "completedAt": "2026-10-01T03:19:39.249054-03:00",
+  "why": "Completar a sequência da categoria Gestão de Negócios com formação introdutória em Recursos Humanos, seguindo o padrão dos cursos existentes.",
+  "how": "Novo curso com conteúdo próprio, esquemas por aula, cartão no hub e serviço autenticado dedicado no Supabase.",
+  "commit": "06a7748fc3fceb281a221ee584b35c607489558c",
+  "url": "https://khassiooluver1988-droid.github.io/plataforma-reino-online/curso-assistente-recursos-humanos.html",
+  "limitations": [
+    "Fluxo autenticado testado com sessão e banco simulados; sem sessão real de aluno disponível.",
+    "Teste visual da interface não concluído: navegador local indisponível e acesso ao navegador remoto não autorizado.",
+    "Validação do certificado requer login."
+  ]
 }
