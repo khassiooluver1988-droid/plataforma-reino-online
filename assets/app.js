@@ -243,7 +243,6 @@ async function shareText(text){if(navigator.share){try{await navigator.share({te
 document.getElementById('share-verse').addEventListener('click',()=>shareText(`${BIBLE.books[currentBookIndex].name} ${currentChapter} — Plataforma Reino`));
 const copyDaily=document.getElementById('copy-daily');if(copyDaily)copyDaily.addEventListener('click',()=>shareText('João 15:5 — Eu sou a videira; vocês são os ramos. Se alguém permanecer em mim e eu nele, esse dará muito fruto. — Plataforma Reino'));
 
-document.querySelectorAll('[data-daily]').forEach(button=>button.addEventListener('click',()=>{const today=localDate();const daily=read(STORE.daily,{date:today,completed:[]});if(daily.date!==today)daily.completed=[];daily.date=today;if(!daily.completed.includes(button.dataset.daily))daily.completed.push(button.dataset.daily);write(STORE.daily,daily);refreshDaily();if(button.dataset.daily==='palavra')location.href='index.html?book=john&chapter=3#palavra';if(button.dataset.daily==='quiz')location.href='quiz.html';if(button.dataset.daily==='oracao')toast('Momento de oração marcado. Que este tempo fortaleça sua caminhada.')}));refreshDaily();
 
 const libraryItems=[
   {id:'evangelho-joao',kind:'Plano',category:'Vida cristã',title:'Conhecendo Jesus em João',description:'Uma caminhada de 7 dias pelos sinais, palavras e encontros de Jesus.',days:7,book:'john',chapter:1},
