@@ -1,0 +1,19 @@
+{
+  "reference": "ATUALIZACAO/CURSOS/02/REINO/00004",
+  "name": "REINO 02 — Adicionar Assistente Administrativo ao GitHub",
+  "date": "2026-10-01T00:46:48.289550-03:00",
+  "category": "Gestão de Negócios",
+  "course": "Assistente Administrativo",
+  "hours": 40,
+  "scope": "Adicionar arquivos do novo curso e uma chamada de integração no index. Preservar todos os demais arquivos existentes.",
+  "checks": [
+    "Identidade e módulos existentes consultados no GitHub",
+    "Seis cursos anteriores preservados",
+    "5 módulos e 25 aulas",
+    "20 questões por módulo e 50 na prova final",
+    "Ordem das questões e alternativas embaralhada sem mudar os valores de correção",
+    "Imagens e esquemas nos cinco módulos",
+    "Certificado liberado a partir de 35 acertos, após todo o percurso"
+  ],
+  "status": "Preparado para commit e publicação automática no GitHub Pages"
+}
