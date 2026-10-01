@@ -2,7 +2,7 @@
   "reference": "DESENVOLVIMENTO/CURSOS/02/REINO/00007",
   "registeredAt": "2026-10-01T03:13:33.491570-03:00",
   "name": "Assistente de Recursos Humanos",
-  "version": "1.0",
+  "version": "1.1",
   "courseCode": "CURSO/GES/03/REINO02/00003",
   "protocol": "PR-REINO-CURSO40H-001",
   "hours": 40,
@@ -10,7 +10,7 @@
   "lessons": 25,
   "exercises": 100,
   "finalQuestions": 50,
-  "status": "PUBLICADO - testes do serviço concluídos; validação com aluno real pendente",
+  "status": "Curso publicado; reforço dos cartões no HTML preparado para publicação",
   "description": "Acrescentar RH à categoria Gestão de Negócios, seguindo os cursos Administrativo e Logística.",
   "checks": [
     "25 aulas e 25 esquemas específicos",
@@ -24,7 +24,8 @@
     "Gabarito final mantido no serviço privado",
     "Serviço Supabase ativo com verify_jwt habilitado",
     "Endpoint real sem autenticação retorna 401",
-    "Página publicada respondeu HTTP 200 com título e scripts de RH"
+    "Página publicada respondeu HTTP 200 com título e scripts de RH",
+    "Cartões dos três cursos incluídos diretamente no HTML do hub, com versão do script para atualização de cache."
   ],
   "completedAt": "2026-10-01T03:19:39.249054-03:00",
   "why": "Completar a sequência da categoria Gestão de Negócios com formação introdutória em Recursos Humanos, seguindo o padrão dos cursos existentes.",
@@ -35,5 +36,23 @@
     "Fluxo autenticado testado com sessão e banco simulados; sem sessão real de aluno disponível.",
     "Teste visual da interface não concluído: navegador local indisponível e acesso ao navegador remoto não autorizado.",
     "Validação do certificado requer login."
-  ]
+  ],
+  "databaseVerification": {
+    "function": "reino02-rh",
+    "status": "ACTIVE",
+    "version": 1,
+    "verifyJwt": true,
+    "table": "reino_course_enrollments",
+    "rlsEnabled": true,
+    "readPolicy": "Aluno autenticado lê somente registros vinculados ao próprio user_id.",
+    "clientWritePermissions": false,
+    "rhEnrollmentsAtVerification": 0,
+    "schemaChanged": false
+  },
+  "deploymentVerification": {
+    "status": "success",
+    "workflowRun": 36823999161,
+    "publishedAt": "2026-10-01T03:17:52-03:00"
+  },
+  "updatedAt": "2026-10-01T03:25:01.574599-03:00"
 }
