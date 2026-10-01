@@ -1,0 +1,23 @@
+{
+  "reference": "CORRECAO/CURSOS/02/REINO/00005",
+  "registeredAt": "2026-10-01T01:12:43.220248-03:00",
+  "name": "Revisão pedagógica — Assistente Administrativo",
+  "scope": "Apenas o curso Assistente Administrativo e sua integração própria; nenhum arquivo dos cursos anteriores é alterado.",
+  "changes": [
+    "Remoção da identificação Reino 02 da capa, cabeçalho, fluxograma e conteúdo visível",
+    "Grade curricular de 40h com objetivos, conteúdos e metodologia",
+    "Objetivo de aprendizagem por módulo",
+    "Imagem temática e esquema em todas as aulas",
+    "5 atividades práticas e 20 questões por módulo",
+    "50 questões na prova final e nota mínima 7,0",
+    "Certificado após conclusão do percurso e aprovação; reprovação exige novo ciclo"
+  ],
+  "checks": [
+    "38h nos módulos mais 2h de revisão e prova",
+    "25 aulas",
+    "100 exercícios e 50 questões finais",
+    "Gabarito final permanece no serviço privado",
+    "IDs e progresso dos alunos preservados"
+  ],
+  "status": "Revisão preparada para publicação"
+}

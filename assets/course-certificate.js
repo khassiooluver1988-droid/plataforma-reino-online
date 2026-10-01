@@ -16,7 +16,7 @@ window.reinoCertificatePdf=async function(cert,validationUrl){
  line('Período: '+date(cert.startedAt)+' a '+date(cert.issuedAt),215,14);
  line('Emissão: '+new Date(cert.issuedAt).toLocaleString('pt-BR',{timeZone:'America/Fortaleza'})+' (Fortaleza)',192,12);
  line('Plataforma Reino - Formação e desenvolvimento',151,15,bold);
- line('Registro: '+cert.code,119,11);line('Curso: '+cert.courseCode,101,11);
+ line('Registro: '+cert.code,119,11);line('Curso: Assistente Administrativo | Gestão de Negócios',101,11);
  line('Verifique o registro pelo código na página de validação do curso.',77,11);
  // Link clicável para o registro oficial; não é assinatura digital.
  if(validationUrl){const link=doc.context.obj({Type:'Annot',Subtype:'Link',Rect:[100,64,742,91],Border:[0,0,0],A:{Type:'Action',S:'URI',URI:window.PDFLib.PDFString.of(validationUrl)}});p.node.set(window.PDFLib.PDFName.of('Annots'),doc.context.obj([doc.context.register(link)]));}

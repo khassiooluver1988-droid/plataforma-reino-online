@@ -5,3 +5,6 @@
 .course-enter{display:inline-block;margin:12px 0 20px;text-decoration:none}
 
 .course-credit{padding:16px 18px;border-radius:16px;background:#071a34;color:#fff;font-size:14px}.course-credit strong{color:#f0cf7a}
+
+
+.curriculum{background:#fff;border:1px solid #dce4ec;border-radius:12px;padding:24px;margin:24px 0}.table-scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.95rem}th,td{padding:12px;text-align:left;border:1px solid #dce4ec;vertical-align:top}thead,tfoot{background:#e5edf5}details{margin:12px 0;border:1px solid #dce4ec;border-radius:8px;padding:12px}summary{font-weight:bold;cursor:pointer}.curriculum ol{padding-left:24px}
