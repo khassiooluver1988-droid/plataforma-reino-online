@@ -51,6 +51,7 @@
           <label>Senha<input id="login-password" type="password" required minlength="6" maxlength="80" autocomplete="current-password" placeholder="Sua senha"></label>
           <label class="show-password"><input id="show-login-password" type="checkbox"><span>Mostrar senha</span></label>
           <button class="button gold full auth-enter-button" type="submit">ENTRAR →</button>
+          <button id="forgot-password" class="text-button" type="button">Esqueci minha senha</button>
           <p class="auth-form-status" id="login-status" role="status" aria-live="polite"></p>
         </form>
         <form id="signup-form" class="auth-mode-form hidden">
@@ -559,6 +560,7 @@
     </main>
   </div>
 
+  <dialog id="password-recovery-dialog" aria-labelledby="password-recovery-title"><div class="dialog-card"><button id="close-password-recovery" class="dialog-close" type="button" aria-label="Fechar recuperação">×</button><span class="eyebrow">ACESSO À CONTA</span><h2 id="password-recovery-title">Recuperar acesso</h2><form id="password-request-form"><p>Informe o e-mail da sua conta para receber um link de recuperação.</p><label>E-mail cadastrado<input id="recovery-email" type="email" required autocomplete="email" maxlength="254"></label><button id="send-password-link" class="button gold full" type="submit">Enviar link por e-mail</button></form><form id="password-update-form" hidden><label>Nova senha<input id="recovery-new-password" type="password" required minlength="8" maxlength="80" autocomplete="new-password"></label><label>Repita a nova senha<input id="recovery-confirm-password" type="password" required minlength="8" maxlength="80" autocomplete="new-password"></label><button id="save-new-password" class="button gold full" type="submit">Salvar nova senha</button></form><p id="password-recovery-status" role="status" aria-live="polite"></p><button id="return-password-login" class="button gold full" type="button" hidden>Voltar ao login</button></div></dialog>
   <dialog id="profile-dialog"><form method="dialog" class="dialog-card"><button class="dialog-close" value="cancel" formnovalidate aria-label="Fechar">×</button><span class="eyebrow">MEU PERFIL</span><h2>Editar informações</h2><div class="profile-photo-editor"><span class="large-avatar" id="profile-photo-preview">V</span><div><label class="button soft photo-picker" for="profile-photo">📷 Escolher uma foto</label><input id="profile-photo" class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp"><button class="text-button remove-profile-photo" id="remove-profile-photo" type="button">Remover foto</button><small>JPG, PNG ou WebP. A foto fica salva na sua conta.</small></div></div><label>Nome completo<input id="profile-name" required maxlength="80" autocomplete="name"></label><label>E-mail<input id="profile-contact" type="email" readonly aria-readonly="true" autocomplete="email"><small class="profile-field-note">O e-mail pertence à sua conta de acesso e não é alterado pelo perfil.</small></label><label>Telefone<input id="profile-phone" type="tel" maxlength="20" autocomplete="tel" placeholder="(00) 00000-0000"></label><p class="profile-save-status" id="profile-save-status" role="status" aria-live="polite"></p><button class="button gold full" id="save-profile" value="default">Salvar alterações</button><button class="text-button reset-access" id="reset-access" type="button">Trocar usuário neste aparelho</button></form></dialog>
   <dialog id="content-dialog"><form method="dialog" class="dialog-card"><button class="dialog-close" value="cancel" aria-label="Fechar">×</button><span class="eyebrow">ADMINISTRAÇÃO</span><h2>Novo conteúdo</h2><label>Título<input id="content-title" required placeholder="Título do conteúdo"></label><label>Categoria<select id="content-category"><option>Devocional</option><option>Estudo</option><option>Oração</option><option>Notícia</option></select></label><button class="button gold full" id="save-content" value="default">Publicar conteúdo</button></form></dialog>
   <dialog id="book-dialog"><div class="dialog-card book-dialog-card"><button class="dialog-close" type="button" id="close-book-dialog" aria-label="Fechar">×</button><span class="eyebrow" id="book-dialog-category">LIVRO EVANGÉLICO</span><h2 id="book-dialog-title"></h2><p class="book-author" id="book-dialog-author"></p><p id="book-dialog-description"></p><div class="book-reason"><strong>Por que conhecer esta obra?</strong><p id="book-dialog-reason"></p></div><p class="source-note">Apresentação editorial. O texto integral não está incluído. Procure uma edição brasileira autorizada.</p><button class="button gold full" type="button" id="save-dialog-book">☆ Salvar na biblioteca</button></div></dialog>
@@ -566,6 +568,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
   <script src="assets/supabase-config.js"></script>
+  <script src="assets/password-recovery.js?v=20261001"></script>
   <script src="assets/bible-data.js"></script>
   <script>
 (function(){
@@ -580,7 +583,7 @@
 })();
 </script>
   <script src="assets/reino-courses.js"></script>
-  <script src="assets/app.js?v=20261001-profile-photo"></script>
+  <script src="assets/app.js?v=20261001-password-recovery"></script>
   <script src="assets/course-hub.js?v=rh-20261001"></script>
   <script src="assets/reino-radio.js?v=20261001-49"></script>
 </body>
