@@ -326,3 +326,8 @@ input,select,textarea,button{max-width:100%}
 @media(max-width:720px){.reino-footer.reino-footer-compact{grid-template-columns:minmax(0,1fr);gap:1rem;padding:1.25rem 1rem .75rem;font-size:.7rem}.reino-footer-compact .footer-brand,.reino-footer-compact .footer-message,.reino-footer-compact .footer-credits,.reino-footer-compact .footer-social,.reino-footer-compact .footer-security-badge{grid-column:1}.reino-footer-compact .footer-brand,.reino-footer-compact .footer-credits{text-align:left}.reino-footer-compact .footer-message{text-align:center}.reino-footer-compact .footer-security-badge{justify-self:end}}
 
 .reino-footer-compact .footer-social-icons{display:flex;align-items:center;gap:1rem;opacity:1}.footer-social-icon{display:block;flex-shrink:0;color:var(--navy,#071a34)}
+
+/* Selo de conexão com maior legibilidade. */
+.reino-footer-compact .footer-security-badge{gap:.55rem;padding:.55rem .85rem;font-size:.8rem;font-weight:600;border-width:1.5px;line-height:1.4}
+.reino-footer-compact .footer-security-badge svg{width:23px;height:23px}
+@media(max-width:720px){.reino-footer-compact .footer-security-badge{font-size:.78rem;padding:.5rem .8rem}}
