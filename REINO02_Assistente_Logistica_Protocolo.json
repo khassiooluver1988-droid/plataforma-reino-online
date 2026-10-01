@@ -1,0 +1,27 @@
+{
+  "reference": "DESENVOLVIMENTO/CURSOS/02/REINO/00006",
+  "registeredAt": "2026-10-01T01:29:15.888957-03:00",
+  "name": "Assistente de Logística — Gestão de Negócios",
+  "courseCode": "CURSO/GES/02/REINO02/00002",
+  "hours": 40,
+  "modules": 5,
+  "lessons": 25,
+  "moduleExerciseCount": 20,
+  "finalQuestionCount": 50,
+  "passScore": 7,
+  "sources": [
+    "Sebrae — controle de estoque",
+    "SINIR — logística reversa"
+  ],
+  "scope": "Adicionar novo curso e cartão à categoria; preservar todos os cursos e demais arquivos existentes.",
+  "checks": [
+    "150 identificadores e enunciados únicos",
+    "38h nos módulos e 2h para revisão e prova",
+    "Certificado bloqueado antes da aprovação",
+    "34 acertos reprovam; 35 aprovam",
+    "Reprovação exige novo ciclo, preservando histórico",
+    "Gabarito final privado",
+    "Endpoint real sem sessão: 401"
+  ],
+  "status": "Curso preparado e serviço publicado; arquivos aguardam publicação do site."
+}
