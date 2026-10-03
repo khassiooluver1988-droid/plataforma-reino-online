@@ -68,14 +68,40 @@ function setAuthMode(mode){
   authMessage('login-status','');authMessage('signup-status','');
   setTimeout(()=>document.getElementById(login?'login-email':'signup-name')?.focus(),50);
 }
+async function setupGoogleAccess(client){
+  const button=document.getElementById('google-login');
+  if(!button)return;
+  button.addEventListener('click',async()=>{
+    button.disabled=true;authMessage('google-status','Conectando ao Google...');
+    try{
+      const redirect=new URL('index.html',location.href);
+      const destination=safeReturnDestination();
+      if(destination)redirect.searchParams.set('return',destination);
+      const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:redirect.href}});
+      if(error)throw error;
+    }catch{
+      authMessage('google-status','Não foi possível conectar ao Google. Tente novamente ou use e-mail e senha.',true);
+      button.disabled=false;
+    }
+  });
+  try{
+    const response=await fetch(REINO_SUPABASE_URL+'/auth/v1/settings',{headers:{apikey:REINO_SUPABASE_PUBLISHABLE_KEY}});
+    if(!response.ok)return;
+    const settings=await response.json();
+    if(settings.external?.google===true)document.getElementById('google-access').hidden=false;
+  }catch{/* O acesso por e-mail continua disponível se a consulta falhar. */}
+}
 async function setupFirstAccess(){
   const gate=document.getElementById('auth-gate'),client=window.REINO_SUPABASE;
   document.body.classList.add('auth-locked');
   if(!client){authMessage('login-status','Conexão com Supabase indisponível.',true);return}
+  setupGoogleAccess(client);
   const {data:{session}}=await client.auth.getSession();
   if(session?.user){
     await cacheAuthenticatedUser(session.user);
     gate.classList.add('authenticated');document.body.classList.remove('auth-locked');
+    const returnedHash=new URLSearchParams(location.hash.slice(1));
+    if(returnedHash.has('access_token')){history.replaceState(null,'',location.pathname+location.search+'#inicio');activateRoute();}
     const destination=safeReturnDestination();if(destination)location.replace(destination);
     return
   }
@@ -121,7 +147,7 @@ async function setupFirstAccess(){
 }
 // Evita o acúmulo de abas: toda a plataforma navega na mesma janela.
 document.querySelectorAll('a[target="_blank"]').forEach(link=>link.removeAttribute('target'));
-function activateRoute(){const authHash=new URLSearchParams(location.hash.slice(1));if(authHash.get('type')==='recovery'||authHash.has('error_description'))return;const route=(location.hash||'#inicio').slice(1);const page=document.getElementById(route)||document.getElementById('inicio');if(page.id!==route&&route!=='inicio')history.replaceState(null,'','#inicio');document.querySelectorAll('.page').forEach(item=>item.classList.remove('active'));page.classList.add('active');document.querySelectorAll('[data-route]').forEach(link=>{const active=link.dataset.route===page.id;link.classList.toggle('active',active);if(active)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current')});document.getElementById('page-title').textContent=page.dataset.title;document.title=`${page.dataset.title} | Plataforma Reino`;window.scrollTo({top:0,left:0,behavior:'instant'});document.body.classList.remove('menu-open');document.querySelector('.mobile-menu')?.setAttribute('aria-expanded','false')}
+function activateRoute(){const authHash=new URLSearchParams(location.hash.slice(1));if(authHash.get('type')==='recovery'||authHash.has('error_description')||authHash.has('access_token'))return;const route=(location.hash||'#inicio').slice(1);const page=document.getElementById(route)||document.getElementById('inicio');if(page.id!==route&&route!=='inicio')history.replaceState(null,'','#inicio');document.querySelectorAll('.page').forEach(item=>item.classList.remove('active'));page.classList.add('active');document.querySelectorAll('[data-route]').forEach(link=>{const active=link.dataset.route===page.id;link.classList.toggle('active',active);if(active)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current')});document.getElementById('page-title').textContent=page.dataset.title;document.title=`${page.dataset.title} | Plataforma Reino`;window.scrollTo({top:0,left:0,behavior:'instant'});document.body.classList.remove('menu-open');document.querySelector('.mobile-menu')?.setAttribute('aria-expanded','false')}
 window.addEventListener('hashchange',activateRoute);activateRoute();
 const promoSlides=[...document.querySelectorAll('[data-promo-slide]')];
 const promoDots=[...document.querySelectorAll('[data-promo-dot]')];
