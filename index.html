@@ -30,6 +30,7 @@
 @media(max-width:760px){.top-actions{width:100%;gap:10px}.reino-radio{flex-basis:100%;max-width:100%;justify-content:space-between}.reino-radio input{width:90px}}
 </style>
 <style>#password-recovery-dialog [hidden]{display:none!important}#password-recovery-dialog input{width:100%}#password-recovery-dialog form{display:grid;gap:16px}#password-recovery-status{margin-top:16px}</style>
+<style>#google-access[hidden]{display:none!important}#google-login:disabled{opacity:.6;cursor:wait}</style>
 </head>
 <body>
   <section class="auth-gate" id="auth-gate" aria-labelledby="access-title">
@@ -66,6 +67,10 @@
           <button class="button gold full auth-enter-button" type="submit">CRIAR MINHA CONTA →</button>
           <p class="auth-form-status" id="signup-status" role="status" aria-live="polite"></p>
         </form>
+        <div id="google-access" hidden style="margin-top:20px">
+          <button id="google-login" class="button full" type="button" style="background:#fff;color:#071a34;border:1px solid #d8b05d">Entrar com Google</button>
+          <p id="google-status" class="auth-form-status" role="status" aria-live="polite"></p>
+        </div>
         <div class="access-trust"><span>✓ Cadastro rápido</span><span>✓ Sessão persistente</span><span>✓ Senha protegida</span></div>
         <p class="auth-note">Sua senha é processada pelo Supabase Auth e não é salva no código da Plataforma Reino.</p>
       </div>
@@ -584,7 +589,7 @@
 })();
 </script>
   <script src="assets/reino-courses.js"></script>
-  <script src="assets/app.js?v=20261001-password-recovery"></script>
+  <script src="assets/app.js?v=20261003-google-login"></script>
   <script src="assets/course-hub.js?v=rh-20261001"></script>
   <script src="assets/reino-radio.js?v=20261001-49"></script>
   <script src="assets/cuidador-hub.js?v=20261001"></script>
