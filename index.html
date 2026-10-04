@@ -53,6 +53,13 @@
 </style>
 <style>#password-recovery-dialog [hidden]{display:none!important}#password-recovery-dialog input{width:100%}#password-recovery-dialog form{display:grid;gap:16px}#password-recovery-status{margin-top:16px}</style>
 <style>#google-access[hidden]{display:none!important}#google-login:disabled{opacity:.6;cursor:wait}</style>
+
+<style id="professional-course-opportunity-style">
+.professional-course-opportunity{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(7,26,52,.72)}
+.professional-course-opportunity.is-open{display:flex}.professional-course-opportunity-card{width:min(560px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 24px 70px rgba(0,0,0,.28)}
+.professional-course-opportunity-card img{width:100%;height:210px;object-fit:cover;display:block;border-radius:18px 18px 0 0}.professional-course-opportunity-body{padding:22px}.professional-course-opportunity-body h2{margin:0 0 10px;color:#071a34}.professional-course-opportunity-body p{margin:0 0 16px}
+.professional-course-opportunity-fields{display:grid;gap:12px}.professional-course-opportunity-fields label{display:grid;gap:6px;font-weight:700}.professional-course-opportunity-fields input{width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid #aab7c4;border-radius:9px;font:inherit}.professional-course-opportunity-choice{display:flex;gap:18px;flex-wrap:wrap}.professional-course-opportunity-choice label{display:flex;align-items:center;gap:7px}.professional-course-opportunity-actions{margin-top:18px}.professional-course-opportunity-actions button{width:100%}
+</style>
 </head>
 <body>
   <section class="auth-gate" id="auth-gate" aria-labelledby="access-title">
@@ -615,6 +622,28 @@
   <script src="assets/course-hub.js?v=rh-20261001"></script>
   <script src="assets/reino-radio.js?v=20261001-49"></script>
   <script src="assets/cuidador-hub.js?v=20261001"></script>
+
+<div class="professional-course-opportunity" id="professional-course-opportunity-modal" role="dialog" aria-modal="true" aria-labelledby="professional-course-opportunity-title">
+  <div class="professional-course-opportunity-card">
+    <img id="professional-course-opportunity-image" src="assets/course-visuals/capa-assistente-administrativo.webp" alt="Jovens em ambiente profissional durante atividade de trabalho">
+    <div class="professional-course-opportunity-body">
+      <span class="eyebrow">OPORTUNIDADES PROFISSIONAIS</span>
+      <h2 id="professional-course-opportunity-title">Quer receber vagas de emprego e estágio relacionadas ao seu curso?</h2>
+      <p>Responda uma única vez antes de iniciar sua formação profissional.</p>
+      <form id="professional-course-opportunity-form">
+        <div class="professional-course-opportunity-fields">
+          <label>E-mail<input id="professional-course-opportunity-email" type="email" autocomplete="email" required></label>
+          <label>Telefone<input id="professional-course-opportunity-phone" type="tel" autocomplete="tel" required></label>
+          <fieldset><legend>Deseja receber essas oportunidades?</legend><div class="professional-course-opportunity-choice"><label><input type="radio" name="professional-course-opportunity-consent" value="sim" required> Sim</label><label><input type="radio" name="professional-course-opportunity-consent" value="nao" required> Não</label></div></fieldset>
+        </div>
+        <div class="professional-course-opportunity-actions"><button class="button navy" type="submit">Continuar para o curso</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+<script id="professional-course-opportunity-script">
+(()=>{const modal=document.getElementById('professional-course-opportunity-modal'),form=document.getElementById('professional-course-opportunity-form'),img=document.getElementById('professional-course-opportunity-image');if(!modal||!form)return;let destination='',courseId='';const key=id=>'reino-professional-opportunity-v1:'+id;document.addEventListener('click',e=>{const link=e.target.closest('[data-reino02-course] a.button[href]');if(!link)return;const card=link.closest('[data-reino02-course]');courseId=card?.dataset.reino02Course||'';if(!courseId||localStorage.getItem(key(courseId)))return;e.preventDefault();destination=link.href;const courseImg=card.querySelector('img');if(courseImg){img.src=courseImg.src;img.alt=courseImg.alt||img.alt;}modal.classList.add('is-open');document.body.style.overflow='hidden';document.getElementById('professional-course-opportunity-email')?.focus();});form.addEventListener('submit',e=>{e.preventDefault();const email=document.getElementById('professional-course-opportunity-email').value.trim(),phone=document.getElementById('professional-course-opportunity-phone').value.trim(),consent=form.querySelector('input[name="professional-course-opportunity-consent"]:checked')?.value;if(!email||!phone||!consent||!courseId||!destination)return;localStorage.setItem(key(courseId),JSON.stringify({email,phone,consent,answeredAt:new Date().toISOString()}));window.location.href=destination;});})();
+</script>
 </body>
 </html>
 
