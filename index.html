@@ -547,11 +547,7 @@
         </div>
       </section>
 
-      <section class="launch-countdown launch-countdown-visual" aria-label="Contagem regressiva para o lançamento">
-  <img class="launch-countdown-bg" src="assets/capa-missoes-v2.webp" alt="" aria-hidden="true">
-  <div class="launch-countdown-copy"><span class="eyebrow">CONTAGEM REGRESSIVA • REINO 01</span><h2>Já, já estaremos no ar!</h2><p>Lançamento da Plataforma Reino em <strong>29 de outubro de 2026 • 00:00</strong>.</p><small>Fé, conteúdo, comunidade e propósito em um só lugar.</small></div>
-  <div class="launch-units"><span><strong id="launch-days">00</strong><small>DIAS</small></span><span><strong id="launch-hours">00</strong><small>HORAS</small></span><span><strong id="launch-minutes">00</strong><small>MINUTOS</small></span><span><strong id="launch-seconds">00</strong><small>SEGUNDOS</small></span></div>
-</section>
+
 <footer class="reino-footer reino-footer-compact">
   <span class="footer-brand">Plataforma Reino • 2026</span>
   <p class="footer-message">Cristo é o centro. A tecnologia é a ferramenta. As pessoas são a missão.</p>
@@ -576,19 +572,8 @@
   <script src="assets/supabase-config.js"></script>
   <script src="assets/password-recovery.js?v=20261001"></script>
   <script src="assets/bible-data.js"></script>
-  <script>
-(function(){
-  const target=Date.parse('2026-10-29T00:00:00-03:00');
-  const ids=['launch-days','launch-hours','launch-minutes','launch-seconds'];
-  function tick(){
-    const diff=Math.max(0,target-Date.now());
-    const values=[Math.floor(diff/86400000),Math.floor((diff%86400000)/3600000),Math.floor((diff%3600000)/60000),Math.floor((diff%60000)/1000)];
-    ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.textContent=String(values[i]).padStart(2,'0')});
-  }
-  tick();window.setInterval(tick,1000);
-})();
-</script>
-  <script src="assets/reino-courses.js"></script>
+
+<script src="assets/reino-courses.js"></script>
   <script src="assets/app.js?v=20261003-google-login"></script>
   <script src="assets/course-hub.js?v=rh-20261001"></script>
   <script src="assets/reino-radio.js?v=20261001-49"></script>
